@@ -1,5 +1,5 @@
 ---
-name: README API
+name: Prometh README API
 description: Specialized README.md template for APIs, libraries, and SDKs with comprehensive endpoint documentation
 ---
 

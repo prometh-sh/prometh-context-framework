@@ -1,5 +1,5 @@
 ---
-name: Technical Documentation
+name: Prometh Technical Documentation
 description: Formal technical writing for DevOps, SRE, and Cloud engineering teams
 ---
 

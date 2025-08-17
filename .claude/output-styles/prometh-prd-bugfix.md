@@ -1,5 +1,5 @@
 ---
-name: PRD Bug Fix
+name: Prometh PRD Bug Fix
 description: Specialized for converting bug reports and issues into comprehensive PRDs with emphasis on problem analysis and remediation strategy
 ---
 

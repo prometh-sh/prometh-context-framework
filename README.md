@@ -30,8 +30,10 @@ A powerful command-line framework for AI-driven document normalization and techn
 ## Features
 
 - **PRD Normalization**: Convert documents from various formats into standardized Product Requirements Documents
+- **Smart Repository Initialization**: Analyze poorly documented codebases and generate comprehensive PRDs with intelligent thinking depth options
 - **README Generation**: Auto-generate comprehensive README.md files for any repository type
 - **Document Intelligence**: Automatically detect document types and apply appropriate formatting styles
+- **Intelligent Analysis Levels**: Choose from basic to ultra-comprehensive codebase analysis (`--think` to `--ultrathink`)
 - **Cross-platform**: Works on Windows, macOS, and Linux with Claude Code
 - **Fast & Lightweight**: Bash-based installation with minimal dependencies
 - **Configurable**: Multiple output styles for different document types and project structures
@@ -96,13 +98,16 @@ ls ~/.claude/output-styles/
 
 ```bash
 # PRD Normalization - convert documents to standardized PRDs
-/prd-normalize bug-report.pdf
+/prometh-prd-normalize bug-report.pdf
+
+# Smart Repository Analysis - analyze poorly documented repositories
+/prometh-init --think
 
 # README Generation - create comprehensive README files
-/document readme
+/prometh-document readme
 
 # Technical Documentation - generate other doc types
-/document runbook
+/prometh-document runbook
 ```
 
 ### Your First Command
@@ -113,7 +118,7 @@ mkdir -p docs/inbox
 cp your-document.pdf docs/inbox/
 
 # 2. Run PRD normalization
-/prd-normalize
+/prometh-prd-normalize
 
 # 3. Check generated PRD
 ls docs/prds/
@@ -138,25 +143,26 @@ ls docs/prds/
 
 | Command | Description | Arguments |
 |---------|-------------|-----------|
-| `/prd-normalize` | Convert documents to PRDs | `[filename]` (optional) |
-| `/document` | Generate technical documentation | `[type]` (required) |
+| `/prometh-prd-normalize` | Convert documents to PRDs | `[filename]` (optional) |
+| `/prometh-init` | Smart repository analysis and PRD generation | `[thinking-option]` (optional) |
+| `/prometh-document` | Generate technical documentation | `[type]` (required) |
 
 ### Document Types Supported
 
 | Input Format | Output Style | Use Case |
 |--------------|--------------|----------|
-| PDF, Markdown, Text | `prd-bugfix` | Bug reports, issue documents |
-| Feature specs, Requirements | `prd-feature` | New feature requests |
-| General documents | `prd-standard` | Comprehensive requirements |
-| Repository analysis | `readme-cli` | CLI tool documentation |
-| API/Library analysis | `readme-api` | Service documentation |
-| General projects | `readme-standard` | Standard README files |
+| PDF, Markdown, Text | `prometh-prd-bugfix` | Bug reports, issue documents |
+| Feature specs, Requirements | `prometh-prd-feature` | New feature requests |
+| General documents | `prometh-prd-standard` | Comprehensive requirements |
+| Repository analysis | `prometh-readme-cli` | CLI tool documentation |
+| API/Library analysis | `prometh-readme-api` | Service documentation |
+| General projects | `prometh-readme-standard` | Standard README files |
 
 ## Commands
 
 ### Core Commands
 
-#### `/prd-normalize [filename]`
+#### `/prometh-prd-normalize [filename]`
 
 Normalize documents from `docs/inbox/` into standardized PRD format.
 
@@ -174,21 +180,55 @@ Normalize documents from `docs/inbox/` into standardized PRD format.
 
 ```bash
 # Process all documents in inbox
-/prd-normalize
+/prometh-prd-normalize
 
 # Process specific document
-/prd-normalize bug-report-login-issue.pdf
+/prometh-prd-normalize bug-report-login-issue.pdf
 
 # Process feature request
-/prd-normalize feature-request-dark-mode.md
+/prometh-prd-normalize feature-request-dark-mode.md
 ```
 
 **Output Styles Applied:**
-- **Bug/Issue Reports** → `prd-bugfix` style
-- **Feature Requests** → `prd-feature` style  
-- **General Requirements** → `prd-standard` style
+- **Bug/Issue Reports** → `prometh-prd-bugfix` style
+- **Feature Requests** → `prometh-prd-feature` style  
+- **General Requirements** → `prometh-prd-standard` style
 
-#### `/document [type]`
+#### `/prometh-init [thinking-option]`
+
+Smart repository initialization that analyzes poorly documented codebases and generates comprehensive PRDs.
+
+**Arguments:**
+- `thinking-option` (optional) - Analysis depth level
+
+**Available Thinking Levels:**
+| Option | Analysis Depth | Duration | Capabilities |
+|--------|----------------|----------|--------------|
+| `--think` | Basic | 2-3 min | Structure, dependencies, tech stack |
+| `--think-hard` | Deep | 5-8 min | Architecture, APIs, security assessment |
+| `--think-harder` | Advanced | 10-15 min | User flows, integrations, business logic |
+| `--ultrathink` | Comprehensive | 20-30 min | Domain modeling, strategy, competitive analysis |
+
+**Examples:**
+
+```bash
+# Basic repository analysis
+/prometh-init --think
+
+# Deep codebase analysis
+/prometh-init --think-hard
+
+# Advanced business logic extraction
+/prometh-init --think-harder
+
+# Comprehensive strategic analysis
+/prometh-init --ultrathink
+
+# Default analysis (basic level)
+/prometh-init
+```
+
+#### `/prometh-document [type]`
 
 Generate comprehensive technical documentation.
 
@@ -199,38 +239,38 @@ Generate comprehensive technical documentation.
 | Type | Description | Output Style |
 |------|-------------|--------------|
 | `readme` | Repository README.md files | Auto-detected (cli/api/standard) |
-| `runbook` | Operational procedures | Technical Documentation |
-| `architecture` | System design docs | Technical Documentation |
-| `api` | Service endpoints | Technical Documentation |
-| `deployment` | CI/CD processes | Technical Documentation |
-| `troubleshooting` | Diagnostic guides | Technical Documentation |
-| `compliance` | Security controls | Technical Documentation |
+| `runbook` | Operational procedures | Prometh Technical Documentation |
+| `architecture` | System design docs | Prometh Technical Documentation |
+| `api` | Service endpoints | Prometh Technical Documentation |
+| `deployment` | CI/CD processes | Prometh Technical Documentation |
+| `troubleshooting` | Diagnostic guides | Prometh Technical Documentation |
+| `compliance` | Security controls | Prometh Technical Documentation |
 
 **Examples:**
 
 ```bash
 # Generate README for current repository
-/document readme
+/prometh-document readme
 
 # Generate operational runbook
-/document runbook
+/prometh-document runbook
 
 # Generate API documentation
-/document api
+/prometh-document api
 
 # Generate system architecture docs
-/document architecture
+/prometh-document architecture
 ```
 
 ### README Generation Features
 
-The `/document readme` command automatically:
+The `/prometh-document readme` command automatically:
 
 1. **Analyzes Repository Structure**: Examines codebase to determine project type
 2. **Auto-detects Style**: Chooses appropriate template:
-   - `readme-cli`: For command-line tools (like this project)
-   - `readme-api`: For APIs and libraries
-   - `readme-standard`: For general repositories
+   - `prometh-readme-cli`: For command-line tools (like this project)
+   - `prometh-readme-api`: For APIs and libraries
+   - `prometh-readme-standard`: For general repositories
 3. **Smart File Handling**: Creates README-new.md if README.md exists
 4. **Extracts Real Examples**: Uses actual code from your repository
 
@@ -256,17 +296,18 @@ prometh-context-framework/
 The framework includes several specialized output styles:
 
 #### PRD Styles
-- **prd-standard**: General requirements and feature documents
-- **prd-bugfix**: Bug/issue reports with systematic resolution focus
-- **prd-feature**: Feature requests with market analysis and user value
+- **prometh-prd-standard**: General requirements and feature documents
+- **prometh-prd-bugfix**: Bug/issue reports with systematic resolution focus
+- **prometh-prd-feature**: Feature requests with market analysis and user value
+- **prometh-prd-codebase-analysis**: Repository initialization and codebase analysis scenarios
 
 #### README Styles  
-- **readme-standard**: Comprehensive README for general repositories
-- **readme-api**: API/library documentation with usage examples
-- **readme-cli**: CLI tool documentation with installation guides
+- **prometh-readme-standard**: Comprehensive README for general repositories
+- **prometh-readme-api**: API/library documentation with usage examples
+- **prometh-readme-cli**: CLI tool documentation with installation guides
 
 #### Technical Documentation
-- **technical-documentation**: For runbooks, architecture, and operational docs
+- **prometh-technical-documentation**: For runbooks, architecture, and operational docs
 
 ### File Naming Conventions
 
@@ -288,7 +329,7 @@ The framework includes several specialized output styles:
 cp critical-login-bug.pdf docs/inbox/
 
 # Process the document
-/prd-normalize critical-login-bug.pdf
+/prometh-prd-normalize critical-login-bug.pdf
 ```
 
 **Output:**
@@ -309,7 +350,7 @@ cp *.pdf docs/inbox/
 cp feature-requests/*.md docs/inbox/
 
 # Process all documents
-/prd-normalize
+/prometh-prd-normalize
 ```
 
 **Output:**
@@ -331,37 +372,63 @@ Summary:
 ```bash
 # For a CLI tool project
 cd my-cli-tool
-/document readme
-# → Generates README.md using readme-cli style
+/prometh-document readme
+# → Generates README.md using prometh-readme-cli style
 
 # For an API project  
 cd my-api-service
-/document readme
-# → Generates README.md using readme-api style
+/prometh-document readme
+# → Generates README.md using prometh-readme-api style
 
 # For a general project
 cd my-web-app
-/document readme  
-# → Generates README.md using readme-standard style
+/prometh-document readme  
+# → Generates README.md using prometh-readme-standard style
 ```
 
 ### Example 4: Technical Documentation Generation
 
 ```bash
 # Generate operational runbook
-/document runbook
+/prometh-document runbook
 # → Creates comprehensive operational procedures
 
 # Generate architecture documentation
-/document architecture
+/prometh-document architecture
 # → Documents system design and component relationships
 
 # Generate troubleshooting guide
-/document troubleshooting
+/prometh-document troubleshooting
 # → Creates diagnostic procedures and common issue solutions
 ```
 
-### Example 5: Advanced Workflow Integration
+### Example 5: Repository Initialization with Different Thinking Levels
+
+```bash
+# Clone a poorly documented repository
+git clone https://github.com/example/legacy-project.git
+cd legacy-project
+
+# Basic analysis - quick overview
+/prometh-init --think
+# → Generates: current-state-analysis-prd.md, feature-inventory-prd.md
+
+# Deep analysis - comprehensive understanding  
+/prometh-init --think-hard
+# → Additional: technical-architecture-prd.md, security-analysis-prd.md
+
+# Advanced analysis - business context extraction
+/prometh-init --think-harder  
+# → Additional: user-journey-analysis-prd.md, integration-analysis-prd.md
+
+# Ultra-comprehensive analysis - strategic insights
+/prometh-init --ultrathink
+# → Additional: strategic-roadmap-prd.md, competitive-analysis-prd.md
+
+# Result: Fully documented project with strategic development guidance
+```
+
+### Example 6: Advanced Workflow Integration
 
 ```bash
 # Complete document processing workflow
@@ -373,12 +440,15 @@ cp issue-reports/*.md docs/inbox/
 cp feature-requests/*.txt docs/inbox/
 
 # Normalize all documents
-/prd-normalize
+/prometh-prd-normalize
+
+# Initialize repository analysis
+/prometh-init --think-hard
 
 # Generate project documentation
-/document readme
-/document architecture
-/document deployment
+/prometh-document readme
+/prometh-document architecture
+/prometh-document deployment
 
 # Result: Comprehensive project documentation suite
 ```
@@ -391,15 +461,23 @@ Add useful aliases to your shell configuration:
 
 ```bash
 # ~/.bashrc or ~/.zshrc
-alias prd='/prd-normalize'
-alias doc='/document'
+alias prd='/prometh-prd-normalize'
+alias doc='/prometh-document'
+alias init='/prometh-init'
 alias prd-status='ls -la docs/prds/ docs/archive/'
 
 # Function for quick PRD processing
 prd-quick() {
     cp "$1" docs/inbox/
-    /prd-normalize "$(basename "$1")"
+    /prometh-prd-normalize "$(basename "$1")"
     echo "PRD generated in docs/prds/"
+}
+
+# Function for repository analysis
+repo-analyze() {
+    local depth=${1:-"--think"}
+    /prometh-init "$depth"
+    echo "Repository analysis complete. Check docs/prds/ for generated PRDs."
 }
 ```
 
@@ -422,14 +500,14 @@ alias recent-prds='ls -lt docs/prds/ | head -10'
 ```bash
 # Add to your git workflow
 git-doc() {
-    /document readme
+    /prometh-document readme
     git add README.md
     git commit -m "docs: update README.md with latest project structure"
 }
 
 # PRD workflow with git
 prd-commit() {
-    /prd-normalize
+    /prometh-prd-normalize
     git add docs/prds/
     git commit -m "docs: add normalized PRDs from latest requirements"
 }
@@ -476,12 +554,12 @@ docs/
 **Git Integration:**
 ```bash
 # Process documents and commit results
-/prd-normalize
+/prometh-prd-normalize
 git add docs/prds/
 git commit -m "docs: add PRDs for sprint planning"
 
 # Generate updated README
-/document readme --update
+/prometh-document readme --update
 git add README.md
 git commit -m "docs: update README with latest features"
 ```
@@ -698,6 +776,7 @@ cp .claude/commands/my-command.md ~/.claude/commands/
 
 **Initial Release**
 - ✨ PRD normalization with auto-detection of document types
+- ✨ **Smart Repository Initialization** with intelligent thinking depth options
 - ✨ README generation with project type analysis
 - ✨ Technical documentation generation for DevOps workflows
 - ✨ Cross-platform setup script with safe installation
@@ -706,13 +785,20 @@ cp .claude/commands/my-command.md ~/.claude/commands/
 - 📚 Comprehensive documentation and examples
 - 🔧 Shell integration with aliases and functions
 
-**Features Added:**
-- `/prd-normalize` command with intelligent document classification
-- `/document readme` command with auto-style detection
-- `/document [type]` for technical documentation generation
+**Major Features Added:**
+- `/prometh-init` command with intelligent codebase analysis and thinking depth options (`--think` to `--ultrathink`)
+- `/prometh-prd-normalize` command with intelligent document classification
+- `/prometh-document readme` command with auto-style detection
+- `/prometh-document [type]` for technical documentation generation
 - Support for PDF, Markdown, and text file processing
 - Archive system with timestamped file management
-- Output styles: `prd-standard`, `prd-bugfix`, `prd-feature`, `readme-cli`, `readme-api`, `readme-standard`
+- Output styles: `prometh-prd-standard`, `prometh-prd-bugfix`, `prometh-prd-feature`, `prometh-prd-codebase-analysis`, `prometh-readme-cli`, `prometh-readme-api`, `prometh-readme-standard`, `prometh-technical-documentation`
+
+**Repository Analysis Capabilities:**
+- Basic analysis (`--think`): Technology stack, structure, dependencies
+- Deep analysis (`--think-hard`): Architecture patterns, API discovery, security assessment
+- Advanced analysis (`--think-harder`): User flows, integrations, business logic extraction
+- Comprehensive analysis (`--ultrathink`): Domain modeling, competitive analysis, strategic recommendations
 
 **Infrastructure:**
 - Apache 2.0 license

@@ -1,5 +1,5 @@
 ---
-name: PRD Feature
+name: Prometh PRD Feature
 description: Specialized for new feature development with emphasis on user value, market analysis, and comprehensive feature specification
 ---
 

@@ -4,14 +4,14 @@ argument-hint: "[type] [options] [path]"
 allowed-tools: ["Read", "Glob", "Grep", "LS", "Bash", "WebFetch"]
 ---
 
-# /document Command
+# /prometh-document Command
 
 Generate comprehensive technical documentation for DevOps, SRE, and Cloud engineering workflows. This command analyzes codebases, infrastructure configurations, and system architectures to produce standardized documentation that meets enterprise engineering standards.
 
 ## Usage
 
 ```bash
-/document [type] [options] [path]
+/prometh-document [type] [options] [path]
 ```
 
 ## Document Types
@@ -84,13 +84,13 @@ When executing this command, analyze and document:
 
 ## README Generation (New Feature)
 
-When using `/document readme`, the command will:
+When using `/prometh-document readme`, the command will:
 
 1. **Analyze Repository Structure**: Examine codebase to determine project type
 2. **Auto-detect Documentation Style**: Choose appropriate README template:
-   - **readme-standard**: General repositories with comprehensive sections
-   - **readme-api**: API/library documentation with usage examples  
-   - **readme-cli**: Command-line tools with installation instructions
+   - **prometh-readme-standard**: General repositories with comprehensive sections
+   - **prometh-readme-api**: API/library documentation with usage examples  
+   - **prometh-readme-cli**: Command-line tools with installation instructions
 3. **Generate Content**: Create well-structured README.md with:
    - Project description and features
    - Installation instructions
@@ -105,16 +105,16 @@ When using `/document readme`, the command will:
 
 ### README Examples:
 ```bash
-/document readme                    # Auto-detect project type
-/document readme --style api        # Force API documentation style
-/document readme --style cli        # Force CLI tool style
-/document readme --update           # Update existing README.md
+/prometh-document readme                    # Auto-detect project type
+/prometh-document readme --style api        # Force API documentation style
+/prometh-document readme --style cli        # Force CLI tool style
+/prometh-document readme --update           # Update existing README.md
 ```
 
 ## Implementation Instructions
 
-1. **For README generation**: Apply appropriate "readme-*" output style based on project analysis
-2. **For other document types**: Apply the "Technical Documentation" output style
+1. **For README generation**: Apply appropriate "prometh-readme-*" output style based on project analysis
+2. **For other document types**: Apply the "prometh-technical-documentation" output style
 3. Scan the specified path for relevant configuration and source files
 4. Analyze file contents and extract specifications
 5. Generate documentation following the specified type and format

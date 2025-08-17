@@ -1,5 +1,5 @@
 ---
-name: PRD Standard
+name: Prometh PRD Standard
 description: Transforms any document into a comprehensive PRD following 2025 best practices with structured sections and professional formatting
 ---
 

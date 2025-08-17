@@ -1,5 +1,5 @@
 ---
-name: README CLI
+name: Prometh README CLI
 description: Specialized README.md template for command-line tools with comprehensive installation and usage instructions
 ---
 
