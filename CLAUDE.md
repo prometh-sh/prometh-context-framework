@@ -8,58 +8,62 @@ The Prometh Context Framework is an AI tooling framework designed to provide pre
 
 ## Project Structure
 
-- `docs/inbox/` - Incoming documents for PRD normalization (PDFs, markdown, text files)
-- `docs/prds/` - Standardized Product Requirements Documents
+- `docs/prds/` - Strategic Product Requirements Documents (Epic-level)
+- `docs/specs/` - Implementation Specifications (User Story/Task-level)
 - `.claude/commands/` - Custom Claude Code slash commands
-- `.claude/output-styles/` - PRD output styles for document normalization
+- `.claude/output-styles/` - Output styles for document normalization
 - `LICENSE` - Apache License 2.0
 - `README.md` - Project overview and description
 
 ## Custom Commands
 
-### PRD Normalization Workflow
+### Understanding PRDs vs SPECs
 
-This project includes a custom `/prometh-prd-normalize` command that automatically converts documents from various formats into standardized PRDs.
+The framework distinguishes between two levels of requirements documentation:
+- **PRDs (Product Requirements Documents)**: Strategic, Epic-level initiatives requiring cross-functional alignment, market analysis, and business justification
+- **SPECs (Specifications)**: Implementation-focused, User Story/Task-level documentation for development teams
+
+### PRD Commands (Strategic Planning)
+
+#### `/prometh-prd`
+- Create new PRDs from scratch based on strategic descriptions
+- For quarterly planning, market positioning, cross-functional initiatives
+- Generates comprehensive business case and stakeholder alignment documents
+
+#### `/prometh-prd-normalize [filename]`
+- Normalize strategic documents into standardized PRD format
+- Supports single file or text input (no bulk processing)
+- Validates strategic scope vs. tactical implementation needs
 
 #### Available PRD Output Styles:
-- **prometh-prd-standard**: For general requirements and feature documents
-- **prometh-prd-bugfix**: Specialized for bug/issue reports converted to PRDs  
-- **prometh-prd-feature**: For new feature requests and development
-- **prometh-prd-codebase-analysis**: For repository initialization and codebase analysis scenarios
+- **prometh-prd-standard**: General strategic requirements and Epic-level planning
+- **prometh-prd-feature**: Major feature development with market analysis
+- **prometh-prd-bugfix**: Complex issues requiring strategic product decisions
 
-#### PRD Workflow:
-1. Place documents (PDF, markdown, text, etc.) in `docs/inbox/`
-2. Run `/prometh-prd-normalize` or `/prometh-prd-normalize [filename]`
-3. System analyzes document type and applies appropriate output style
-4. Generates standardized PRD in `docs/prds/` directory
+### SPEC Commands (Implementation Planning)
 
-#### Document Types Supported:
-- **Bug/Issue Reports**: Converted using `prometh-prd-bugfix` style with focus on problem analysis and resolution
-- **Feature Requests**: Processed using `prometh-prd-feature` style with market analysis and user value
-- **General Requirements**: Normalized using `prometh-prd-standard` style for comprehensive specification
+#### `/prometh-spec`
+- Create new SPECs from scratch based on implementation descriptions
+- For user stories, tasks, feature implementations, bug fixes
+- Generates implementation-ready specifications for development teams
 
-### Repository Initialization Workflow
+#### `/prometh-spec-normalize [filename]`
+- Normalize implementation documents into standardized SPEC format
+- Supports single file or text input
+- Focuses on tactical implementation details
 
-This project includes an advanced `/prometh-init` command that intelligently analyzes repositories with poor documentation and generates comprehensive PRDs based on codebase analysis.
+#### Available SPEC Output Styles:
+- **prometh-spec-feature**: New feature implementation (user stories)
+- **prometh-spec-bugfix**: Bug fixes and defects
+- **prometh-spec-enhancement**: Improvements to existing features
+- **prometh-spec-task**: Technical/maintenance tasks
 
-#### Available Thinking Depth Options:
-- **--think**: Basic repository analysis (file structure, dependencies, technology stack)
-- **--think-hard**: Deep analysis (architecture patterns, API discovery, security assessment)
-- **--think-harder**: Advanced analysis (user flows, integration patterns, business logic extraction)
-- **--ultrathink**: Comprehensive analysis (domain modeling, competitive analysis, strategic recommendations)
+### Documentation Generation
 
-#### Repository Initialization Workflow:
-1. Navigate to repository with poor or missing documentation
-2. Run `/prometh-init [thinking-option]` to analyze codebase
-3. System performs intelligent analysis based on selected depth level
-4. Generates multiple specialized PRDs using `prometh-prd-codebase-analysis` style
-5. Creates comprehensive documentation structure for ongoing development
-
-#### Repository Analysis Capabilities:
-- **Codebase Assessment**: Technology stack, architecture patterns, code quality analysis
-- **Feature Discovery**: Existing functionality inventory and business logic extraction
-- **Gap Analysis**: Missing documentation, technical debt, security vulnerabilities
-- **Strategic Planning**: Development roadmaps, prioritization recommendations, competitive positioning
+#### `/prometh-document [type]`
+- Generate technical documentation (README, runbooks, architecture docs)
+- Supports various documentation types with appropriate templates
+- Auto-detects project characteristics for relevant content
 
 ### README Generation Workflow
 
@@ -121,25 +125,37 @@ cp .claude/commands/prometh-*.md ~/.claude/commands/
 
 After installation, you will have access to:
 
-### `/prometh-prd-normalize [filename]`
-- Converts documents to standardized PRDs
-- Auto-detects document type (bug report, feature request, general requirements)
-- Applies appropriate output style automatically
-- Archives processed files with timestamps
+### Strategic Planning (PRDs)
 
-### `/prometh-init [thinking-option]`
-- Smart repository initialization and codebase analysis
-- Thinking depth options: `--think`, `--think-hard`, `--think-harder`, `--ultrathink`
-- Generates comprehensive PRDs from repository analysis
-- Creates complete documentation structure for poorly documented projects
-- Analyzes technology stack, architecture, features, and strategic opportunities
+#### `/prometh-prd`
+- Create new strategic PRDs from user descriptions
+- For Epic-level initiatives, market positioning, cross-functional projects
+- Generates comprehensive business case and stakeholder alignment
 
-### `/prometh-document readme [--style type]`
+#### `/prometh-prd-normalize [filename]`
+- Normalize strategic documents into standardized PRD format
+- Single file or text input processing
+- Validates strategic scope and business impact
+
+### Implementation Planning (SPECs)
+
+#### `/prometh-spec`
+- Create new implementation SPECs from user descriptions
+- For user stories, tasks, features, bug fixes
+- Generates implementation-ready specifications
+
+#### `/prometh-spec-normalize [filename]`
+- Normalize implementation documents into standardized SPEC format
+- Single file or text input processing
+- Focuses on tactical development details
+
+### Documentation Generation
+
+#### `/prometh-document readme [--style type]`
 - Generates comprehensive README.md files
 - Auto-detects project type (general, API, CLI tool)
 - Analyzes codebase for real examples and configuration
-- Creates README-new.md if README.md already exists
 
-### `/prometh-document [type]` 
+#### `/prometh-document [type]`
 - Generate other technical documentation types
 - Supports runbook, architecture, api, deployment, troubleshooting, compliance
