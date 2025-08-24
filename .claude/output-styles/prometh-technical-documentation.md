@@ -48,3 +48,7 @@ When generating documentation, ensure output maintains professional standards wh
 - Maintain formal technical writing standards without emojis
 - Use clean, professional formatting without decorative elements
 - Focus on factual information and technical precision
+
+---
+
+Generated with: **Prometh Context Framework by Prometh.sh**
