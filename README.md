@@ -7,7 +7,7 @@
 
 A comprehensive AI tooling framework that provides structured commands and templates for creating strategic Product Requirements Documents (PRDs), implementation Specifications (SPECs), and technical documentation. Designed to deliver predictable, high-quality output for software development teams.
 
-## 🔥 Features
+## Features
 
 ### Strategic Planning (PRDs)
 - **Epic-Level Documentation**: Create comprehensive PRDs for cross-functional initiatives
@@ -24,7 +24,7 @@ A comprehensive AI tooling framework that provides structured commands and templ
 - **Multi-Format Support**: README generation for general, API, and CLI projects
 - **Technical Documentation**: Runbooks, architecture docs, and operational procedures
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 
@@ -74,7 +74,7 @@ A comprehensive AI tooling framework that provides structured commands and templ
 /prometh-document runbook
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 prometh-context-framework/
@@ -95,7 +95,7 @@ prometh-context-framework/
 └── LICENSE                # Apache License 2.0
 ```
 
-## 📋 Available Commands
+## Available Commands
 
 | Command | Purpose | Output Location |
 |---------|---------|----------------|
@@ -105,7 +105,7 @@ prometh-context-framework/
 | `/prometh-spec-normalize [file]` | Convert documents to SPEC format | `docs/specs/` |
 | `/prometh-document [type]` | Generate technical documentation | Current directory |
 
-## 🎨 Output Styles
+## Output Styles
 
 ### PRD Styles (Strategic)
 - **prometh-prd-standard**: General strategic requirements and Epic-level planning
@@ -124,7 +124,7 @@ prometh-context-framework/
 - **prometh-readme-cli**: CLI tool documentation with installation guides
 - **prometh-technical-documentation**: Technical documentation for DevOps workflows
 
-## 🔧 Configuration
+## Configuration
 
 ### Directory Setup
 The framework expects the following directory structure:
@@ -139,7 +139,7 @@ export PROMETH_PRD_DIR="docs/prds"
 export PROMETH_SPEC_DIR="docs/specs"
 ```
 
-## 📖 Usage Examples
+## Usage Examples
 
 ### Creating a Strategic PRD
 ```bash
@@ -167,7 +167,7 @@ export PROMETH_SPEC_DIR="docs/specs"
 /prometh-document api
 ```
 
-## 🤝 Contributing
+## Contributing
 
 ### Development Setup
 1. Fork the repository
@@ -183,11 +183,11 @@ export PROMETH_SPEC_DIR="docs/specs"
 - Update documentation for new features
 - Maintain backward compatibility with existing commands
 
-## 📄 License
+## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
-## 🎯 Framework Philosophy
+## Framework Philosophy
 
 The Prometh Context Framework follows a dual-documentation approach:
 
@@ -196,7 +196,7 @@ The Prometh Context Framework follows a dual-documentation approach:
 
 This separation ensures that strategic planning remains focused on business value while implementation details stay practical and actionable.
 
-## 🔗 Related Projects
+## Related Projects
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) - Official Claude CLI tool
 - [Claude API](https://docs.anthropic.com/en/api) - Anthropic's Claude API documentation
