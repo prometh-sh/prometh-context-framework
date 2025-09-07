@@ -19,8 +19,9 @@ A comprehensive AI tooling framework that provides structured commands and templ
 
 ## Features
 
-### Simplified Command Structure
-- **3 Unified Commands**: Down from 5 separate commands for streamlined usage
+### Complete Implementation Workflow
+- **End-to-End Lifecycle**: From strategic vision to guided delivery
+- **6 Unified Commands**: Streamlined workflow with comprehensive tracking
 - **CLAUDE.md Validation**: Mandatory project configuration ensures proper context
 - **Smart Input Handling**: Supports file paths, text input, and interactive prompts
 
@@ -30,11 +31,13 @@ A comprehensive AI tooling framework that provides structured commands and templ
 - **Stakeholder Alignment**: Structured formats for quarterly planning and strategic decisions
 - **Scope Validation**: Automatic detection of strategic vs. tactical content
 
-### Implementation Planning (SPECs)
+### Implementation Planning & Execution (SPECs + BUILD)
 - **3-Phase Workflow**: Structured Planning → Task Breakdown → Implementation phases
+- **Guided Implementation**: Interactive execution with progress tracking (`/prometh-build`)
 - **User Story Documentation**: Task-level specifications ready for development teams
 - **Auto-Classification**: Automatic categorization as Feature/Bug Fix/Enhancement/Task
 - **Comprehensive Testing**: Built-in test strategies and acceptance criteria
+- **Complete Traceability**: Full visibility from strategic vision to delivery
 
 ### Documentation Generation
 - **Repository Analysis**: Smart analysis to determine appropriate documentation style
@@ -124,6 +127,15 @@ After installing the framework commands, initialize it in any project:
 /prometh-doc runbook
 ```
 
+#### Implementation Execution
+```bash
+# Execute SPEC with guided workflow
+/prometh-build docs/specs/user-authentication-spec.md
+
+# Resume implementation from last checkpoint
+/prometh-build docs/specs/payment-integration-spec.md
+```
+
 #### Status Dashboard
 ```bash
 # Full project status overview
@@ -141,12 +153,14 @@ After installing the framework commands, initialize it in any project:
 ```
 prometh-context-framework/
 ├── .claude/
-│   ├── commands/              # 5 unified Claude Code commands
+│   ├── commands/              # 6 unified Claude Code commands
 │   │   ├── prometh-init.md    # Framework initialization and project setup
 │   │   ├── prometh-prd.md     # Strategic PRD creation & normalization
 │   │   ├── prometh-spec.md    # Implementation SPEC creation & normalization
+│   │   ├── prometh-build.md   # Guided SPEC implementation execution
 │   │   ├── prometh-doc.md     # Technical documentation generation
-│   │   └── prometh-status.md  # Project documentation status dashboard
+│   │   ├── prometh-status.md  # Project documentation status dashboard
+│   │   └── prometh-help.md    # Comprehensive command reference
 │   └── output-styles/         # 4 unified templates
 │       ├── prometh-prd.md     # Unified PRD template
 │       ├── prometh-spec.md    # Unified SPEC template with workflow
@@ -168,8 +182,10 @@ prometh-context-framework/
 | `/prometh-init` | Initialize framework in project | N/A | Current directory |
 | `/prometh-prd` | Create or normalize strategic PRDs | Descriptions, file paths, interactive | `docs/prds/` |
 | `/prometh-spec` | Create or normalize implementation SPECs | User stories, bug reports, file paths, interactive, PRD references | `docs/specs/` |
+| `/prometh-build` | **Execute SPEC with guided implementation** | **SPEC file path (required)** | **PROMETH.md tracking** |
 | `/prometh-doc` | Generate technical documentation | `readme` or `runbook` types | Current directory |
 | `/prometh-status` | Display project documentation status dashboard | Optional flags: `--brief`, `--counts`, `--health` | Console output |
+| `/prometh-help` | Display comprehensive command reference | N/A | Console output |
 
 ## Framework Architecture
 
@@ -238,24 +254,52 @@ All commands require `CLAUDE.md` or `CLAUDE.local.md` in the project root:
 # Creates runbook based on system configuration analysis
 ```
 
-## 3-Phase SPEC Workflow
+## Complete Implementation Workflow
 
-All implementation SPECs include a structured workflow:
+**Your complete workflow is now:**
+```
+/prometh-prd → /prometh-spec → /prometh-build → Delivery
+Strategic      Implementation    Guided          Complete
+Vision         Planning          Execution       Traceability
+```
 
-### Phase 1: Planning
+### Phase 1: Strategic Planning (`/prometh-prd`)
+- Create strategic PRDs for Epic-level initiatives
+- Market analysis and business justification
+- Cross-functional alignment and stakeholder buy-in
+
+### Phase 2: Implementation Planning (`/prometh-spec`)
+- Convert PRDs into actionable SPECs
+- 3-phase workflow structure (Planning → Task Breakdown → Implementation)
+- Detailed acceptance criteria and technical requirements
+
+### Phase 3: Guided Execution (`/prometh-build`)
+- Interactive implementation tracking through SPEC phases
+- Real-time progress updates in PROMETH.md
+- Phase transition validation and milestone tracking
+- Complete traceability from strategic vision to delivery
+
+### 3-Phase SPEC Implementation Workflow
+
+When using `/prometh-build`, you'll be guided through:
+
+#### Phase 1: Planning
 - [ ] Requirements analysis and clarification
-- [ ] Technical design and architecture decisions
+- [ ] Technical design and architecture decisions  
 - [ ] Resource allocation and timeline estimation
+- [ ] Deliverable validation and sign-off
 
-### Phase 2: Task Breakdown
-- [ ] Create detailed development tasks
+#### Phase 2: Task Breakdown
+- [ ] Create detailed development tasks with priorities
 - [ ] Define acceptance criteria for each task
-- [ ] Identify dependencies and risk factors
+- [ ] Identify dependencies and critical path
+- [ ] Risk assessment and mitigation planning
 
-### Phase 3: Implementation
+#### Phase 3: Implementation
 - [ ] Execute development tasks in priority order
-- [ ] Perform testing and quality assurance
-- [ ] Deploy and validate in production environment
+- [ ] Perform integration testing and quality assurance
+- [ ] Deploy to staging and production environments
+- [ ] Validate against original SPEC acceptance criteria
 
 ## Configuration
 
@@ -320,16 +364,18 @@ This separation ensures that strategic planning remains focused on business valu
 
 ## Key Benefits
 
-### Simplified Usage
-- **5 Commands**: Includes initialization, status dashboard, and 3 core document commands for complete workflow
+### Complete Workflow Coverage
+- **6 Commands**: End-to-end lifecycle from strategic planning to guided delivery
+- **Interactive Execution**: `/prometh-build` provides guided implementation with progress tracking
 - **Unified Templates**: Single template per command type reduces complexity
 - **Smart Input**: Handles files, text, and interactive input seamlessly
 
 ### Enhanced Quality  
 - **Status Dashboard**: Real-time visibility into documentation health and progress
-- **3-Phase Workflow**: Structured implementation approach for SPECs
+- **Guided Implementation**: Interactive execution with `/prometh-build` for SPECs
+- **3-Phase Workflow**: Structured implementation approach with progress tracking
 - **Auto-Classification**: Prevents document type confusion
-- **Traceability Matrix**: Links between strategic PRDs and implementation SPECs
+- **Complete Traceability**: Full visibility from strategic PRDs through SPEC execution to delivery
 
 ### Consistent Output
 - **Unified Templates**: Predictable structure across all document types

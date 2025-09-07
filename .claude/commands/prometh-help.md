@@ -15,6 +15,8 @@ The Prometh Context Framework provides structured documentation workflows for st
 
 ## Available Commands
 
+All commands require PROMETH.md in project root. Use `/prometh-init` if missing.
+
 ### Framework Setup
 
 #### `/prometh-init`
@@ -89,6 +91,29 @@ The Prometh Context Framework provides structured documentation workflows for st
 
 ---
 
+### Implementation Execution
+
+#### `/prometh-build`
+**Purpose**: Execute SPEC implementation with 3-phase workflow tracking  
+**Input**: SPEC file path (required)  
+**Usage**: `/prometh-build docs/specs/user-authentication-spec.md`
+
+**3-Phase Execution:**
+- **Phase 1: Planning** - Interactive task completion for requirements analysis and technical design
+- **Phase 2: Task Breakdown** - Detailed development tasks and dependency mapping  
+- **Phase 3: Implementation** - Core development, testing, and deployment validation
+
+**Features:**
+- Interactive progress tracking with task completion
+- PROMETH.md status updates (Draft → Planning → Implementation → Completed)
+- Phase transition validation and milestone tracking
+- Resume sessions from last checkpoint
+- Complete traceability back to original PRD
+
+**Output**: Guided implementation workflow with comprehensive progress tracking
+
+---
+
 ### Project Status & Tracking
 
 #### `/prometh-status`
@@ -138,6 +163,22 @@ The Prometh Context Framework provides structured documentation workflows for st
 
 # Normalize existing user story
 /prometh-spec existing-user-story.md
+```
+
+### 4. Complete Implementation Workflow
+```bash
+# Create strategic PRD
+/prometh-prd
+# Input: "Launch comprehensive mobile platform"
+
+# Generate implementation SPEC from PRD
+/prometh-spec --from-prd docs/prds/mobile-platform-prd.md
+
+# Execute SPEC with guided implementation
+/prometh-build docs/specs/mobile-platform-implementation-spec.md
+
+# Monitor overall project status
+/prometh-status
 ```
 
 ---
@@ -211,11 +252,18 @@ cp .claude/commands/prometh-*.md ~/.claude/commands/
 - User stories requiring detailed implementation
 
 ### Document Lifecycle
-1. **PRD Creation** → Strategic planning and stakeholder alignment
-2. **SPEC Generation** → Implementation planning from PRDs
-3. **Development** → Execute SPEC phases (Planning → Task Breakdown → Implementation)  
-4. **Documentation** → Generate README/runbooks as needed
+1. **PRD Creation** → Strategic planning and stakeholder alignment (`/prometh-prd`)
+2. **SPEC Generation** → Implementation planning from PRDs (`/prometh-spec`)
+3. **Guided Implementation** → Execute SPEC phases with tracking (`/prometh-build`) 
+4. **Documentation** → Generate README/runbooks as needed (`/prometh-doc`)
 5. **Status Tracking** → Monitor progress via `/prometh-status`
+
+### Complete Implementation Flow
+```
+Strategic Vision (PRD) → Implementation Plan (SPEC) → Guided Execution (BUILD) → Delivery
+       ↓                        ↓                         ↓                    ↓
+  /prometh-prd            /prometh-spec            /prometh-build         Completed
+```
 
 ---
 
