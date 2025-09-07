@@ -225,6 +225,11 @@ Update the "Last Updated" timestamp at the top of PROMETH.md:
 
 ### 6. PROMETH.md Update Process
 
+**Privacy Note**: When updating PROMETH.md, ensure no private information is exposed:
+- Use relative paths (docs/filename.md) not absolute paths
+- Never include user directories or private file paths
+- Keep all content shareable with team members
+
 **Implementation Steps:**
 1. Read existing PROMETH.md (if exists)
 2. Parse technical documentation table

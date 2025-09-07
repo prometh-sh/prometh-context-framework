@@ -1,0 +1,247 @@
+---
+description: Display comprehensive help for all Prometh Context Framework commands with usage examples and workflow guidance.
+argument-hint: ""
+allowed-tools: []
+---
+
+# Prometh Context Framework - Help & Command Reference
+
+## 🔥 Prometh Context Framework
+*Just as Prometheus gave humanity fire, this framework gives AI users the tools to ignite high-quality, predictable output.*
+
+The Prometh Context Framework provides structured documentation workflows for strategic planning (PRDs) and implementation specifications (SPECs) with integrated project tracking.
+
+---
+
+## Available Commands
+
+### Framework Setup
+
+#### `/prometh-init`
+**Purpose**: Initialize Prometh Context Framework in any project  
+**Prerequisites**: Requires existing CLAUDE.md or CLAUDE.local.md (created via `/init`)  
+**Usage**: `/prometh-init`
+
+**What it does:**
+- Creates `docs/prds/` and `docs/specs/` directory structure
+- Initializes PROMETH.md tracking file for document inventory
+- Sets up project-wide documentation workflow
+- Provides context-aware guidance based on project state
+
+---
+
+### Strategic Planning (PRDs)
+
+#### `/prometh-prd`
+**Purpose**: Create strategic Product Requirements Documents  
+**Input Types**: Strategic descriptions, file paths (PDF/markdown/text), interactive prompts  
+**Usage**: 
+- `/prometh-prd` - Interactive mode with prompts
+- `/prometh-prd strategic-document.pdf` - Normalize existing file
+- `/prometh-prd` + paste strategic content - Process text input
+
+**Use Cases:**
+- Quarterly planning and roadmap initiatives
+- Market positioning and competitive strategy
+- Cross-functional initiatives requiring alignment
+- Major feature launches with business impact
+- Strategic technical decisions affecting multiple teams
+
+**Output**: Comprehensive PRD using unified `prometh-prd` template in `docs/prds/`
+
+---
+
+### Implementation Planning (SPECs)
+
+#### `/prometh-spec`
+**Purpose**: Create implementation specifications with 3-phase workflow  
+**Input Types**: Implementation descriptions, user stories, bug reports, file paths  
+**Usage**:
+- `/prometh-spec` - Interactive mode with prompts
+- `/prometh-spec user-story.md` - Normalize existing file
+- `/prometh-spec --from-prd mobile-strategy-prd.md` - Generate SPECs from PRD
+- `/prometh-spec` + paste implementation requirements - Process text input
+
+**Implementation Types:** Feature/Bug Fix/Enhancement/Technical Task
+
+**3-Phase Workflow:**
+- **Phase 1: Planning** - Requirements analysis, technical design, resource planning
+- **Phase 2: Task Breakdown** - Detailed development tasks, acceptance criteria, dependency mapping
+- **Phase 3: Implementation** - Core development, testing, deployment, validation
+
+**Output**: Comprehensive SPEC using unified `prometh-spec` template in `docs/specs/`
+
+---
+
+### Documentation Generation
+
+#### `/prometh-doc`
+**Purpose**: Generate technical documentation with auto-analysis  
+**Types**: `readme` and `runbook` documentation  
+**Usage**:
+- `/prometh-doc readme` - Generate comprehensive README.md
+- `/prometh-doc runbook` - Generate operational runbook
+
+**Features:**
+- Analyzes repository structure and system configuration
+- Uses unified templates for consistent documentation
+- Integrates with existing project context
+
+---
+
+### Project Status & Tracking
+
+#### `/prometh-status`
+**Purpose**: Display comprehensive project documentation dashboard  
+**Usage**:
+- `/prometh-status` - Full status dashboard
+- `/prometh-status --brief` - Condensed view
+- `/prometh-status --counts` - Document counts only
+- `/prometh-status --health` - Health metrics and suggestions
+
+**Dashboard Features:**
+- Document inventory summary (PRDs, SPECs, documentation)
+- Recent activity feed with chronological updates
+- Traceability matrix showing PRD → SPEC relationships
+- Health metrics and context-aware next step suggestions
+
+---
+
+## Workflow Examples
+
+### 1. Strategic Initiative → Implementation
+```bash
+# Create strategic PRD
+/prometh-prd
+# Input: "Launch comprehensive mobile platform for customer self-service"
+
+# Generate implementation SPECs from PRD
+/prometh-spec --from-prd docs/prds/mobile-customer-platform-prd.md
+
+# Check project status
+/prometh-status
+```
+
+### 2. Bug Report → SPEC
+```bash
+# Convert bug report to implementation SPEC
+/prometh-spec critical-payment-bug.pdf
+
+# Generate project documentation
+/prometh-doc readme
+```
+
+### 3. Document Normalization
+```bash
+# Normalize existing strategic document
+/prometh-prd quarterly-planning-deck.pdf
+
+# Normalize existing user story
+/prometh-spec existing-user-story.md
+```
+
+---
+
+## Key Features
+
+### ✅ **CLAUDE.md Validation**
+All commands require CLAUDE.md or CLAUDE.local.md in project root. Use `/init` to create if missing.
+
+### 📊 **Integrated Tracking**
+PROMETH.md file maintains:
+- Complete document inventory with status tracking
+- Traceability matrix linking PRDs to SPECs
+- Recent activity log with chronological updates
+- Context-aware next step suggestions
+
+### 🎯 **Intelligent Classification**
+- Automatic PRD vs SPEC scope detection
+- Implementation type classification (Feature/Bug/Enhancement/Task)
+- Content validation and workflow guidance
+
+### 📁 **Organized Structure**
+```
+docs/
+├── prds/           # Strategic Product Requirements
+└── specs/          # Implementation Specifications
+
+PROMETH.md          # Project tracking and inventory
+```
+
+### 🔄 **Unified Templates**
+- `prometh-prd`: Strategic planning template
+- `prometh-spec`: Implementation template with 3-phase workflow
+- `prometh-doc-readme`: Project documentation template
+- `prometh-doc-runbook`: Operational procedures template
+
+---
+
+## Installation & Setup
+
+### Quick Setup
+```bash
+# In your Prometh framework repository
+./setup.sh
+
+# Initialize in any project
+/prometh-init
+```
+
+### Manual Installation
+```bash
+# Copy to your Claude Code directory
+cp .claude/output-styles/prometh-*.md ~/.claude/output-styles/
+cp .claude/commands/prometh-*.md ~/.claude/commands/
+```
+
+---
+
+## Best Practices
+
+### When to Use PRDs
+- Strategic initiatives requiring business justification
+- Cross-functional projects needing stakeholder alignment  
+- Market-driven feature development
+- Complex technical decisions with business impact
+
+### When to Use SPECs
+- Feature implementation and development tasks
+- Bug fixes and system enhancements
+- Technical debt and refactoring projects
+- User stories requiring detailed implementation
+
+### Document Lifecycle
+1. **PRD Creation** → Strategic planning and stakeholder alignment
+2. **SPEC Generation** → Implementation planning from PRDs
+3. **Development** → Execute SPEC phases (Planning → Task Breakdown → Implementation)  
+4. **Documentation** → Generate README/runbooks as needed
+5. **Status Tracking** → Monitor progress via `/prometh-status`
+
+---
+
+## Troubleshooting
+
+### Common Issues
+- **CLAUDE.md missing**: Run `/init` to create project configuration
+- **PROMETH.md missing**: Run `/prometh-init` to initialize framework
+- **Wrong document type**: Framework auto-detects and suggests correct command
+- **File access errors**: Check file permissions and paths
+
+### Getting Help
+- Use `/prometh-help` for this reference
+- Check PROMETH.md for project-specific guidance
+- View `/prometh-status` for context-aware next steps
+
+---
+
+## Framework Philosophy
+
+The Prometh Context Framework separates strategic thinking (PRDs) from implementation execution (SPECs), ensuring:
+- **Clear scope boundaries** between business strategy and technical implementation
+- **Traceability** from strategic initiatives to delivered features
+- **Predictable workflows** that scale across teams and projects
+- **Quality documentation** that serves both planning and execution phases
+
+---
+
+*Generated with: **Prometh Context Framework by Prometh***

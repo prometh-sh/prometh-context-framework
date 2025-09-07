@@ -59,6 +59,13 @@ mkdir -p docs/specs
 - If missing: Create new PROMETH.md with complete template
 
 **PROMETH.md Template:**
+
+**IMPORTANT**: When creating PROMETH.md, sanitize any private information:
+- Use only the project directory name (not full path)
+- Extract project name from CLAUDE.md if available
+- Never include user home directories or private paths
+- Keep content shareable with team members
+
 ```markdown
 # Prometh Context Framework Status
 
@@ -72,7 +79,7 @@ mkdir -p docs/specs
 
 ## Project Configuration
 
-- **Project Directory**: [Current Directory Path]
+- **Project Name**: [Extract project name from directory basename, not full path]
 - **CLAUDE.md Found**: [Yes/No] 
 - **CLAUDE.local.md Found**: [Yes/No]
 - **Initialization Date**: [Current Date]
