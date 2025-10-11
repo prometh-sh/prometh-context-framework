@@ -166,12 +166,12 @@ prometh-context-framework/
 │       ├── prometh-spec.md    # Unified SPEC template with workflow
 │       ├── prometh-doc-readme.md    # Unified README template
 │       └── prometh-doc-runbook.md   # Specialized runbook template
-├── docs/
+├── docs/                      # Created by /prometh-init
 │   ├── prds/                  # Strategic Product Requirements Documents
 │   └── specs/                 # Implementation Specifications
 ├── setup.sh                   # Installation script
 ├── CLAUDE.md                  # Claude Code configuration
-├── PROMETH.md                 # Framework status and document tracking
+├── PROMETH.md                 # Framework status and document tracking (created by /prometh-init)
 └── LICENSE                    # Apache License 2.0
 ```
 
