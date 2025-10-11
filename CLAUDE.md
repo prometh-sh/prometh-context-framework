@@ -17,93 +17,154 @@ The Prometh Context Framework is an AI tooling framework designed to provide pre
 
 ## Custom Commands
 
+### Framework Initialization
+
+#### `/prometh-init`
+- **Purpose**: Initialize Prometh Context Framework in any project
+- **Prerequisites**: Requires existing CLAUDE.md or CLAUDE.local.md (created via `/init`)
+- **Functions**: Creates directory structure, initializes PROMETH.md tracking file, provides context-aware guidance
+- **Output**: Sets up `docs/prds/`, `docs/specs/`, and project tracking system
+
+**Usage:**
+```bash
+/prometh-init                                       # Initialize framework in current project
+```
+
 ### Understanding PRDs vs SPECs
 
 The framework distinguishes between two levels of requirements documentation:
 - **PRDs (Product Requirements Documents)**: Strategic, Epic-level initiatives requiring cross-functional alignment, market analysis, and business justification
-- **SPECs (Specifications)**: Implementation-focused, User Story/Task-level documentation for development teams
+- **SPECs (Specifications)**: Implementation-focused, User Story/Task-level documentation for development teams with 3-phase workflow
 
-### PRD Commands (Strategic Planning)
+### Document Tracking System
+
+All commands integrate with a **PROMETH.md** tracking file that maintains:
+- **Document Inventory**: Complete list of PRDs, SPECs, and technical documentation
+- **Status Tracking**: Monitor document lifecycle from Draft to Completed
+- **Traceability Matrix**: Links between PRDs and their derived SPECs
+- **Recent Activity Log**: Chronological record of document creation and updates
+- **Context-Aware Guidance**: Smart next steps based on project state
+
+### CLAUDE.md Validation Requirement
+
+**IMPORTANT**: All Prometh commands require either `CLAUDE.md` or `CLAUDE.local.md` to exist in the project root. If neither file is found, commands will display an error message and exit. Use `/init` in Claude Code to create CLAUDE.md with proper project configuration.
+
+### Strategic Planning (PRDs)
 
 #### `/prometh-prd`
-- Create new PRDs from scratch based on strategic descriptions
-- For quarterly planning, market positioning, cross-functional initiatives
-- Generates comprehensive business case and stakeholder alignment documents
+- **Unified Command**: Handles both creation from scratch and normalization of existing documents
+- **Input Types**: Strategic descriptions, file paths (PDF, markdown, text), or interactive prompts
+- **Use Cases**: Quarterly planning, market positioning, cross-functional initiatives, major feature launches
+- **Output**: Comprehensive PRD using unified `prometh-prd` template
+- **Validation**: Automatically validates strategic scope vs. tactical implementation needs
 
-#### `/prometh-prd-normalize [filename]`
-- Normalize strategic documents into standardized PRD format
-- Supports single file or text input (no bulk processing)
-- Validates strategic scope vs. tactical implementation needs
+**Examples:**
+```bash
+/prometh-prd                                    # Interactive mode - prompts for strategic description
+/prometh-prd strategic-planning-document.pdf   # Normalize existing strategic document
+/prometh-prd                                    # Text input mode - provide strategic content in prompt
+```
 
-#### Available PRD Output Styles:
-- **prometh-prd-standard**: General strategic requirements and Epic-level planning
-- **prometh-prd-feature**: Major feature development with market analysis
-- **prometh-prd-bugfix**: Complex issues requiring strategic product decisions
-
-### SPEC Commands (Implementation Planning)
+### Implementation Planning (SPECs)
 
 #### `/prometh-spec`
-- Create new SPECs from scratch based on implementation descriptions
-- For user stories, tasks, feature implementations, bug fixes
-- Generates implementation-ready specifications for development teams
+- **Unified Command**: Handles both creation from scratch and normalization of existing documents
+- **Input Types**: Implementation descriptions, file paths, user stories, bug reports, enhancement requests
+- **Use Cases**: Feature development, bug fixes, enhancements, technical tasks
+- **Output**: Comprehensive SPEC using unified `prometh-spec` template with 3-phase workflow
+- **Classification**: Automatically categorizes as Feature/Bug Fix/Enhancement/Technical Task
 
-#### `/prometh-spec-normalize [filename]`
-- Normalize implementation documents into standardized SPEC format
-- Supports single file or text input
-- Focuses on tactical implementation details
+**3-Phase Implementation Workflow:**
+- **Phase 1: Planning** - Requirements analysis, technical design, resource planning
+- **Phase 2: Task Breakdown** - Detailed development tasks, acceptance criteria, dependency mapping
+- **Phase 3: Implementation** - Core development, testing, deployment, validation
 
-#### Available SPEC Output Styles:
-- **prometh-spec-feature**: New feature implementation (user stories)
-- **prometh-spec-bugfix**: Bug fixes and defects
-- **prometh-spec-enhancement**: Improvements to existing features
-- **prometh-spec-task**: Technical/maintenance tasks
+**PRD-to-SPEC Workflow:**
+```bash
+/prometh-spec --from-prd docs/prds/strategic-initiative-prd.md  # Create implementation SPECs from existing PRD
+```
+
+**Examples:**
+```bash
+/prometh-spec                                   # Interactive mode - prompts for implementation description
+/prometh-spec user-story.md                     # Normalize existing user story
+/prometh-spec bug-report.pdf                    # Convert bug report to SPEC format
+/prometh-spec --from-prd mobile-strategy-prd.md # Generate SPECs from PRD with traceability
+```
 
 ### Documentation Generation
 
-#### `/prometh-document [type]`
-- Generate technical documentation (README, runbooks, architecture docs)
-- Supports various documentation types with appropriate templates
-- Auto-detects project characteristics for relevant content
+#### `/prometh-doc`
+- **Renamed**: Previously `/prometh-document`, now simplified to `/prometh-doc`
+- **Types Supported**: `readme` and `runbook` documentation
+- **Auto-Analysis**: Analyzes repository structure and system configuration
+- **Output**: Uses unified templates for consistent documentation
 
-### README Generation Workflow
+**Usage:**
+```bash
+/prometh-doc readme                             # Generate comprehensive README.md
+/prometh-doc runbook                            # Generate operational runbook
+```
 
-The project includes an enhanced `/prometh-document` command that can generate comprehensive README.md files for repositories.
+### Status Dashboard
 
-#### Available README Output Styles:
-- **prometh-readme-standard**: Comprehensive README.md for general repositories with all essential sections
-- **prometh-readme-api**: Specialized for API/library documentation with usage examples and endpoint documentation
-- **prometh-readme-cli**: For command-line tools with installation instructions and usage guides
+#### `/prometh-status`
+- **Purpose**: Display comprehensive project documentation status dashboard
+- **Features**: Document inventory summary, recent activity feed, traceability matrix overview, health metrics
+- **Output**: Formatted console dashboard with project insights and context-aware suggestions
+- **Options**: `--brief` (condensed view), `--counts` (document counts only), `--health` (health metrics focus)
 
-#### README Generation Workflow:
-1. Navigate to any repository directory
-2. Run `/prometh-document readme` for auto-detection, or `/prometh-document readme --style [type]` for specific style
-3. System analyzes the codebase to determine project type and appropriate template
-4. Generates comprehensive README.md (or README-new.md if one already exists)
+**Usage:**
+```bash
+/prometh-status                                 # Full status dashboard
+/prometh-status --brief                         # Quick summary view
+/prometh-status --health                        # Health metrics and suggestions
+```
 
-#### Repository Types Supported:
-- **General Projects**: Uses `prometh-readme-standard` with comprehensive sections for features, installation, usage
-- **APIs/Libraries**: Uses `prometh-readme-api` with endpoint documentation, SDK examples, authentication guides
-- **CLI Tools**: Uses `prometh-readme-cli` with installation methods, command references, shell integration
+## Available Output Styles
 
-#### README Features:
-- Auto-detects project type from package.json, requirements.txt, Cargo.toml, etc.
-- Extracts actual code examples from the repository
-- Generates appropriate badges and metadata
-- Includes installation instructions for multiple platforms
-- Smart file handling (creates README-new.md if README.md exists)
+The framework now uses 4 unified output styles (simplified from 11):
+
+### Strategic Documentation
+- **prometh-prd**: Unified PRD template for all strategic planning scenarios
+
+### Implementation Documentation  
+- **prometh-spec**: Unified SPEC template with 3-phase workflow for all implementation tasks
+
+### Technical Documentation
+- **prometh-doc-readme**: Unified README template for comprehensive project documentation
+- **prometh-doc-runbook**: Specialized runbook template for operational procedures and troubleshooting
 
 ## Development Notes
 
 - The project uses Apache License 2.0
-- Documentation is organized in the `docs/` directory with PRDs in `docs/prds/`
+- Documentation is organized in the `docs/` directory with PRDs in `docs/prds/` and SPECs in `docs/specs/`
 - The gitignore is configured for general development artifacts, temporary files, and common IDE files
 - AI development tools (Cursor) are specifically configured in the gitignore
 - Custom Claude Code commands are available in `.claude/commands/`
-- PRD output styles are stored in `.claude/output-styles/` for version control and backup
+- Unified output styles are stored in `.claude/output-styles/` for version control and backup
+
+## Framework Features
+
+### CLAUDE.md Validation
+- **Mandatory Check**: All commands validate presence of CLAUDE.md or CLAUDE.local.md
+- **Error Handling**: Clear error messages guide users to create configuration files
+- **Context Assurance**: Ensures proper project context for all Prometh operations
+
+### Intelligent Classification
+- **PRD vs SPEC Detection**: Automatic classification of strategic vs. tactical content
+- **Implementation Type Detection**: Auto-categorizes SPECs as Feature/Bug/Enhancement/Task
+- **Scope Validation**: Prevents misclassification and suggests appropriate commands
+
+### Enhanced SPEC Workflow
+- **3-Phase Structure**: Planning → Task Breakdown → Implementation
+- **Actionable Tasks**: Each phase includes specific deliverables and checkboxes
+- **Risk Assessment**: Built-in risk identification and mitigation planning
+- **Quality Assurance**: Comprehensive testing and validation procedures
 
 ## Setup Instructions
 
-To install the PRD normalization system on any machine, run the setup script:
+To install the Prometh Context Framework on any machine, run the setup script:
 
 ```bash
 ./setup.sh
@@ -121,41 +182,34 @@ cp .claude/output-styles/prometh-*.md ~/.claude/output-styles/
 cp .claude/commands/prometh-*.md ~/.claude/commands/
 ```
 
-## Available Commands
+## Available Commands Summary
 
-After installation, you will have access to:
+After installation, you will have access to these simplified commands:
 
-### Strategic Planning (PRDs)
+### `/prometh-prd`
+- **Purpose**: Strategic Product Requirements Documents
+- **Input**: Strategic descriptions, file paths, or interactive prompts
+- **Output**: Comprehensive PRD using unified template
+- **Use For**: Quarterly planning, market positioning, cross-functional initiatives
 
-#### `/prometh-prd`
-- Create new strategic PRDs from user descriptions
-- For Epic-level initiatives, market positioning, cross-functional projects
-- Generates comprehensive business case and stakeholder alignment
+### `/prometh-spec`  
+- **Purpose**: Implementation Specifications with 3-phase workflow
+- **Input**: Implementation descriptions, user stories, bug reports, file paths
+- **Output**: Comprehensive SPEC with structured workflow
+- **Use For**: Feature development, bug fixes, enhancements, technical tasks
 
-#### `/prometh-prd-normalize [filename]`
-- Normalize strategic documents into standardized PRD format
-- Single file or text input processing
-- Validates strategic scope and business impact
+### `/prometh-doc`
+- **Purpose**: Technical documentation generation
+- **Types**: `readme` for project documentation, `runbook` for operational procedures
+- **Output**: Uses unified templates based on repository/system analysis
+- **Use For**: Project README files, operational runbooks
 
-### Implementation Planning (SPECs)
+## Migration from Previous Version
 
-#### `/prometh-spec`
-- Create new implementation SPECs from user descriptions
-- For user stories, tasks, features, bug fixes
-- Generates implementation-ready specifications
+If upgrading from a previous version with multiple output styles:
+- **Commands Simplified**: `/prometh-prd-normalize` and `/prometh-spec-normalize` merged into main commands
+- **Output Styles Unified**: 11 separate styles consolidated into 4 unified templates
+- **CLAUDE.md Required**: New mandatory validation for all commands
+- **Enhanced Workflows**: SPECs now include 3-phase implementation structure
 
-#### `/prometh-spec-normalize [filename]`
-- Normalize implementation documents into standardized SPEC format
-- Single file or text input processing
-- Focuses on tactical development details
-
-### Documentation Generation
-
-#### `/prometh-document readme [--style type]`
-- Generates comprehensive README.md files
-- Auto-detects project type (general, API, CLI tool)
-- Analyzes codebase for real examples and configuration
-
-#### `/prometh-document [type]`
-- Generate other technical documentation types
-- Supports runbook, architecture, api, deployment, troubleshooting, compliance
+The new unified approach provides the same functionality with improved simplicity and consistency.

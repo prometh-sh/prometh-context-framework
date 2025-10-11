@@ -26,21 +26,14 @@ logs/
 .idea/
 *.swp
 *.swo
-*~
 
 # Build artifacts
 build/
 dist/
 target/
 
-# Cursor
-#  Cursor is an AI-powered code editor. `.cursorignore` specifies files/directories to
-#  exclude from AI features like autocomplete and code analysis. Recommended for sensitive data
-#  refer to https://docs.cursor.com/context/ignore-files
-.cursorignore
-.cursorindexingignore
+# Claude Code local settings (user-specific configurations)
+.claude/settings.local.json
 
-# Marimo
-marimo/_static/
-marimo/_lsp/
-__marimo__/
+# Project-specific generated files
+# docs/ and PROMETH.md are created by /prometh-init and should be tracked per-project
