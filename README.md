@@ -318,21 +318,6 @@ The framework automatically creates required directories:
 - `docs/prds/` - Strategic Product Requirements Documents
 - `docs/specs/` - Implementation Specifications
 
-## Migration from Previous Version
-
-If upgrading from a previous version:
-
-### Changes Made
-- **Commands Simplified**: `/prometh-prd-normalize` and `/prometh-spec-normalize` merged into main commands
-- **Output Styles Unified**: 11 separate styles consolidated into 4 unified templates  
-- **CLAUDE.md Required**: New mandatory validation for all commands
-- **Enhanced Workflows**: SPECs now include 3-phase implementation structure
-
-### Migration Steps
-1. Run `./setup.sh` to install updated commands and templates
-2. Add `CLAUDE.md` file to your projects
-3. Existing documents remain compatible - no changes needed
-
 ## Contributing
 
 ### Development Setup
