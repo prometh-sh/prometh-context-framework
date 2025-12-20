@@ -50,7 +50,7 @@ A comprehensive AI tooling framework that provides structured commands and templ
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/ivannagy/prometh-context-framework.git
+   git clone https://github.com/prometh-sh/prometh-context-framework.git
    cd prometh-context-framework
    ```
 
