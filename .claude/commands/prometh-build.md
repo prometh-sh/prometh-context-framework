@@ -1,33 +1,49 @@
 ---
-description: Execute SPEC implementation with 3-phase workflow tracking and PROMETH.md progress updates. Guides development through Planning, Task Breakdown, and Implementation phases.
+description: Execute SPEC implementation with 3-phase workflow tracking and ${TRACKING_FILE} progress updates. Guides development through Planning, Task Breakdown, and Implementation phases.
 argument-hint: "<spec-file-path>"
 allowed-tools: ["Read", "Write", "Edit", "MultiEdit", "Glob", "Grep"]
 ---
 
 # SPEC Implementation and Build Tracking Command
 
-You are tasked with guiding the implementation of a specific SPEC document through its 3-phase workflow while maintaining comprehensive progress tracking in PROMETH.md.
+You are tasked with guiding the implementation of a specific SPEC document through its 3-phase workflow while maintaining comprehensive progress tracking in ${TRACKING_FILE}.
 
-## PROMETH.md Validation
+## Directory and Tracking File Resolution
 
-**MANDATORY FIRST STEP**: Before any processing, check for PROMETH.md in the project root:
+**MANDATORY FIRST STEP**: Resolve the documentation directory and tracking file:
 
+**Directory Resolution:**
 ```bash
-# Check for required framework file
-ls PROMETH.md 2>/dev/null
+# Check for documentation directories (local takes precedence)
+if [ -d "prometh-docs.local" ]; then
+  DOCS_DIR="prometh-docs.local"
+elif [ -d "prometh-docs" ]; then
+  DOCS_DIR="prometh-docs"
+else
+  echo "❌ Error: Neither prometh-docs/ nor prometh-docs.local/ found."
+  echo "Please run '/prometh-init' to initialize the framework."
+  exit 1
+fi
 ```
 
-If file does not exist, display this error and EXIT:
+**Tracking File Resolution:**
+```bash
+# Check for tracking files (local takes precedence)
+if [ -f "PROMETH.local.md" ]; then
+  TRACKING_FILE="PROMETH.local.md"
+elif [ -f "PROMETH.md" ]; then
+  TRACKING_FILE="PROMETH.md"
+else
+  echo "❌ Error: Neither PROMETH.md nor PROMETH.local.md found."
+  echo "Please run '/prometh-init' to initialize the framework."
+  exit 1
+fi
 ```
-❌ Prometh Context Framework Error
 
-PROMETH.md not found in project root.
-
-Please initialize the Prometh Context Framework first:
-• Run '/prometh-init' to set up framework tracking and directory structure
-
-This file is required for Prometh commands to track documents and maintain project state.
-```
+**Priority Rules:**
+- `prometh-docs.local/` takes precedence over `prometh-docs/`
+- `PROMETH.local.md` takes precedence over `PROMETH.md`
+- Use resolved variables (`$DOCS_DIR` and `$TRACKING_FILE`) for all file operations
 
 ## Command Processing Logic
 
@@ -35,7 +51,7 @@ This file is required for Prometh commands to track documents and maintain proje
 1. **SPEC File Path Required**: Command requires a SPEC file path as argument
 2. **File Validation**: Verify SPEC file exists and is readable
 3. **Content Analysis**: Parse SPEC content and extract 3-phase workflow structure
-4. **Current Status Check**: Determine current phase and completion status from PROMETH.md
+4. **Current Status Check**: Determine current phase and completion status from ${TRACKING_FILE}
 
 ### Error Handling for Missing Arguments
 If no SPEC file path provided, display:
@@ -45,11 +61,11 @@ If no SPEC file path provided, display:
 Usage: /prometh-build <spec-file-path>
 
 Examples:
-• /prometh-build docs/specs/user-authentication-spec.md
-• /prometh-build docs/specs/payment-integration-spec.md
+• /prometh-build ${DOCS_DIR}/specs/user-authentication-spec.md
+• /prometh-build ${DOCS_DIR}/specs/payment-integration-spec.md
 
 Available SPECs:
-[List available SPEC files from docs/specs/ directory]
+[List available SPEC files from ${DOCS_DIR}/specs/ directory]
 ```
 
 ## 3-Phase Implementation Workflow
@@ -99,7 +115,7 @@ Available SPECs:
 - Deployment & Validation
 - Documentation Updates
 
-## PROMETH.md Integration
+## ${TRACKING_FILE} Integration
 
 ### 1. SPEC Status Tracking
 
@@ -113,13 +129,13 @@ Available SPECs:
 
 ### 2. Phase Progress Tracking
 
-**Add Phase Progress Section to PROMETH.md:**
+**Add Phase Progress Section to ${TRACKING_FILE}:**
 ```markdown
 ## Implementation Progress
 
 ### Active SPECs in Development
 
-#### [SPEC Name] - docs/specs/filename.md
+#### [SPEC Name] - ${DOCS_DIR}/specs/filename.md
 - **Current Phase**: [Planning/Task Breakdown/Implementation]
 - **Phase Progress**: [X/Y tasks completed]
 - **Started**: [Date]
@@ -160,7 +176,7 @@ Available SPECs:
 ### Current Phase Display
 ```
 🔥 Prometh Build: [SPEC Name]
-📁 File: docs/specs/filename.md
+📁 File: ${DOCS_DIR}/specs/filename.md
 🔗 Linked PRD: [PRD name if applicable]
 📊 Status: [Current Status]
 
@@ -227,31 +243,31 @@ Continue? (y/n):
 
 ### Starting Implementation
 ```bash
-/prometh-build docs/specs/user-authentication-spec.md
+/prometh-build ${DOCS_DIR}/specs/user-authentication-spec.md
 # Displays current phase, progress, and available actions
-# Updates PROMETH.md with "In Progress" status
+# Updates ${TRACKING_FILE} with "In Progress" status
 ```
 
 ### Resuming Implementation
 ```bash
-/prometh-build docs/specs/user-authentication-spec.md
-# Detects current phase from PROMETH.md
+/prometh-build ${DOCS_DIR}/specs/user-authentication-spec.md
+# Detects current phase from ${TRACKING_FILE}
 # Shows progress and continues from last session
 ```
 
 ### Completing Implementation
 ```bash
-/prometh-build docs/specs/user-authentication-spec.md
+/prometh-build ${DOCS_DIR}/specs/user-authentication-spec.md
 # When all phases complete, marks SPEC as "Completed"
-# Updates PROMETH.md with completion date
+# Updates ${TRACKING_FILE} with completion date
 # Links completion back to original PRD
 ```
 
-## PROMETH.md Update Process
+## ${TRACKING_FILE} Update Process
 
 ### 1. Status Updates
 **Implementation Steps:**
-1. Read existing PROMETH.md
+1. Read existing ${TRACKING_FILE}
 2. Locate SPEC entry in inventory table
 3. Update status column with current phase/status
 4. Update last modified date
@@ -272,8 +288,8 @@ Continue? (y/n):
 3. Add completion entries with PRD traceability
 4. Maintain chronological order
 
-**Privacy Note**: When updating PROMETH.md, ensure no private information is exposed:
-- Use relative paths (docs/specs/filename.md) not absolute paths
+**Privacy Note**: When updating ${TRACKING_FILE}, ensure no private information is exposed:
+- Use relative paths (${DOCS_DIR}/specs/filename.md) not absolute paths
 - Never include user directories or private file paths
 - Keep all content shareable with team members
 
@@ -284,7 +300,7 @@ Continue? (y/n):
 🎉 SPEC Implementation Complete!
 
 📋 SPEC: [SPEC name]
-📁 File: docs/specs/filename.md
+📁 File: ${DOCS_DIR}/specs/filename.md
 🔗 Linked PRD: [PRD name if applicable]
 📅 Started: [Start date]
 📅 Completed: [Completion date]
@@ -295,13 +311,13 @@ Continue? (y/n):
 ✅ Phase 3: Implementation - Completed [Date]
 
 📊 Final Status: Completed
-🔄 PROMETH.md Updated: All tracking information synchronized
+🔄 ${TRACKING_FILE} Updated: All tracking information synchronized
 
 💡 What's Next:
 • Generate project documentation: /prometh-doc readme
 • View project status: /prometh-status
 • Create related SPECs: /prometh-spec --from-prd [PRD-file]
-• Review completed work in PROMETH.md
+• Review completed work in ${TRACKING_FILE}
 
 Implementation session complete! 🚀
 ```
@@ -311,12 +327,12 @@ Implementation session complete! 🚀
 ### File Access Errors
 - **SPEC not found**: List available SPECs and provide correct usage
 - **SPEC not readable**: Report file permissions and suggest solutions
-- **PROMETH.md locked**: Continue with session but warn about tracking updates
+- **${TRACKING_FILE} locked**: Continue with session but warn about tracking updates
 
 ### Workflow Errors
 - **Invalid phase transition**: Warn user about incomplete tasks
 - **Corrupted SPEC format**: Report parsing issues and suggest manual review
-- **PROMETH.md sync issues**: Report discrepancies and offer sync resolution
+- **${TRACKING_FILE} sync issues**: Report discrepancies and offer sync resolution
 
 ### Recovery Options
 ```
@@ -331,16 +347,16 @@ Completed tasks: [Number]
 Recovery options:
 • Resume session: /prometh-build [same-spec-file]
 • Check status: /prometh-status
-• Manual review: Open PROMETH.md for current state
+• Manual review: Open ${TRACKING_FILE} for current state
 ```
 
 ## Instructions
 
-1. **Always validate PROMETH.md existence first** - Exit with error if not found
+1. **Always validate ${TRACKING_FILE} existence first** - Exit with error if not found
 2. **Require SPEC file path argument** - Display usage help if missing
 3. **Parse SPEC structure completely** - Extract all 3-phase tasks and deliverables
 4. **Maintain interactive session** - Guide user through implementation phases
-5. **Update tracking continuously** - Sync all progress to PROMETH.md
+5. **Update tracking continuously** - Sync all progress to ${TRACKING_FILE}
 6. **Provide clear status displays** - Show current phase, progress, and next steps
 7. **Handle phase transitions** - Validate completion before allowing progression
 8. **Link to PRD when applicable** - Maintain traceability from strategic to tactical
@@ -352,16 +368,16 @@ After successful build session completion:
 ```
 ✅ SPEC Build Session Complete
 
-File: docs/specs/[filename].md
+File: ${DOCS_DIR}/specs/[filename].md
 Status: [Final Status]
 Implementation Duration: [Duration]
 Phases Completed: 3/3
-PROMETH.md: Updated with full progress tracking
+${TRACKING_FILE}: Updated with full progress tracking
 
 The SPEC implementation has been successfully tracked and completed.
 
 💡 Next Steps:
-- Review implementation in PROMETH.md
+- Review implementation in ${TRACKING_FILE}
 - Update related PRD status if applicable  
 - Generate updated project documentation
 - Plan next SPEC implementation
@@ -369,4 +385,4 @@ The SPEC implementation has been successfully tracked and completed.
 Build session ended successfully! 🚀
 ```
 
-Start by validating PROMETH.md existence, then verify the SPEC file path argument. Parse the SPEC structure, determine current implementation phase, and begin the interactive implementation tracking workflow.
+Start by validating ${TRACKING_FILE} existence, then verify the SPEC file path argument. Parse the SPEC structure, determine current implementation phase, and begin the interactive implementation tracking workflow.

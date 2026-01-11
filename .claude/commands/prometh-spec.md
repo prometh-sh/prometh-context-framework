@@ -1,5 +1,5 @@
 ---
-description: Create or normalize implementation SPECs with PROMETH.md tracking. Supports interactive mode, file normalization, PRD-to-SPEC workflow (--from-prd), and 3-phase implementation structure.
+description: Create or normalize implementation SPECs with ${TRACKING_FILE} tracking. Supports interactive mode, file normalization, PRD-to-SPEC workflow (--from-prd), and 3-phase implementation structure.
 argument-hint: "[description|filename|--from-prd prd-file.md]"
 allowed-tools: ["Read", "Write", "LS", "Glob", "MultiEdit"]
 ---
@@ -8,26 +8,42 @@ allowed-tools: ["Read", "Write", "LS", "Glob", "MultiEdit"]
 
 You are tasked with creating new Specification (SPEC) documents or normalizing existing documents into standardized SPEC format for implementation tasks.
 
-## PROMETH.md Validation
+## Directory and Tracking File Resolution
 
-**MANDATORY FIRST STEP**: Before any processing, check for PROMETH.md in the project root:
+**MANDATORY FIRST STEP**: Resolve the documentation directory and tracking file:
 
+**Directory Resolution:**
 ```bash
-# Check for required framework file
-ls PROMETH.md 2>/dev/null
+# Check for documentation directories (local takes precedence)
+if [ -d "prometh-docs.local" ]; then
+  DOCS_DIR="prometh-docs.local"
+elif [ -d "prometh-docs" ]; then
+  DOCS_DIR="prometh-docs"
+else
+  echo "❌ Error: Neither prometh-docs/ nor prometh-docs.local/ found."
+  echo "Please run '/prometh-init' to initialize the framework."
+  exit 1
+fi
 ```
 
-If file does not exist, display this error and EXIT:
+**Tracking File Resolution:**
+```bash
+# Check for tracking files (local takes precedence)
+if [ -f "PROMETH.local.md" ]; then
+  TRACKING_FILE="PROMETH.local.md"
+elif [ -f "${TRACKING_FILE}" ]; then
+  TRACKING_FILE="${TRACKING_FILE}"
+else
+  echo "❌ Error: Neither ${TRACKING_FILE} nor PROMETH.local.md found."
+  echo "Please run '/prometh-init' to initialize the framework."
+  exit 1
+fi
 ```
-❌ Prometh Context Framework Error
 
-PROMETH.md not found in project root.
-
-Please initialize the Prometh Context Framework first:
-• Run '/prometh-init' to set up framework tracking and directory structure
-
-This file is required for Prometh commands to track documents and maintain project state.
-```
+**Priority Rules:**
+- `prometh-docs.local/` takes precedence over `prometh-docs/`
+- `PROMETH.local.md` takes precedence over `${TRACKING_FILE}`
+- Use resolved variables (`$DOCS_DIR` and `$TRACKING_FILE`) for all file operations
 
 ## Processing Logic
 
@@ -38,13 +54,13 @@ This file is required for Prometh commands to track documents and maintain proje
 4. **Interactive Mode**: If no content provided, prompt user for implementation description
 
 ### Document Processing
-1. **PROMETH.md Validation**: Verify framework file exists (mandatory)
+1. **${TRACKING_FILE} Validation**: Verify framework file exists (mandatory)
 2. **Content Analysis**: Analyze input to classify implementation type
 3. **Template Application**: Apply the unified `prometh-spec` output style with 3-phase workflow
-4. **Directory Creation**: Ensure `docs/specs/` directory exists
+4. **Directory Creation**: Ensure `${DOCS_DIR}/specs/` directory exists
 5. **Document Generation**: Create comprehensive SPEC with implementation workflow
 6. **Filename Generation**: Create descriptive filename from content analysis
-7. **PROMETH.md Tracking**: Update project tracking file with new SPEC information and traceability
+7. **${TRACKING_FILE} Tracking**: Update project tracking file with new SPEC information and traceability
 
 ## Available Output Style
 - **prometh-spec**: Unified SPEC template with 3-phase implementation workflow for all implementation scenarios
@@ -132,31 +148,31 @@ User: "I need to implement a user profile editing feature where users can update
 
 ### PRD-to-SPEC Creation:
 ```bash
-/prometh-spec --from-prd docs/prds/mobile-platform-strategy-prd.md
+/prometh-spec --from-prd ${DOCS_DIR}/prds/mobile-platform-strategy-prd.md
 # Analyzes existing PRD and creates implementation SPEC(s)
-# Updates PROMETH.md with traceability link
+# Updates ${TRACKING_FILE} with traceability link
 ```
 
-## PROMETH.md Tracking
+## ${TRACKING_FILE} Tracking
 
 After successfully creating or normalizing a SPEC, update the project tracking file:
 
-### 1. Check PROMETH.md Existence
+### 1. Check ${TRACKING_FILE} Existence
 ```bash
-# Check if PROMETH.md exists in project root
-ls PROMETH.md 2>/dev/null
+# Check if ${TRACKING_FILE} exists in project root
+ls ${TRACKING_FILE} 2>/dev/null
 ```
 
-### 2. Update PROMETH.md Content
+### 2. Update ${TRACKING_FILE} Content
 
-**If PROMETH.md exists:**
+**If ${TRACKING_FILE} exists:**
 - Read current content
 - Update the SPEC inventory section
 - Update the recent activity section
 - Update traceability matrix if PRD-linked
 - Maintain chronological order
 
-**If PROMETH.md doesn't exist:**
+**If ${TRACKING_FILE} doesn't exist:**
 - Display suggestion: "Run `/prometh-init` to initialize project tracking"
 - Continue with SPEC creation (don't block the process)
 
@@ -216,30 +232,30 @@ If PRD already exists in matrix, add SPEC to the "Derived SPECs" column:
 
 ### 6. Update Timestamps
 
-Update the "Last Updated" timestamp at the top of PROMETH.md:
+Update the "Last Updated" timestamp at the top of ${TRACKING_FILE}:
 ```
 *Last Updated: [Current Date and Time]*
 ```
 
-### 7. PROMETH.md Update Process
+### 7. ${TRACKING_FILE} Update Process
 
-**Privacy Note**: When updating PROMETH.md, ensure no private information is exposed:
-- Use relative paths (docs/specs/filename.md) not absolute paths
+**Privacy Note**: When updating ${TRACKING_FILE}, ensure no private information is exposed:
+- Use relative paths (${DOCS_DIR}/specs/filename.md) not absolute paths
 - Never include user directories or private file paths
 - Keep all content shareable with team members
 
 **Implementation Steps:**
-1. Read existing PROMETH.md (if exists)
+1. Read existing ${TRACKING_FILE} (if exists)
 2. Parse SPEC inventory table
 3. Add new SPEC entry with generated filename, type, and description
 4. Update recent activity section
 5. Update traceability matrix if PRD-linked
 6. Update last modified timestamp
-7. Write updated content back to PROMETH.md
+7. Write updated content back to ${TRACKING_FILE}
 8. Handle any write errors gracefully
 
 **Error Handling:**
-- If PROMETH.md is locked or unwriteable, continue with SPEC creation but warn user
+- If ${TRACKING_FILE} is locked or unwriteable, continue with SPEC creation but warn user
 - If parsing fails, suggest running `/prometh-init` to reset tracking file
 - Never block SPEC creation due to tracking file issues
 - Report traceability link creation success/failure
@@ -288,7 +304,7 @@ Generate focused implementation specification(s) that translate the strategic re
 
 ### 5. Traceability Establishment
 - **Link SPEC to PRD**: Record which PRD generated this SPEC
-- **Update PROMETH.md**: Add traceability entry in matrix
+- **Update ${TRACKING_FILE}**: Add traceability entry in matrix
 - **Cross-reference**: Include PRD reference in SPEC document
 
 ## 3-Phase Implementation Workflow
@@ -312,18 +328,18 @@ All generated SPECs include a structured 3-phase workflow:
 
 ## Instructions
 
-1. **Always validate PROMETH.md existence first** - Exit with error if not found
+1. **Always validate ${TRACKING_FILE} existence first** - Exit with error if not found
 2. **Process both file inputs and text descriptions** - Handle multiple input types seamlessly
 3. **Classify implementation type automatically** - Determine feature/bug/enhancement/task category
 4. **Generate meaningful filenames** - Extract key implementation concepts from content
 5. **Use unified template with workflow** - Apply `prometh-spec` output style consistently
 6. **Add metadata** - Include current date and document information
-7. **Create directory structure** - Ensure `docs/specs/` exists before writing
+7. **Create directory structure** - Ensure `${DOCS_DIR}/specs/` exists before writing
 8. **Report completion** - Confirm successful SPEC creation with file location and type
 
 ## Error Handling
 
-- **No PROMETH.md found**: Display error message and exit immediately
+- **No ${TRACKING_FILE} found**: Display error message and exit immediately
 - **Content too strategic**: Suggest using `/prometh-prd` command instead
 - **Insufficient implementation detail**: Ask for technical requirements and acceptance criteria
 - **File read errors**: Report file access issues and suggest alternatives
@@ -336,7 +352,7 @@ After successful SPEC creation:
 ```
 ✅ SPEC Created Successfully
 
-File: docs/specs/[filename]-spec.md
+File: ${DOCS_DIR}/specs/[filename]-spec.md
 Template: prometh-spec (unified with 3-phase workflow)
 Type: [Feature/Bug Fix/Enhancement/Technical Task]
 Date: [Current Date]
@@ -350,27 +366,27 @@ The SPEC includes a structured 3-phase implementation workflow and is ready for 
 ```bash
 /prometh-spec
 # User provides: "Create a password reset flow with email verification and secure token generation"
-# Result: feature-password-reset-flow-spec.md in docs/specs/
+# Result: feature-password-reset-flow-spec.md in ${DOCS_DIR}/specs/
 ```
 
 ### 2. Normalizing Existing Bug Report
 ```bash
 /prometh-spec bug-report-login-issue.pdf
-# Result: fix-login-authentication-spec.md in docs/specs/
+# Result: fix-login-authentication-spec.md in ${DOCS_DIR}/specs/
 ```
 
 ### 3. Converting Enhancement Request
 ```bash
 /prometh-spec
 # User provides: "Improve the image upload process to support drag-and-drop and progress indicators"
-# Result: enhance-image-upload-process-spec.md in docs/specs/
+# Result: enhance-image-upload-process-spec.md in ${DOCS_DIR}/specs/
 ```
 
 ### 4. Processing Technical Task
 ```bash
 /prometh-spec
 # User provides: "Setup CI/CD pipeline with automated testing and deployment to staging environment"
-# Result: task-setup-cicd-pipeline-spec.md in docs/specs/
+# Result: task-setup-cicd-pipeline-spec.md in ${DOCS_DIR}/specs/
 ```
 
 ## Strategic vs. Tactical Validation

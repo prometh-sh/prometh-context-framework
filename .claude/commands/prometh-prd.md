@@ -1,5 +1,5 @@
 ---
-description: Create or normalize strategic PRDs with PROMETH.md validation and tracking. Supports interactive mode, file normalization (PDF/markdown/text), and text descriptions.
+description: Create or normalize strategic PRDs with ${TRACKING_FILE} validation and tracking. Supports interactive mode, file normalization (PDF/markdown/text), and text descriptions.
 argument-hint: "[description|filename]"
 allowed-tools: ["Read", "Write", "LS", "Glob", "MultiEdit"]
 ---
@@ -8,26 +8,42 @@ allowed-tools: ["Read", "Write", "LS", "Glob", "MultiEdit"]
 
 You are tasked with creating new Product Requirements Documents (PRDs) or normalizing existing documents into standardized PRD format for strategic product planning.
 
-## PROMETH.md Validation
+## Directory and Tracking File Resolution
 
-**MANDATORY FIRST STEP**: Before any processing, check for PROMETH.md in the project root:
+**MANDATORY FIRST STEP**: Resolve the documentation directory and tracking file:
 
+**Directory Resolution:**
 ```bash
-# Check for required framework file
-ls PROMETH.md 2>/dev/null
+# Check for documentation directories (local takes precedence)
+if [ -d "prometh-docs.local" ]; then
+  DOCS_DIR="prometh-docs.local"
+elif [ -d "prometh-docs" ]; then
+  DOCS_DIR="prometh-docs"
+else
+  echo "❌ Error: Neither prometh-docs/ nor prometh-docs.local/ found."
+  echo "Please run '/prometh-init' to initialize the framework."
+  exit 1
+fi
 ```
 
-If file does not exist, display this error and EXIT:
+**Tracking File Resolution:**
+```bash
+# Check for tracking files (local takes precedence)
+if [ -f "PROMETH.local.md" ]; then
+  TRACKING_FILE="PROMETH.local.md"
+elif [ -f "${TRACKING_FILE}" ]; then
+  TRACKING_FILE="${TRACKING_FILE}"
+else
+  echo "❌ Error: Neither ${TRACKING_FILE} nor PROMETH.local.md found."
+  echo "Please run '/prometh-init' to initialize the framework."
+  exit 1
+fi
 ```
-❌ Prometh Context Framework Error
 
-PROMETH.md not found in project root.
-
-Please initialize the Prometh Context Framework first:
-• Run '/prometh-init' to set up framework tracking and directory structure
-
-This file is required for Prometh commands to track documents and maintain project state.
-```
+**Priority Rules:**
+- `prometh-docs.local/` takes precedence over `prometh-docs/`
+- `PROMETH.local.md` takes precedence over `${TRACKING_FILE}`
+- Use resolved variables (`$DOCS_DIR` and `$TRACKING_FILE`) for all file operations
 
 ## Processing Logic
 
@@ -37,13 +53,14 @@ This file is required for Prometh commands to track documents and maintain proje
 3. **Interactive Mode**: If no content provided, prompt user for strategic description
 
 ### Document Processing
-1. **PROMETH.md Validation**: Verify framework file exists (mandatory)
-2. **Content Analysis**: Analyze input to validate strategic scope
-3. **Template Application**: Apply the unified `prometh-prd` output style
-4. **Directory Creation**: Ensure `docs/prds/` directory exists
-5. **Document Generation**: Create comprehensive PRD with proper formatting
-6. **Filename Generation**: Create descriptive filename from content analysis
-7. **PROMETH.md Tracking**: Update project tracking file with new PRD information
+1. **Directory Resolution**: Determine which directory to use (prometh-docs.local/ or prometh-docs/)
+2. **Tracking File Resolution**: Determine which tracking file to use (PROMETH.local.md or ${TRACKING_FILE})
+3. **Content Analysis**: Analyze input to validate strategic scope
+4. **Template Application**: Apply the unified `prometh-prd` output style
+5. **Directory Verification**: Ensure `${DOCS_DIR}/prds/` directory exists
+6. **Document Generation**: Create comprehensive PRD with proper formatting
+7. **Filename Generation**: Create descriptive filename from content analysis
+8. **Tracking File Update**: Update ${TRACKING_FILE} with new PRD information
 
 ## Available Output Style
 - **prometh-prd**: Unified PRD template for all strategic planning scenarios
@@ -119,25 +136,25 @@ User: "We need to develop a comprehensive mobile application that allows custome
 # System generates appropriate PRD
 ```
 
-## PROMETH.md Tracking
+## ${TRACKING_FILE} Tracking
 
 After successfully creating or normalizing a PRD, update the project tracking file:
 
-### 1. Check PROMETH.md Existence
+### 1. Check ${TRACKING_FILE} Existence
 ```bash
-# Check if PROMETH.md exists in project root
-ls PROMETH.md 2>/dev/null
+# Check if ${TRACKING_FILE} exists in project root
+ls ${TRACKING_FILE} 2>/dev/null
 ```
 
-### 2. Update PROMETH.md Content
+### 2. Update ${TRACKING_FILE} Content
 
-**If PROMETH.md exists:**
+**If ${TRACKING_FILE} exists:**
 - Read current content
 - Update the PRD inventory section
 - Update the recent activity section
 - Maintain chronological order
 
-**If PROMETH.md doesn't exist:**
+**If ${TRACKING_FILE} doesn't exist:**
 - Display suggestion: "Run `/prometh-init` to initialize project tracking"
 - Continue with PRD creation (don't block the process)
 
@@ -164,47 +181,47 @@ Add entry to recent activity section:
 
 ### 5. Update Timestamps
 
-Update the "Last Updated" timestamp at the top of PROMETH.md:
+Update the "Last Updated" timestamp at the top of ${TRACKING_FILE}:
 ```
 *Last Updated: [Current Date and Time]*
 ```
 
-### 6. PROMETH.md Update Process
+### 6. ${TRACKING_FILE} Update Process
 
-**Privacy Note**: When updating PROMETH.md, ensure no private information is exposed:
-- Use relative paths (docs/prds/filename.md) not absolute paths
+**Privacy Note**: When updating ${TRACKING_FILE}, ensure no private information is exposed:
+- Use relative paths (${DOCS_DIR}/prds/filename.md) not absolute paths
 - Never include user directories or private file paths
 - Keep all content shareable with team members
 
 **Implementation Steps:**
-1. Read existing PROMETH.md (if exists)
+1. Read existing ${TRACKING_FILE} (if exists)
 2. Parse PRD inventory table
 3. Add new PRD entry with generated filename and description
 4. Update recent activity section
 5. Update last modified timestamp
-6. Write updated content back to PROMETH.md
+6. Write updated content back to ${TRACKING_FILE}
 7. Handle any write errors gracefully
 
 **Error Handling:**
-- If PROMETH.md is locked or unwriteable, continue with PRD creation but warn user
+- If ${TRACKING_FILE} is locked or unwriteable, continue with PRD creation but warn user
 - If parsing fails, suggest running `/prometh-init` to reset tracking file
 - Never block PRD creation due to tracking file issues
 
 ## Instructions
 
-1. **Always validate PROMETH.md existence first** - Exit with error if not found
+1. **Always resolve directories first** - Determine DOCS_DIR and TRACKING_FILE using resolution logic
 2. **Process both file inputs and text descriptions** - Handle multiple input types seamlessly
 3. **Validate strategic scope** - Ensure content is appropriate for PRD-level documentation
 4. **Generate meaningful filenames** - Extract key strategic concepts from content
 5. **Use unified template** - Apply `prometh-prd` output style consistently
 6. **Add metadata** - Include current date and document information
-7. **Create directory structure** - Ensure `docs/prds/` exists before writing
-8. **Update PROMETH.md tracking** - Add PRD to project inventory and activity log
-9. **Report completion** - Confirm successful PRD creation with file location
+7. **Create directory structure** - Ensure `${DOCS_DIR}/prds/` exists before writing
+8. **Update tracking file** - Add PRD to ${TRACKING_FILE} inventory and activity log
+9. **Report completion** - Confirm successful PRD creation with actual file location
 
 ## Error Handling
 
-- **No PROMETH.md found**: Display error message and exit immediately
+- **No ${TRACKING_FILE} found**: Display error message and exit immediately
 - **Content too tactical**: Suggest using `/prometh-spec` command instead
 - **Insufficient strategic context**: Ask for business justification and market impact details
 - **File read errors**: Report file access issues and suggest alternatives
@@ -216,18 +233,18 @@ After successful PRD creation:
 ```
 ✅ PRD Created Successfully
 
-File: docs/prds/[filename]-prd.md
+File: ${DOCS_DIR}/prds/[filename]-prd.md
 Template: prometh-prd (unified)
 Type: [Strategic Planning/Major Feature/Critical Issue Resolution]
 Date: [Current Date]
-Tracking: Added to PROMETH.md inventory
+Tracking: Added to ${TRACKING_FILE} inventory
 
 The PRD has been saved and is ready for stakeholder review.
 
 💡 Next Steps:
-- Create implementation SPECs: /prometh-spec --from-prd docs/prds/[filename]-prd.md
+- Create implementation SPECs: /prometh-spec --from-prd ${DOCS_DIR}/prds/[filename]-prd.md
 - Generate project documentation: /prometh-doc readme
-- View project status: Open PROMETH.md to see all documents
+- View project status: Open ${TRACKING_FILE} to see all documents
 ```
 
 ## Example Usage Scenarios
@@ -236,13 +253,13 @@ The PRD has been saved and is ready for stakeholder review.
 ```bash
 /prometh-prd
 # User provides: "Launch comprehensive B2B platform to capture small business market segment"
-# Result: comprehensive-b2b-platform-prd.md in docs/prds/
+# Result: comprehensive-b2b-platform-prd.md in ${DOCS_DIR}/prds/
 ```
 
 ### 2. Normalizing Existing Strategic Document
 ```bash
 /prometh-prd quarterly-planning-doc.pdf
-# Result: quarterly-planning-initiative-prd.md in docs/prds/
+# Result: quarterly-planning-initiative-prd.md in ${DOCS_DIR}/prds/
 ```
 
 ### 3. Converting Business Requirements
@@ -252,4 +269,4 @@ The PRD has been saved and is ready for stakeholder review.
 # Result: Normalized PRD document following standard format
 ```
 
-Start by validating CLAUDE.md existence, then process the input according to type (file path, text content, or interactive prompt), validate strategic scope, and generate the comprehensive PRD document using the unified template.
+Start by resolving the documentation directory (DOCS_DIR) and tracking file (TRACKING_FILE), then process the input according to type (file path, text content, or interactive prompt), validate strategic scope, and generate the comprehensive PRD document using the unified template in the resolved directory.

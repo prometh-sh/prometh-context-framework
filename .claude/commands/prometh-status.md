@@ -8,34 +8,56 @@ allowed-tools: ["Read", "LS", "Bash"]
 
 Display a comprehensive overview of project documentation status, recent activities, and traceability information from the Prometh Context Framework.
 
-## PROMETH.md Validation
+## Directory and Tracking File Resolution
 
-**MANDATORY FIRST STEP**: Before any processing, check for PROMETH.md in the project root:
+**MANDATORY FIRST STEP**: Resolve the documentation directory and tracking file:
 
+**Directory Resolution:**
 ```bash
-# Check for required framework file
-ls PROMETH.md 2>/dev/null
+# Check for documentation directories (local takes precedence)
+if [ -d "prometh-docs.local" ]; then
+  DOCS_DIR="prometh-docs.local"
+  DOCS_TYPE="local-only"
+elif [ -d "prometh-docs" ]; then
+  DOCS_DIR="prometh-docs"
+  DOCS_TYPE="committed"
+else
+  echo "❌ Error: Neither prometh-docs/ nor prometh-docs.local/ found."
+  echo "Please run '/prometh-init' to initialize the framework."
+  exit 1
+fi
 ```
 
-If file does not exist, display this error and EXIT:
+**Tracking File Resolution:**
+```bash
+# Check for tracking files (local takes precedence)
+if [ -f "PROMETH.local.md" ]; then
+  TRACKING_FILE="PROMETH.local.md"
+  TRACKING_TYPE="local-only"
+elif [ -f "PROMETH.md" ]; then
+  TRACKING_FILE="PROMETH.md"
+  TRACKING_TYPE="committed"
+else
+  echo "❌ Error: Neither PROMETH.md nor PROMETH.local.md found."
+  echo "Please run '/prometh-init' to initialize the framework."
+  exit 1
+fi
 ```
-❌ Prometh Context Framework Error
 
-PROMETH.md not found in project root.
-
-Please initialize the Prometh Context Framework first:
-• Run '/prometh-init' to set up framework tracking and directory structure
-
-This file is required for Prometh commands to track documents and maintain project state.
-```
+**Priority Rules:**
+- `prometh-docs.local/` takes precedence over `prometh-docs/`
+- `PROMETH.local.md` takes precedence over `PROMETH.md`
+- Use resolved variables (`$DOCS_DIR`, `$TRACKING_FILE`, `$DOCS_TYPE`, `$TRACKING_TYPE`) for all operations
+- Display the active variant type in the dashboard output
 
 ## Dashboard Components
 
 ### 1. Project Overview
 - **Project Path**: Current working directory
 - **Framework Status**: Initialization date and health check
-- **Directory Structure**: Verification of `docs/prds/` and `docs/specs/` 
-- **Last Updated**: Timestamp from PROMETH.md
+- **Directory Structure**: Show active directory (`${DOCS_DIR}/` - ${DOCS_TYPE})
+- **Tracking File**: Show active tracking file (`${TRACKING_FILE}` - ${TRACKING_TYPE})
+- **Last Updated**: Timestamp from ${TRACKING_FILE}
 
 ### 2. Document Inventory Summary
 - **PRDs**: Total count, status breakdown (Draft/Under Review/Approved/In Progress/Completed)
@@ -59,9 +81,9 @@ This file is required for Prometh commands to track documents and maintain proje
 
 ## Processing Logic
 
-### 1. PROMETH.md Analysis
+### 1. ${TRACKING_FILE} Analysis
 ```
-1. Read and parse PROMETH.md content
+1. Read and parse ${TRACKING_FILE} content
 2. Extract all document inventories (PRDs, SPECs, Technical Docs)
 3. Parse recent activity log
 4. Analyze traceability matrix relationships
@@ -71,9 +93,9 @@ This file is required for Prometh commands to track documents and maintain proje
 
 ### 2. File System Validation
 ```
-1. Verify docs/prds/ and docs/specs/ directories exist
-2. Cross-reference PROMETH.md entries with actual files
-3. Identify orphaned files not tracked in PROMETH.md
+1. Verify ${DOCS_DIR}/prds/ and ${DOCS_DIR}/specs/ directories exist
+2. Cross-reference ${TRACKING_FILE} entries with actual files
+3. Identify orphaned files not tracked in ${TRACKING_FILE}
 4. Check for missing files referenced in tracking
 5. Validate directory structure integrity
 ```
@@ -99,7 +121,7 @@ This file is required for Prometh commands to track documents and maintain proje
 Project Path: /path/to/current/project
 Framework Initialized: [Date]
 Last Updated: [Timestamp]
-Directory Status: ✓ docs/prds/ ✓ docs/specs/
+Directory Status: ✓ ${DOCS_DIR}/prds/ ✓ ${DOCS_DIR}/specs/
 
 📚 DOCUMENT INVENTORY
 ─────────────────────
@@ -171,7 +193,7 @@ Generated with: Prometh Context Framework by Prometh
 **Many Draft Documents:**
 ```
 📝 Review and Progress:
-1. Review draft PRDs and update status in PROMETH.md
+1. Review draft PRDs and update status in ${TRACKING_FILE}
 2. Advance SPECs from planning to implementation phase
 3. Update document statuses to reflect current state
 ```
@@ -186,10 +208,10 @@ Generated with: Prometh Context Framework by Prometh
 
 ## Error Handling
 
-- **No PROMETH.md found**: Display error message and exit immediately
-- **Corrupted PROMETH.md**: Report parsing issues and suggest `/prometh-init` to reset
+- **No ${TRACKING_FILE} found**: Display error message and exit immediately
+- **Corrupted ${TRACKING_FILE}**: Report parsing issues and suggest `/prometh-init` to reset
 - **Missing directories**: Report directory issues and suggest `/prometh-init` to repair
-- **File sync issues**: Report discrepancies between PROMETH.md and file system
+- **File sync issues**: Report discrepancies between ${TRACKING_FILE} and file system
 - **Empty project**: Display welcome message with getting started guidance
 
 ## Health Assessment Logic
@@ -213,8 +235,8 @@ Generated with: Prometh Context Framework by Prometh
 
 ## Instructions
 
-1. **Always validate PROMETH.md existence first** - Exit with error if not found
-2. **Parse PROMETH.md completely** - Extract all sections and validate structure
+1. **Always validate ${TRACKING_FILE} existence first** - Exit with error if not found
+2. **Parse ${TRACKING_FILE} completely** - Extract all sections and validate structure
 3. **Cross-reference with file system** - Verify actual files match tracking
 4. **Calculate comprehensive metrics** - Provide actionable insights
 5. **Generate context-aware suggestions** - Help users understand next steps

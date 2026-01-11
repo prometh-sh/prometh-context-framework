@@ -8,12 +8,42 @@ The Prometh Context Framework is an AI tooling framework designed to provide pre
 
 ## Project Structure
 
-- `docs/prds/` - Strategic Product Requirements Documents (Epic-level)
-- `docs/specs/` - Implementation Specifications (User Story/Task-level)
+- `prometh-docs/prds/` (or `prometh-docs.local/prds/`) - Strategic Product Requirements Documents (Epic-level)
+- `prometh-docs/specs/` (or `prometh-docs.local/specs/`) - Implementation Specifications (User Story/Task-level)
+- `prometh-docs/concepts/` (or `prometh-docs.local/concepts/`) - Comprehensive technical concept documentation
 - `.claude/commands/` - Custom Claude Code slash commands
 - `.claude/output-styles/` - Output styles for document normalization
 - `LICENSE` - Apache License 2.0
 - `README.md` - Project overview and description
+
+## Directory Structure Variants
+
+The framework supports two directory structure options:
+
+### Committed Documentation (Team Projects)
+- **Directory**: `prometh-docs/` - Documentation tracked in git
+- **Tracking File**: `PROMETH.md` - Project tracking tracked in git
+- **Use Case**: Team projects where documentation should be shared and version-controlled
+- **Benefits**: Collaborative documentation, shared project history, team alignment
+
+### Local-Only Documentation (Personal Projects)
+- **Directory**: `prometh-docs.local/` - Documentation stays on your machine
+- **Tracking File**: `PROMETH.local.md` - Project tracking stays on your machine
+- **Use Case**: Personal projects, private work, local experiments
+- **Benefits**: Privacy, no git commits, independent local work
+
+### Priority Rules
+When both directory structures exist:
+- `prometh-docs.local/` **always takes precedence** over `prometh-docs/`
+- `PROMETH.local.md` **always takes precedence** over `PROMETH.md`
+- Non-local versions are **completely ignored** when local versions exist
+
+### Choosing Your Structure
+During `/prometh-init`, you'll be prompted to choose:
+1. **Committed** (prometh-docs/) - Recommended for team projects
+2. **Local-only** (prometh-docs.local/) - Recommended for personal projects
+
+You can manually convert between structures by renaming directories and updating `.gitignore`.
 
 ## Custom Commands
 
@@ -22,8 +52,8 @@ The Prometh Context Framework is an AI tooling framework designed to provide pre
 #### `/prometh-init`
 - **Purpose**: Initialize Prometh Context Framework in any project
 - **Prerequisites**: Requires existing CLAUDE.md or CLAUDE.local.md (created via `/init`)
-- **Functions**: Creates directory structure, initializes PROMETH.md tracking file, provides context-aware guidance
-- **Output**: Sets up `docs/prds/`, `docs/specs/`, and project tracking system
+- **Functions**: Prompts for directory choice, creates directory structure, initializes tracking file, provides context-aware guidance
+- **Output**: Sets up `prometh-docs/` (or `prometh-docs.local/`) with `prds/` and `specs/` subdirectories, and tracking file
 
 **Usage:**
 ```bash
@@ -38,7 +68,7 @@ The framework distinguishes between two levels of requirements documentation:
 
 ### Document Tracking System
 
-All commands integrate with a **PROMETH.md** tracking file that maintains:
+All commands integrate with a tracking file (**PROMETH.md** or **PROMETH.local.md**) that maintains:
 - **Document Inventory**: Complete list of PRDs, SPECs, and technical documentation
 - **Status Tracking**: Monitor document lifecycle from Draft to Completed
 - **Traceability Matrix**: Links between PRDs and their derived SPECs
@@ -81,7 +111,7 @@ All commands integrate with a **PROMETH.md** tracking file that maintains:
 
 **PRD-to-SPEC Workflow:**
 ```bash
-/prometh-spec --from-prd docs/prds/strategic-initiative-prd.md  # Create implementation SPECs from existing PRD
+/prometh-spec --from-prd prometh-docs/prds/strategic-initiative-prd.md  # Create implementation SPECs from existing PRD
 ```
 
 **Examples:**
@@ -96,7 +126,7 @@ All commands integrate with a **PROMETH.md** tracking file that maintains:
 
 #### `/prometh-doc`
 - **Renamed**: Previously `/prometh-document`, now simplified to `/prometh-doc`
-- **Types Supported**: `readme` and `runbook` documentation
+- **Types Supported**: `readme`, `runbook`, and `concept` documentation
 - **Auto-Analysis**: Analyzes repository structure and system configuration
 - **Output**: Uses unified templates for consistent documentation
 
@@ -104,6 +134,7 @@ All commands integrate with a **PROMETH.md** tracking file that maintains:
 ```bash
 /prometh-doc readme                             # Generate comprehensive README.md
 /prometh-doc runbook                            # Generate operational runbook
+/prometh-doc concept                            # Generate deep-dive concept documentation
 ```
 
 ### Status Dashboard
@@ -121,24 +152,47 @@ All commands integrate with a **PROMETH.md** tracking file that maintains:
 /prometh-status --health                        # Health metrics and suggestions
 ```
 
+### Concept Documentation
+
+The Concept documentation type provides comprehensive technical understanding that complements README.md:
+
+**When to Use Concept Docs:**
+- **New Team Onboarding**: Comprehensive guide for new developers joining the project
+- **Technology Deep-Dive**: Detailed documentation of technology stack, versions, and configuration
+- **Architecture Documentation**: System design, component relationships, and design decisions (ADRs)
+- **Domain Knowledge**: Core business concepts, terminology, workflows, and data models
+- **Knowledge Preservation**: Capture architectural decisions and technical context for future reference
+
+**Concept vs README:**
+- **README**: High-level overview, quick start, installation, basic usage
+- **Concept**: Deep technical understanding, architecture, domain concepts, comprehensive onboarding
+
+**Output Location**: `prometh-docs/concepts/` (or `prometh-docs.local/concepts/`)
+
+**Example:**
+```bash
+/prometh-doc concept                            # Generate concept documentation for current project
+```
+
 ## Available Output Styles
 
-The framework now uses 4 unified output styles (simplified from 11):
+The framework now uses 5 unified output styles:
 
 ### Strategic Documentation
 - **prometh-prd**: Unified PRD template for all strategic planning scenarios
 
-### Implementation Documentation  
+### Implementation Documentation
 - **prometh-spec**: Unified SPEC template with 3-phase workflow for all implementation tasks
 
 ### Technical Documentation
 - **prometh-doc-readme**: Unified README template for comprehensive project documentation
 - **prometh-doc-runbook**: Specialized runbook template for operational procedures and troubleshooting
+- **prometh-doc-concept**: Comprehensive concept template for technology, architecture, and domain documentation
 
 ## Development Notes
 
 - The project uses Apache License 2.0
-- Documentation is organized in the `docs/` directory with PRDs in `docs/prds/` and SPECs in `docs/specs/`
+- Documentation is organized in `prometh-docs/` (or `prometh-docs.local/`) with PRDs in `prds/`, SPECs in `specs/`, and Concepts in `concepts/` subdirectories
 - The gitignore is configured for general development artifacts, temporary files, and common IDE files
 - AI development tools (Cursor) are specifically configured in the gitignore
 - Custom Claude Code commands are available in `.claude/commands/`

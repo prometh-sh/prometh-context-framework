@@ -9,6 +9,48 @@ You are tasked with initializing the Prometh Context Framework in a project. Thi
 
 ## Processing Logic
 
+### 0. Directory and Tracking File Resolution (for Existing Projects)
+
+**IMPORTANT**: If the project already has Prometh initialized, resolve existing directories before prompting:
+
+**Directory Resolution:**
+```bash
+# Check for existing documentation directories
+if [ -d "prometh-docs.local" ]; then
+  EXISTING_DOCS_DIR="prometh-docs.local"
+  DOCS_EXISTS=true
+elif [ -d "prometh-docs" ]; then
+  EXISTING_DOCS_DIR="prometh-docs"
+  DOCS_EXISTS=true
+elif [ -d "docs" ]; then
+  # Legacy directory from previous version
+  LEGACY_DOCS=true
+  DOCS_EXISTS=false
+else
+  DOCS_EXISTS=false
+fi
+```
+
+**Tracking File Resolution:**
+```bash
+# Check for existing tracking files
+if [ -f "PROMETH.local.md" ]; then
+  EXISTING_TRACKING_FILE="PROMETH.local.md"
+  TRACKING_EXISTS=true
+elif [ -f "PROMETH.md" ]; then
+  EXISTING_TRACKING_FILE="PROMETH.md"
+  TRACKING_EXISTS=true
+else
+  TRACKING_EXISTS=false
+fi
+```
+
+**Priority Rules:**
+- `prometh-docs.local/` takes precedence over `prometh-docs/`
+- `PROMETH.local.md` takes precedence over `PROMETH.md`
+- If either exists, skip prompts and use existing structure
+- If legacy `docs/` exists, offer migration (see Migration section below)
+
 ### 1. CLAUDE.md Validation
 
 **MANDATORY FIRST STEP**: Check for CLAUDE.md or CLAUDE.local.md in the project root:
@@ -37,30 +79,94 @@ After creating CLAUDE.md, run '/prometh-init' again to continue setup.
 
 **If files exist, proceed to next step.**
 
-### 2. Directory Structure Creation
+### 2. Directory Structure Selection
 
-Create the required directory structure for Prometh documents:
+**Prompt user to choose directory structure:**
+
+```
+📁 Prometh Documentation Directory Setup
+
+Which directory structure would you like to create?
+
+1. prometh-docs/ (Committed - Recommended for team projects)
+   ✓ Documentation will be tracked in git
+   ✓ Shared with all team members
+   ✓ Public project history
+
+2. prometh-docs.local/ (Local-only - Recommended for personal projects)
+   ✓ Documentation stays on your machine only
+   ✓ Not committed to git (added to .gitignore)
+   ✓ Private local work
+
+Which option would you like? (1 or 2):
+```
+
+**Wait for user selection before proceeding.**
+
+### 3. Directory Structure Creation
+
+Based on user selection, create the required directory structure:
 
 ```bash
-# Create docs directories if they don't exist
-mkdir -p docs/prds
-mkdir -p docs/specs
+# Option 1: Committed documentation (user chose 1)
+mkdir -p prometh-docs/prds
+mkdir -p prometh-docs/specs
+DOCS_DIR="prometh-docs"
+
+# Option 2: Local-only documentation (user chose 2)
+mkdir -p prometh-docs.local/prds
+mkdir -p prometh-docs.local/specs
+DOCS_DIR="prometh-docs.local"
 ```
 
 **Verification:**
-- Check that `docs/prds/` was created successfully
-- Check that `docs/specs/` was created successfully
+- Check that `${DOCS_DIR}/prds/` was created successfully
+- Check that `${DOCS_DIR}/specs/` was created successfully
 - Report any creation failures
 
-### 3. PROMETH.md Initialization
+**Store the selected directory for use in subsequent steps.**
 
-**Check if PROMETH.md exists:**
+### 4. Tracking File Selection
+
+**Prompt user to choose tracking file type:**
+
+```
+📊 Prometh Tracking File Setup
+
+Would you like local-only tracking (not committed to git)?
+
+1. PROMETH.md (Committed - Recommended for team projects)
+   ✓ Tracking shared with all team members
+   ✓ Project history visible in git
+
+2. PROMETH.local.md (Local-only - Recommended for personal projects)
+   ✓ Tracking stays on your machine only
+   ✓ Not committed to git (added to .gitignore)
+
+Which option would you like? (1 or 2):
+```
+
+**Wait for user selection before proceeding.**
+
+### 5. Tracking File Initialization
+
+Based on user selection, determine tracking file to use:
+
+```bash
+# Option 1: Committed tracking (user chose 1)
+TRACKING_FILE="PROMETH.md"
+
+# Option 2: Local-only tracking (user chose 2)
+TRACKING_FILE="PROMETH.local.md"
+```
+
+**Check if tracking file exists:**
 - If exists: Update initialization timestamp and validate structure
-- If missing: Create new PROMETH.md with complete template
+- If missing: Create new tracking file with complete template
 
-**PROMETH.md Template:**
+**Tracking File Template:**
 
-**IMPORTANT**: When creating PROMETH.md, sanitize any private information:
+**IMPORTANT**: When creating the tracking file, sanitize any private information:
 - Use only the project directory name (not full path)
 - Extract project name from CLAUDE.md if available
 - Never include user home directories or private paths
@@ -140,23 +246,41 @@ Run one of these commands to get started:
 *Generated with: Prometh Context Framework by Prometh*
 ```
 
-### 4. Next Steps Guidance
+### 6. Next Steps Guidance
 
 After successful initialization, display context-aware next steps based on project state:
 
-**Success Message:**
+**Success Message (Committed variant example):**
 ```
 ✅ Prometh Context Framework Initialized Successfully!
 
 📁 Directory Structure:
-  ✓ docs/prds/     - Strategic Product Requirements Documents
-  ✓ docs/specs/    - Implementation Specifications  
-  ✓ PROMETH.md     - Framework status and tracking
+  ✓ prometh-docs/prds/     - Strategic Product Requirements Documents (committed)
+  ✓ prometh-docs/specs/    - Implementation Specifications (committed)
+  ✓ PROMETH.md             - Framework status and tracking (committed)
 
 🎯 Recommended Next Steps:
 
 [Context-specific recommendations based on project state]
 ```
+
+**Success Message (Local-only variant example):**
+```
+✅ Prometh Context Framework Initialized Successfully!
+
+📁 Directory Structure:
+  ✓ prometh-docs.local/prds/   - Strategic Product Requirements Documents (local-only)
+  ✓ prometh-docs.local/specs/  - Implementation Specifications (local-only)
+  ✓ PROMETH.local.md           - Framework status and tracking (local-only)
+
+ℹ️  Note: Your documentation will remain local and won't be committed to git.
+
+🎯 Recommended Next Steps:
+
+[Context-specific recommendations based on project state]
+```
+
+**Adapt the success message based on user's selections from steps 2 and 4.**
 
 **Context-Aware Recommendations:**
 
@@ -194,13 +318,13 @@ Recommendations:
 ```
 ⚡ Implementation Ready:
 
-Found PRDs in docs/prds/:
+Found PRDs in ${DOCS_DIR}/prds/:
 • [List existing PRD files]
 
 Next Steps:
-1. /prometh-spec --from-prd [prd-file.md]
+1. /prometh-spec --from-prd ${DOCS_DIR}/prds/[prd-file.md]
    🔗 Create implementation SPECs from existing PRDs
-   
+
 2. /prometh-spec
    ➕ Create additional implementation SPECs
 ```
@@ -247,6 +371,52 @@ Maintenance Tasks:
 • Backing up existing file to PROMETH.md.backup
 • Creating new PROMETH.md with correct template
 ```
+
+### 7. Legacy Directory Migration
+
+**If legacy `docs/` directory detected:**
+
+```
+🔄 Legacy Directory Detected
+
+Found existing 'docs/' directory from previous version of Prometh.
+
+Migration Options:
+
+1. Migrate to prometh-docs/ (Committed)
+   • Renames docs/ → prometh-docs/
+   • Preserves all existing documents
+   • Tracked in git
+
+2. Migrate to prometh-docs.local/ (Local-only)
+   • Renames docs/ → prometh-docs.local/
+   • Preserves all existing documents
+   • Not tracked in git
+
+3. Cancel (manual migration)
+   • Keep docs/ directory as-is
+   • Manually migrate later
+
+Which option would you like? (1, 2, or 3):
+```
+
+**Migration Process:**
+```bash
+# Option 1: Migrate to committed
+mv docs prometh-docs
+echo "✓ Migrated docs/ → prometh-docs/"
+
+# Option 2: Migrate to local-only
+mv docs prometh-docs.local
+echo "✓ Migrated docs/ → prometh-docs.local/"
+
+# Option 3: Cancel
+echo "ℹ️  Keeping docs/ directory. You can migrate manually later."
+echo "   For committed: mv docs prometh-docs"
+echo "   For local-only: mv docs prometh-docs.local"
+```
+
+**After migration, continue with normal initialization using migrated directory.**
 
 ## Instructions
 
