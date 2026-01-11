@@ -87,8 +87,15 @@ After installing the framework commands, initialize it in any project:
 3. **Verify setup:**
    ```bash
    # Check created directories and tracking file
-   ls docs/prds docs/specs
+   # (Will be prometh-docs/ or prometh-docs.local/ depending on your choice)
+   ls prometh-docs/prds prometh-docs/specs
+   # OR
+   ls prometh-docs.local/prds prometh-docs.local/specs
+
+   # Check tracking file (PROMETH.md or PROMETH.local.md)
    ls PROMETH.md
+   # OR
+   ls PROMETH.local.md
    ```
 
 ### Basic Usage
@@ -125,15 +132,18 @@ After installing the framework commands, initialize it in any project:
 
 # Create operational runbook
 /prometh-doc runbook
+
+# Generate deep-dive concept documentation
+/prometh-doc concept
 ```
 
 #### Implementation Execution
 ```bash
 # Execute SPEC with guided workflow
-/prometh-build docs/specs/user-authentication-spec.md
+/prometh-build prometh-docs/specs/user-authentication-spec.md
 
 # Resume implementation from last checkpoint
-/prometh-build docs/specs/payment-integration-spec.md
+/prometh-build prometh-docs/specs/payment-integration-spec.md
 ```
 
 #### Status Dashboard
@@ -161,11 +171,12 @@ prometh-context-framework/
 │   │   ├── prometh-doc.md     # Technical documentation generation
 │   │   ├── prometh-status.md  # Project documentation status dashboard
 │   │   └── prometh-help.md    # Comprehensive command reference
-│   └── output-styles/         # 4 unified templates
+│   └── output-styles/         # 5 unified templates
 │       ├── prometh-prd.md     # Unified PRD template
 │       ├── prometh-spec.md    # Unified SPEC template with workflow
 │       ├── prometh-doc-readme.md    # Unified README template
-│       └── prometh-doc-runbook.md   # Specialized runbook template
+│       ├── prometh-doc-runbook.md   # Specialized runbook template
+│       └── prometh-doc-concept.md   # Comprehensive concept template
 ├── docs/                      # Created by /prometh-init
 │   ├── prds/                  # Strategic Product Requirements Documents
 │   └── specs/                 # Implementation Specifications
@@ -180,10 +191,10 @@ prometh-context-framework/
 | Command | Purpose | Input Types | Output Location |
 |---------|---------|-------------|-----------------|
 | `/prometh-init` | Initialize framework in project | N/A | Current directory |
-| `/prometh-prd` | Create or normalize strategic PRDs | Descriptions, file paths, interactive | `docs/prds/` |
-| `/prometh-spec` | Create or normalize implementation SPECs | User stories, bug reports, file paths, interactive, PRD references | `docs/specs/` |
+| `/prometh-prd` | Create or normalize strategic PRDs | Descriptions, file paths, interactive | `prometh-docs/prds/` |
+| `/prometh-spec` | Create or normalize implementation SPECs | User stories, bug reports, file paths, interactive, PRD references | `prometh-docs/specs/` |
 | `/prometh-build` | **Execute SPEC with guided implementation** | **SPEC file path (required)** | **PROMETH.md tracking** |
-| `/prometh-doc` | Generate technical documentation | `readme` or `runbook` types | Current directory |
+| `/prometh-doc` | Generate technical documentation | `readme`, `runbook`, or `concept` types | Current directory or `prometh-docs/concepts/` |
 | `/prometh-status` | Display project documentation status dashboard | Optional flags: `--brief`, `--counts`, `--health` | Console output |
 | `/prometh-help` | Display comprehensive command reference | N/A | Console output |
 
@@ -208,6 +219,7 @@ The framework uses 4 simplified templates (reduced from 11):
 #### Technical Documentation
 - **prometh-doc-readme**: Comprehensive README template for project documentation
 - **prometh-doc-runbook**: Specialized template for operational procedures and troubleshooting
+- **prometh-doc-concept**: Comprehensive concept template for technology, architecture, and domain documentation
 
 ### CLAUDE.md Validation
 
@@ -229,18 +241,18 @@ All commands require `CLAUDE.md` or `CLAUDE.local.md` in the project root:
 # Epic-level initiative
 /prometh-prd
 # Prompt: "Implement microservices architecture migration for improved scalability and team autonomy"
-# Output: docs/prds/microservices-architecture-migration-prd.md
+# Output: prometh-docs/prds/microservices-architecture-migration-prd.md
 ```
 
 ### Converting Existing Documents
 ```bash
 # Normalize strategic document from file
 /prometh-prd quarterly-planning-doc.pdf
-# Output: docs/prds/quarterly-planning-initiative-prd.md
+# Output: prometh-docs/prds/quarterly-planning-initiative-prd.md
 
 # Normalize implementation requirements  
 /prometh-spec feature-requirements.md
-# Output: docs/specs/feature-user-authentication-spec.md
+# Output: prometh-docs/specs/feature-user-authentication-spec.md
 ```
 
 ### Generating Project Documentation
@@ -250,8 +262,13 @@ All commands require `CLAUDE.md` or `CLAUDE.local.md` in the project root:
 # Analyzes repository structure and creates comprehensive README.md
 
 # Generate operational runbook
-/prometh-doc runbook  
+/prometh-doc runbook
 # Creates runbook based on system configuration analysis
+
+# Generate deep-dive concept documentation
+/prometh-doc concept
+# Creates comprehensive technical documentation for team onboarding
+# Output: prometh-docs/concepts/[project-name]-concept.md
 ```
 
 ## Complete Implementation Workflow
@@ -314,9 +331,80 @@ touch CLAUDE.local.md
 ```
 
 ### Directory Setup
-The framework automatically creates required directories:
-- `docs/prds/` - Strategic Product Requirements Documents
-- `docs/specs/` - Implementation Specifications
+
+The framework supports two directory structures:
+
+**Committed Documentation (Team Projects)**
+- Directory: `prometh-docs/` - Tracked in git
+- Tracking File: `PROMETH.md` - Tracked in git
+- Use Case: Team projects with shared documentation
+
+**Local-Only Documentation (Personal Projects)**
+- Directory: `prometh-docs.local/` - Not tracked in git (added to .gitignore)
+- Tracking File: `PROMETH.local.md` - Not tracked in git
+- Use Case: Personal projects, private work, local experiments
+
+**Priority**: If both exist, `.local` variants take precedence.
+
+During `/prometh-init`, you'll be prompted to choose your preferred structure.
+
+## Migrating from Previous Version
+
+If you have an existing `docs/` directory from a previous version of Prometh:
+
+### Automatic Migration (Recommended)
+
+Run `/prometh-init` and it will detect your legacy `docs/` directory and offer migration options:
+
+1. **Migrate to prometh-docs/** (Committed)
+   ```bash
+   # The command will prompt you to select this option
+   # It will automatically: mv docs prometh-docs
+   ```
+
+2. **Migrate to prometh-docs.local/** (Local-only)
+   ```bash
+   # The command will prompt you to select this option
+   # It will automatically: mv docs prometh-docs.local
+   ```
+
+### Manual Migration
+
+If you prefer to migrate manually:
+
+1. **For committed documentation:**
+   ```bash
+   # Rename directory
+   mv docs prometh-docs
+
+   # PROMETH.md is already correctly named (no change needed)
+   ```
+
+2. **For local-only documentation:**
+   ```bash
+   # Rename directory
+   mv docs prometh-docs.local
+
+   # Rename tracking file (if you want local-only tracking)
+   mv PROMETH.md PROMETH.local.md
+
+   # Add to .gitignore
+   echo "prometh-docs.local/" >> .gitignore
+   echo "PROMETH.local.md" >> .gitignore
+   ```
+
+3. **Verify the migration:**
+   ```bash
+   /prometh-status
+   # Should display your documentation with the new directory structure
+   ```
+
+### Post-Migration Notes
+
+- All documents within the directories remain unchanged
+- Tracking file content is preserved
+- Commands automatically detect and use the new directory structure
+- No manual updates to PROMETH.md are needed
 
 ## Contributing
 

@@ -13,9 +13,25 @@ The Prometh Context Framework provides structured documentation workflows for st
 
 ---
 
+## Directory Structure Variants
+
+The framework supports two directory structures:
+
+**Committed Documentation** (Team Projects):
+- `prometh-docs/` - Documentation tracked in git and shared with team
+- `PROMETH.md` - Tracking file tracked in git
+
+**Local-Only Documentation** (Personal Projects):
+- `prometh-docs.local/` - Documentation stays local, not committed
+- `PROMETH.local.md` - Tracking file stays local, not committed
+
+**Priority**: If both exist, `.local` variants take precedence and non-local versions are ignored.
+
+---
+
 ## Available Commands
 
-All commands require PROMETH.md in project root. Use `/prometh-init` if missing.
+All commands require PROMETH.md or PROMETH.local.md in project root. Use `/prometh-init` if missing.
 
 ### Framework Setup
 
@@ -25,8 +41,9 @@ All commands require PROMETH.md in project root. Use `/prometh-init` if missing.
 **Usage**: `/prometh-init`
 
 **What it does:**
-- Creates `docs/prds/` and `docs/specs/` directory structure
-- Initializes PROMETH.md tracking file for document inventory
+- Prompts you to choose committed or local-only documentation structure
+- Creates `prometh-docs/prds/` and `prometh-docs/specs/` (or `.local` variants)
+- Initializes PROMETH.md or PROMETH.local.md tracking file for document inventory
 - Sets up project-wide documentation workflow
 - Provides context-aware guidance based on project state
 
@@ -49,7 +66,7 @@ All commands require PROMETH.md in project root. Use `/prometh-init` if missing.
 - Major feature launches with business impact
 - Strategic technical decisions affecting multiple teams
 
-**Output**: Comprehensive PRD using unified `prometh-prd` template in `docs/prds/`
+**Output**: Comprehensive PRD using unified `prometh-prd` template in `prometh-docs/prds/` (or `prometh-docs.local/prds/`)
 
 ---
 
@@ -71,7 +88,7 @@ All commands require PROMETH.md in project root. Use `/prometh-init` if missing.
 - **Phase 2: Task Breakdown** - Detailed development tasks, acceptance criteria, dependency mapping
 - **Phase 3: Implementation** - Core development, testing, deployment, validation
 
-**Output**: Comprehensive SPEC using unified `prometh-spec` template in `docs/specs/`
+**Output**: Comprehensive SPEC using unified `prometh-spec` template in `prometh-docs/specs/` (or `prometh-docs.local/specs/`)
 
 ---
 
@@ -96,7 +113,7 @@ All commands require PROMETH.md in project root. Use `/prometh-init` if missing.
 #### `/prometh-build`
 **Purpose**: Execute SPEC implementation with 3-phase workflow tracking  
 **Input**: SPEC file path (required)  
-**Usage**: `/prometh-build docs/specs/user-authentication-spec.md`
+**Usage**: `/prometh-build prometh-docs/specs/user-authentication-spec.md` (or `prometh-docs.local/specs/...`)
 
 **3-Phase Execution:**
 - **Phase 1: Planning** - Interactive task completion for requirements analysis and technical design
@@ -105,7 +122,7 @@ All commands require PROMETH.md in project root. Use `/prometh-init` if missing.
 
 **Features:**
 - Interactive progress tracking with task completion
-- PROMETH.md status updates (Draft → Planning → Implementation → Completed)
+- Tracking file status updates (Draft → Planning → Implementation → Completed)
 - Phase transition validation and milestone tracking
 - Resume sessions from last checkpoint
 - Complete traceability back to original PRD
@@ -141,7 +158,7 @@ All commands require PROMETH.md in project root. Use `/prometh-init` if missing.
 # Input: "Launch comprehensive mobile platform for customer self-service"
 
 # Generate implementation SPECs from PRD
-/prometh-spec --from-prd docs/prds/mobile-customer-platform-prd.md
+/prometh-spec --from-prd prometh-docs/prds/mobile-customer-platform-prd.md
 
 # Check project status
 /prometh-status
@@ -172,10 +189,10 @@ All commands require PROMETH.md in project root. Use `/prometh-init` if missing.
 # Input: "Launch comprehensive mobile platform"
 
 # Generate implementation SPEC from PRD
-/prometh-spec --from-prd docs/prds/mobile-platform-prd.md
+/prometh-spec --from-prd prometh-docs/prds/mobile-platform-prd.md
 
 # Execute SPEC with guided implementation
-/prometh-build docs/specs/mobile-platform-implementation-spec.md
+/prometh-build prometh-docs/specs/mobile-platform-implementation-spec.md
 
 # Monitor overall project status
 /prometh-status
@@ -189,7 +206,7 @@ All commands require PROMETH.md in project root. Use `/prometh-init` if missing.
 All commands require CLAUDE.md or CLAUDE.local.md in project root. Use `/init` to create if missing.
 
 ### 📊 **Integrated Tracking**
-PROMETH.md file maintains:
+Tracking files (PROMETH.md or PROMETH.local.md) maintain:
 - Complete document inventory with status tracking
 - Traceability matrix linking PRDs to SPECs
 - Recent activity log with chronological updates
@@ -202,11 +219,11 @@ PROMETH.md file maintains:
 
 ### 📁 **Organized Structure**
 ```
-docs/
+prometh-docs/       # (or prometh-docs.local/)
 ├── prds/           # Strategic Product Requirements
 └── specs/          # Implementation Specifications
 
-PROMETH.md          # Project tracking and inventory
+PROMETH.md          # Project tracking and inventory (or PROMETH.local.md)
 ```
 
 ### 🔄 **Unified Templates**
@@ -271,13 +288,13 @@ Strategic Vision (PRD) → Implementation Plan (SPEC) → Guided Execution (BUIL
 
 ### Common Issues
 - **CLAUDE.md missing**: Run `/init` to create project configuration
-- **PROMETH.md missing**: Run `/prometh-init` to initialize framework
+- **Tracking file missing**: Run `/prometh-init` to initialize framework
 - **Wrong document type**: Framework auto-detects and suggests correct command
 - **File access errors**: Check file permissions and paths
 
 ### Getting Help
 - Use `/prometh-help` for this reference
-- Check PROMETH.md for project-specific guidance
+- Check tracking file (PROMETH.md or PROMETH.local.md) for project-specific guidance
 - View `/prometh-status` for context-aware next steps
 
 ---

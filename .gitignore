@@ -36,4 +36,7 @@ target/
 .claude/settings.local.json
 
 # Project-specific generated files
-# docs/ and PROMETH.md are created by /prometh-init and should be tracked per-project
+# prometh-docs/ and PROMETH.md are created by /prometh-init and tracked per-project
+# prometh-docs.local/ and PROMETH.local.md are local-only variants (not committed)
+prometh-docs.local/
+PROMETH.local.md
