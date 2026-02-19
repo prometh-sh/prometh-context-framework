@@ -4,266 +4,125 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-The Prometh Context Framework is an AI tooling framework designed to provide predictable, high-quality output for AI users. As the description states: "Just as Prometheus gave humanity fire, this framework gives AI users the tools to ignite high-quality, predictable output."
+The Prometh Context Framework is a documentation-first AI tooling framework — **no compiled application exists**. The repository is entirely Markdown command/template files plus a Bash setup script.
 
-## Project Structure
-
-- `prometh-docs/prds/` (or `prometh-docs.local/prds/`) - Strategic Product Requirements Documents (Epic-level)
-- `prometh-docs/specs/` (or `prometh-docs.local/specs/`) - Implementation Specifications (User Story/Task-level)
-- `prometh-docs/concepts/` (or `prometh-docs.local/concepts/`) - Comprehensive technical concept documentation
-- `.claude/commands/` - Custom Claude Code slash commands
-- `.claude/output-styles/` - Output styles for document normalization
-- `LICENSE` - Apache License 2.0
-- `README.md` - Project overview and description
-
-## Directory Structure Variants
-
-The framework supports two directory structure options:
-
-### Committed Documentation (Team Projects)
-- **Directory**: `prometh-docs/` - Documentation tracked in git
-- **Tracking File**: `PROMETH.md` - Project tracking tracked in git
-- **Use Case**: Team projects where documentation should be shared and version-controlled
-- **Benefits**: Collaborative documentation, shared project history, team alignment
-
-### Local-Only Documentation (Personal Projects)
-- **Directory**: `prometh-docs.local/` - Documentation stays on your machine
-- **Tracking File**: `PROMETH.local.md` - Project tracking stays on your machine
-- **Use Case**: Personal projects, private work, local experiments
-- **Benefits**: Privacy, no git commits, independent local work
-
-### Priority Rules
-When both directory structures exist:
-- `prometh-docs.local/` **always takes precedence** over `prometh-docs/`
-- `PROMETH.local.md` **always takes precedence** over `PROMETH.md`
-- Non-local versions are **completely ignored** when local versions exist
-
-### Choosing Your Structure
-During `/prometh-init`, you'll be prompted to choose:
-1. **Committed** (prometh-docs/) - Recommended for team projects
-2. **Local-only** (prometh-docs.local/) - Recommended for personal projects
-
-You can manually convert between structures by renaming directories and updating `.gitignore`.
-
-## Custom Commands
-
-### Framework Initialization
-
-#### `/prometh-init`
-- **Purpose**: Initialize Prometh Context Framework in any project
-- **Prerequisites**: Requires existing CLAUDE.md or CLAUDE.local.md (created via `/init`)
-- **Functions**: Prompts for directory choice, creates directory structure, initializes tracking file, provides context-aware guidance
-- **Output**: Sets up `prometh-docs/` (or `prometh-docs.local/`) with `prds/` and `specs/` subdirectories, and tracking file
-
-**Usage:**
-```bash
-/prometh-init                                       # Initialize framework in current project
-```
-
-### Understanding PRDs vs SPECs
-
-The framework distinguishes between two levels of requirements documentation:
-- **PRDs (Product Requirements Documents)**: Strategic, Epic-level initiatives requiring cross-functional alignment, market analysis, and business justification
-- **SPECs (Specifications)**: Implementation-focused, User Story/Task-level documentation for development teams with 3-phase workflow
-
-### Document Tracking System
-
-All commands integrate with a tracking file (**PROMETH.md** or **PROMETH.local.md**) that maintains:
-- **Document Inventory**: Complete list of PRDs, SPECs, and technical documentation
-- **Status Tracking**: Monitor document lifecycle from Draft to Completed
-- **Traceability Matrix**: Links between PRDs and their derived SPECs
-- **Recent Activity Log**: Chronological record of document creation and updates
-- **Context-Aware Guidance**: Smart next steps based on project state
-
-### CLAUDE.md Validation Requirement
-
-**IMPORTANT**: All Prometh commands require either `CLAUDE.md` or `CLAUDE.local.md` to exist in the project root. If neither file is found, commands will display an error message and exit. Use `/init` in Claude Code to create CLAUDE.md with proper project configuration.
-
-### Strategic Planning (PRDs)
-
-#### `/prometh-prd`
-- **Unified Command**: Handles both creation from scratch and normalization of existing documents
-- **Input Types**: Strategic descriptions, file paths (PDF, markdown, text), or interactive prompts
-- **Use Cases**: Quarterly planning, market positioning, cross-functional initiatives, major feature launches
-- **Output**: Comprehensive PRD using unified `prometh-prd` template
-- **Validation**: Automatically validates strategic scope vs. tactical implementation needs
-
-**Examples:**
-```bash
-/prometh-prd                                    # Interactive mode - prompts for strategic description
-/prometh-prd strategic-planning-document.pdf   # Normalize existing strategic document
-/prometh-prd                                    # Text input mode - provide strategic content in prompt
-```
-
-### Implementation Planning (SPECs)
-
-#### `/prometh-spec`
-- **Unified Command**: Handles both creation from scratch and normalization of existing documents
-- **Input Types**: Implementation descriptions, file paths, user stories, bug reports, enhancement requests
-- **Use Cases**: Feature development, bug fixes, enhancements, technical tasks
-- **Output**: Comprehensive SPEC using unified `prometh-spec` template with 3-phase workflow
-- **Classification**: Automatically categorizes as Feature/Bug Fix/Enhancement/Technical Task
-
-**3-Phase Implementation Workflow:**
-- **Phase 1: Planning** - Requirements analysis, technical design, resource planning
-- **Phase 2: Task Breakdown** - Detailed development tasks, acceptance criteria, dependency mapping
-- **Phase 3: Implementation** - Core development, testing, deployment, validation
-
-**PRD-to-SPEC Workflow:**
-```bash
-/prometh-spec --from-prd prometh-docs/prds/strategic-initiative-prd.md  # Create implementation SPECs from existing PRD
-```
-
-**Examples:**
-```bash
-/prometh-spec                                   # Interactive mode - prompts for implementation description
-/prometh-spec user-story.md                     # Normalize existing user story
-/prometh-spec bug-report.pdf                    # Convert bug report to SPEC format
-/prometh-spec --from-prd mobile-strategy-prd.md # Generate SPECs from PRD with traceability
-```
-
-### Documentation Generation
-
-#### `/prometh-doc`
-- **Renamed**: Previously `/prometh-document`, now simplified to `/prometh-doc`
-- **Types Supported**: `readme`, `runbook`, and `concept` documentation
-- **Auto-Analysis**: Analyzes repository structure and system configuration
-- **Output**: Uses unified templates for consistent documentation
-
-**Usage:**
-```bash
-/prometh-doc readme                             # Generate comprehensive README.md
-/prometh-doc runbook                            # Generate operational runbook
-/prometh-doc concept                            # Generate deep-dive concept documentation
-```
-
-### Status Dashboard
-
-#### `/prometh-status`
-- **Purpose**: Display comprehensive project documentation status dashboard
-- **Features**: Document inventory summary, recent activity feed, traceability matrix overview, health metrics
-- **Output**: Formatted console dashboard with project insights and context-aware suggestions
-- **Options**: `--brief` (condensed view), `--counts` (document counts only), `--health` (health metrics focus)
-
-**Usage:**
-```bash
-/prometh-status                                 # Full status dashboard
-/prometh-status --brief                         # Quick summary view
-/prometh-status --health                        # Health metrics and suggestions
-```
-
-### Concept Documentation
-
-The Concept documentation type provides comprehensive technical understanding that complements README.md:
-
-**When to Use Concept Docs:**
-- **New Team Onboarding**: Comprehensive guide for new developers joining the project
-- **Technology Deep-Dive**: Detailed documentation of technology stack, versions, and configuration
-- **Architecture Documentation**: System design, component relationships, and design decisions (ADRs)
-- **Domain Knowledge**: Core business concepts, terminology, workflows, and data models
-- **Knowledge Preservation**: Capture architectural decisions and technical context for future reference
-
-**Concept vs README:**
-- **README**: High-level overview, quick start, installation, basic usage
-- **Concept**: Deep technical understanding, architecture, domain concepts, comprehensive onboarding
-
-**Output Location**: `prometh-docs/concepts/` (or `prometh-docs.local/concepts/`)
-
-**Example:**
-```bash
-/prometh-doc concept                            # Generate concept documentation for current project
-```
-
-## Available Output Styles
-
-The framework now uses 5 unified output styles:
-
-### Strategic Documentation
-- **prometh-prd**: Unified PRD template for all strategic planning scenarios
-
-### Implementation Documentation
-- **prometh-spec**: Unified SPEC template with 3-phase workflow for all implementation tasks
-
-### Technical Documentation
-- **prometh-doc-readme**: Unified README template for comprehensive project documentation
-- **prometh-doc-runbook**: Specialized runbook template for operational procedures and troubleshooting
-- **prometh-doc-concept**: Comprehensive concept template for technology, architecture, and domain documentation
-
-## Development Notes
-
-- The project uses Apache License 2.0
-- Documentation is organized in `prometh-docs/` (or `prometh-docs.local/`) with PRDs in `prds/`, SPECs in `specs/`, and Concepts in `concepts/` subdirectories
-- The gitignore is configured for general development artifacts, temporary files, and common IDE files
-- AI development tools (Cursor) are specifically configured in the gitignore
-- Custom Claude Code commands are available in `.claude/commands/`
-- Unified output styles are stored in `.claude/output-styles/` for version control and backup
-
-## Framework Features
-
-### CLAUDE.md Validation
-- **Mandatory Check**: All commands validate presence of CLAUDE.md or CLAUDE.local.md
-- **Error Handling**: Clear error messages guide users to create configuration files
-- **Context Assurance**: Ensures proper project context for all Prometh operations
-
-### Intelligent Classification
-- **PRD vs SPEC Detection**: Automatic classification of strategic vs. tactical content
-- **Implementation Type Detection**: Auto-categorizes SPECs as Feature/Bug/Enhancement/Task
-- **Scope Validation**: Prevents misclassification and suggests appropriate commands
-
-### Enhanced SPEC Workflow
-- **3-Phase Structure**: Planning → Task Breakdown → Implementation
-- **Actionable Tasks**: Each phase includes specific deliverables and checkboxes
-- **Risk Assessment**: Built-in risk identification and mitigation planning
-- **Quality Assurance**: Comprehensive testing and validation procedures
-
-## Setup Instructions
-
-To install the Prometh Context Framework on any machine, run the setup script:
+## Installation and Verification
 
 ```bash
+# Interactive install (prompts for platform choice)
 ./setup.sh
+
+# Non-interactive
+./setup.sh --claude      # Claude Code: ~/.claude/commands/ and ~/.claude/output-styles/
+./setup.sh --opencode    # OpenCode: ~/.config/opencode/commands/
+./setup.sh --all         # Both platforms
+
+# Verify
+ls ~/.claude/commands/prometh-*
+ls ~/.claude/output-styles/prometh-*
+
+# Lint setup script
+bash -n setup.sh         # Syntax check
+shellcheck setup.sh      # Full analysis (requires shellcheck)
 ```
 
-The setup script will:
-- Safely copy commands and output styles to your `~/.claude/` directory
-- Ask before overwriting any existing files
-- Preserve your existing Claude Code configuration
-- Provide verification of successful installation
+There is no test runner. To validate a command file: check YAML frontmatter validity, verify template variables (`${DOCS_DIR}`, `${TRACKING_FILE}`) are consistently used, then exercise the installed command manually.
 
-Manual installation (if preferred):
-```bash
-cp .claude/output-styles/prometh-*.md ~/.claude/output-styles/
-cp .claude/commands/prometh-*.md ~/.claude/commands/
+## Repository Structure
+
+```
+.claude/
+  commands/          # 7 Claude Code slash commands (prometh-*.md)
+  output-styles/     # 5 output templates referenced by commands
+.opencode/
+  commands/          # 7 OpenCode slash commands (self-contained, templates embedded inline)
+setup.sh             # Multi-platform installation script
+CLAUDE.md            # This file
+AGENTS.md            # OpenCode / general agent instructions
 ```
 
-## Available Commands Summary
+## Architecture and Key Concepts
 
-After installation, you will have access to these simplified commands:
+### Dual-platform design
+- **Claude Code** commands in `.claude/commands/` reference separate output-style templates from `.claude/output-styles/` via frontmatter.
+- **OpenCode** commands in `.opencode/commands/` are **self-contained** — output templates must be embedded inline because OpenCode has no output-styles directory.
+- When adding a new command, always create it in both `.claude/commands/` and `.opencode/commands/`.
 
-### `/prometh-prd`
-- **Purpose**: Strategic Product Requirements Documents
-- **Input**: Strategic descriptions, file paths, or interactive prompts
-- **Output**: Comprehensive PRD using unified template
-- **Use For**: Quarterly planning, market positioning, cross-functional initiatives
+### Template variables in commands
+| Variable | Resolves to |
+|----------|-------------|
+| `${DOCS_DIR}` | `prometh-docs` or `prometh-docs.local` |
+| `${TRACKING_FILE}` | `PROMETH.md` or `PROMETH.local.md` |
 
-### `/prometh-spec`  
-- **Purpose**: Implementation Specifications with 3-phase workflow
-- **Input**: Implementation descriptions, user stories, bug reports, file paths
-- **Output**: Comprehensive SPEC with structured workflow
-- **Use For**: Feature development, bug fixes, enhancements, technical tasks
+Resolution is always: local variant first, then committed variant.
 
-### `/prometh-doc`
-- **Purpose**: Technical documentation generation
-- **Types**: `readme` for project documentation, `runbook` for operational procedures
-- **Output**: Uses unified templates based on repository/system analysis
-- **Use For**: Project README files, operational runbooks
+### Local vs. committed documentation (created in user projects by `/prometh-init`)
+| Variant | Directory | Tracking file | Git-tracked |
+|---------|-----------|---------------|-------------|
+| Team | `prometh-docs/` | `PROMETH.md` | Yes |
+| Personal | `prometh-docs.local/` | `PROMETH.local.md` | No |
 
-## Migration from Previous Version
+`.local` variants always take precedence when both exist.
 
-If upgrading from a previous version with multiple output styles:
-- **Commands Simplified**: `/prometh-prd-normalize` and `/prometh-spec-normalize` merged into main commands
-- **Output Styles Unified**: 11 separate styles consolidated into 4 unified templates
-- **CLAUDE.md Required**: New mandatory validation for all commands
-- **Enhanced Workflows**: SPECs now include 3-phase implementation structure
+### Command precondition order
+All commands must check in this order and exit clearly on failure:
+1. `CLAUDE.md` or `AGENTS.md` exists in project root
+2. `${DOCS_DIR}` and `${TRACKING_FILE}` exist (suggest `/prometh-init` if absent)
+3. Required arguments are present (display usage + list available files if missing)
+4. Tracking file write failures: warn but never block the primary action
 
-The new unified approach provides the same functionality with improved simplicity and consistency.
+## File Naming Conventions
+
+| Artifact | Convention | Example |
+|----------|-----------|---------|
+| Command files | `prometh-<verb>.md` | `prometh-spec.md` |
+| Output style files | `prometh-<noun>.md` or `prometh-<noun>-<type>.md` | `prometh-doc-runbook.md` |
+| Generated PRDs | `<kebab-name>-prd.md` | `mobile-strategy-prd.md` |
+| Generated SPECs | `<type>-<kebab-name>-spec.md` | `feature-user-auth-spec.md` |
+
+SPEC filename type prefixes: `feature-`, `fix-`, `enhance-`, `task-`.
+
+## Code Style
+
+### Markdown
+- ATX headings (`#`), never Setext.
+- Blank line before/after headings, lists, code blocks, and tables.
+- Code blocks must always include a language tag.
+- Lines under ~120 characters. No trailing whitespace.
+- Numbered lists for sequential steps; bullets for unordered items; checkboxes for task lists.
+
+### Bash (`setup.sh` and inline code blocks)
+- `set -e` at top of standalone scripts.
+- Quote all variable expansions: `"$var"`.
+- Use `[[ ... ]]` for conditionals.
+- `local` for function-scoped variables; `UPPER_SNAKE_CASE` for constants.
+- Function names: `snake_case`.
+- User-facing messages via `echo -e` with ANSI color codes (GREEN, YELLOW, BLUE, NC defined at top).
+- Always provide `show_help()` and handle `-h`/`--help`.
+
+### Error message emoji prefixes
+`❌` fatal · `⚠️` warning · `ℹ️` info · `✅` success
+
+### Output style template format
+```yaml
+---
+name: Prometh SPEC
+description: Short description
+---
+[Template body...]
+Generated with: **Prometh Context Framework by Prometh**
+```
+
+## Document Lifecycle
+
+**SPEC status**: `Draft` → `Under Review` → `Approved` → `In Progress` → `Testing` → `Completed`
+
+**PRD status**: `Draft` · `Under Review` · `Approved` · `Active` · `Completed` · `Deprecated`
+
+## Contributing
+
+1. Branch from `main`: `git checkout -b feature/<name>` or `fix/<name>`
+2. Changes affecting commands go in both `.claude/` and `.opencode/`
+3. Run `./setup.sh --all` to verify installation
+4. Update `CHANGELOG.md` under `[Unreleased]` (Keep a Changelog format)
+5. Commit format: `<Category>: <concise imperative description>` — e.g., `Add: /prometh-build phase resume support`
