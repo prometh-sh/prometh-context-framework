@@ -40,3 +40,5 @@ target/
 # prometh-docs.local/ and PROMETH.local.md are local-only variants (not committed)
 prometh-docs.local/
 PROMETH.local.md
+
+!AGENTS.md

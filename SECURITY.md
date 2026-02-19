@@ -22,7 +22,7 @@ The Prometh Context Framework team takes security seriously. If you discover a s
 Instead, please report security issues via one of these methods:
 
 1. **Email**: Send details to **786743+ivannagy@users.noreply.github.com**
-2. **GitHub Security Advisories**: Use the [Security Advisory](https://github.com/ivannagy/prometh-context-framework/security/advisories/new) feature
+2. **GitHub Security Advisories**: Use the [Security Advisory](https://github.com/prometh-sh/prometh-context-framework/security/advisories/new) feature
 
 ### What to Include
 
@@ -91,7 +91,7 @@ Security updates will be:
 
 ## Additional Resources
 
-- [GitHub Security](https://github.com/ivannagy/prometh-context-framework/security)
+- [GitHub Security](https://github.com/prometh-sh/prometh-context-framework/security)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Contributing Guidelines](CONTRIBUTING.md)
 

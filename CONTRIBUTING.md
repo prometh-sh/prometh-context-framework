@@ -14,7 +14,7 @@ Thank you for your interest in contributing to the Prometh Context Framework! Th
 
 1. **Fork the repository**
    ```bash
-   git clone https://github.com/ivannagy/prometh-context-framework.git
+   git clone https://github.com/prometh-sh/prometh-context-framework.git
    cd prometh-context-framework
    ```
 

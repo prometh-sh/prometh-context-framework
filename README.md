@@ -14,6 +14,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-green.svg)](https://docs.anthropic.com/en/docs/claude-code)
+[![OpenCode](https://img.shields.io/badge/OpenCode-Compatible-blue.svg)](https://opencode.ai/)
 
 A comprehensive AI tooling framework that provides structured commands and templates for creating strategic Product Requirements Documents (PRDs), implementation Specifications (SPECs), and technical documentation. Designed to deliver predictable, high-quality output for software development teams.
 
@@ -48,6 +49,8 @@ A comprehensive AI tooling framework that provides structured commands and templ
 
 ### Installation
 
+The framework supports both **Claude Code** and **OpenCode** platforms.
+
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/prometh-sh/prometh-context-framework.git
@@ -56,33 +59,59 @@ A comprehensive AI tooling framework that provides structured commands and templ
 
 2. **Run the setup script:**
    ```bash
+   # Interactive mode - choose platform(s)
    ./setup.sh
+
+   # Or specify platform directly
+   ./setup.sh --claude      # Claude Code only
+   ./setup.sh --opencode    # OpenCode only
+   ./setup.sh --all         # Both platforms
    ```
 
 3. **Verify installation:**
    ```bash
-   # Check installed commands in Claude Code
+   # For Claude Code
    ls ~/.claude/commands/prometh-*
+
+   # For OpenCode
+   ls ~/.config/opencode/commands/prometh-*
+   ls ~/.config/opencode/skills/prometh-*/SKILL.md
    ```
+
+### Platform Compatibility
+
+| Platform | Status | Configuration File | Commands Location |
+|----------|--------|-------------------|-------------------|
+| **Claude Code** | ✅ Fully Supported | CLAUDE.md / CLAUDE.local.md | ~/.claude/commands/ |
+| **OpenCode** | ✅ Fully Supported | AGENTS.md / AGENTS.local.md | ~/.config/opencode/commands/ + ~/.config/opencode/skills/ |
 
 ### Project Initialization
 
-After installing the framework commands, initialize it in any project:
+After installing the framework commands, initialize it in any project.
 
-1. **Initialize Claude Code in your project:**
-   ```bash
-   # Navigate to your project directory
-   cd /path/to/your/project
-   
-   # Initialize with Claude Code (creates CLAUDE.md)
-   /init
-   ```
+**For Claude Code users:**
+```bash
+# Navigate to your project directory
+cd /path/to/your/project
 
-2. **Initialize Prometh Framework:**
-   ```bash
-   # Set up Prometh tracking and directory structure
-   /prometh-init
-   ```
+# Initialize Claude Code in your project (creates CLAUDE.md)
+/init
+
+# Initialize Prometh Framework
+/prometh-init
+```
+
+**For OpenCode users:**
+```bash
+# Navigate to your project directory
+cd /path/to/your/project
+
+# Initialize OpenCode in your project (creates AGENTS.md)
+/init
+
+# Initialize Prometh Framework
+/prometh-init
+```
 
 3. **Verify setup:**
    ```bash
@@ -100,46 +129,42 @@ After installing the framework commands, initialize it in any project:
 
 ### Basic Usage
 
+> **Note for OpenCode users**: `prometh-prd`, `prometh-spec`, and `prometh-doc` are Agent Skills — the agent loads them automatically when you ask it to create a PRD, SPEC, or documentation. The four workflow commands (`/prometh-init`, `/prometh-build`, `/prometh-status`, `/prometh-help`) remain slash commands on both platforms.
+
 #### Strategic Planning
 ```bash
-# Interactive mode - prompts for strategic description
+# Claude Code slash command
 /prometh-prd
 
-# Create from file - normalizes existing strategic documents  
-/prometh-prd strategic-planning-document.pdf
-
-# Text input mode - provide content directly in prompt
-/prometh-prd
-# Then paste or type your strategic initiative description
+# OpenCode — just ask the agent directly:
+# "Create a PRD for our mobile platform strategy"
+# (agent loads the prometh-prd skill automatically)
 ```
 
 #### Implementation Planning
 ```bash
-# Interactive mode - prompts for implementation description
-/prometh-spec
-
-# Create from user story file
+# Claude Code slash command
 /prometh-spec user-story.md
 
-# Convert bug report to SPEC format
-/prometh-spec bug-report.pdf
+# OpenCode — ask the agent:
+# "Create a SPEC from this user story" or "Create a SPEC from the PRD"
 ```
 
 #### Documentation Generation
 ```bash
-# Generate comprehensive README
+# Claude Code slash commands
 /prometh-doc readme
-
-# Create operational runbook
 /prometh-doc runbook
-
-# Generate deep-dive concept documentation
 /prometh-doc concept
+
+# OpenCode — ask the agent:
+# "Generate a README for this project"
+# "Create a runbook for this service"
 ```
 
 #### Implementation Execution
 ```bash
-# Execute SPEC with guided workflow
+# Available as a slash command on both platforms
 /prometh-build prometh-docs/specs/user-authentication-spec.md
 
 # Resume implementation from last checkpoint
@@ -148,7 +173,7 @@ After installing the framework commands, initialize it in any project:
 
 #### Status Dashboard
 ```bash
-# Full project status overview
+# Available as a slash command on both platforms
 /prometh-status
 
 # Quick summary view
@@ -162,8 +187,8 @@ After installing the framework commands, initialize it in any project:
 
 ```
 prometh-context-framework/
-├── .claude/
-│   ├── commands/              # 6 unified Claude Code commands
+├── .claude/                   # Claude Code commands and templates
+│   ├── commands/              # 7 unified Claude Code commands
 │   │   ├── prometh-init.md    # Framework initialization and project setup
 │   │   ├── prometh-prd.md     # Strategic PRD creation & normalization
 │   │   ├── prometh-spec.md    # Implementation SPEC creation & normalization
@@ -177,26 +202,41 @@ prometh-context-framework/
 │       ├── prometh-doc-readme.md    # Unified README template
 │       ├── prometh-doc-runbook.md   # Specialized runbook template
 │       └── prometh-doc-concept.md   # Comprehensive concept template
-├── docs/                      # Created by /prometh-init
-│   ├── prds/                  # Strategic Product Requirements Documents
-│   └── specs/                 # Implementation Specifications
-├── setup.sh                   # Installation script
-├── CLAUDE.md                  # Claude Code configuration
+├── .opencode/                 # OpenCode commands and skills
+│   ├── commands/              # 4 workflow slash commands
+│   │   ├── prometh-init.md    # Framework initialization (AGENTS.md validation)
+│   │   ├── prometh-build.md   # Guided SPEC implementation execution
+│   │   ├── prometh-status.md  # Project documentation status dashboard
+│   │   └── prometh-help.md    # Comprehensive command reference
+│   └── skills/                # 3 document-creation Agent Skills
+│       ├── prometh-prd/SKILL.md    # Strategic PRD creation (self-contained)
+│       ├── prometh-spec/SKILL.md   # Implementation SPEC creation (self-contained)
+│       └── prometh-doc/SKILL.md    # Technical documentation generation (3 embedded templates)
+├── setup.sh                   # Multi-platform installation script
+├── CLAUDE.md                  # Claude Code configuration (example)
+├── AGENTS.md                  # OpenCode / general agent configuration
 ├── PROMETH.md                 # Framework status and document tracking (created by /prometh-init)
 └── LICENSE                    # Apache License 2.0
 ```
 
 ## Available Commands
 
+### Slash Commands (both platforms)
+
 | Command | Purpose | Input Types | Output Location |
 |---------|---------|-------------|-----------------|
 | `/prometh-init` | Initialize framework in project | N/A | Current directory |
-| `/prometh-prd` | Create or normalize strategic PRDs | Descriptions, file paths, interactive | `prometh-docs/prds/` |
-| `/prometh-spec` | Create or normalize implementation SPECs | User stories, bug reports, file paths, interactive, PRD references | `prometh-docs/specs/` |
 | `/prometh-build` | **Execute SPEC with guided implementation** | **SPEC file path (required)** | **PROMETH.md tracking** |
-| `/prometh-doc` | Generate technical documentation | `readme`, `runbook`, or `concept` types | Current directory or `prometh-docs/concepts/` |
 | `/prometh-status` | Display project documentation status dashboard | Optional flags: `--brief`, `--counts`, `--health` | Console output |
 | `/prometh-help` | Display comprehensive command reference | N/A | Console output |
+
+### Agent Skills (OpenCode) / Slash Commands (Claude Code)
+
+| Name | Purpose | Input Types | Output Location |
+|------|---------|-------------|-----------------|
+| `prometh-prd` | Create or normalize strategic PRDs | Descriptions, file paths, interactive | `prometh-docs/prds/` |
+| `prometh-spec` | Create or normalize implementation SPECs | User stories, bug reports, file paths, PRD references | `prometh-docs/specs/` |
+| `prometh-doc` | Generate technical documentation | `readme`, `runbook`, or `concept` types | Root or `prometh-docs/concepts/` |
 
 ## Framework Architecture
 
@@ -237,38 +277,44 @@ All commands require `CLAUDE.md` or `CLAUDE.local.md` in the project root:
 ## Usage Examples
 
 ### Creating a Strategic PRD
+
 ```bash
-# Epic-level initiative
+# Claude Code slash command
 /prometh-prd
 # Prompt: "Implement microservices architecture migration for improved scalability and team autonomy"
 # Output: prometh-docs/prds/microservices-architecture-migration-prd.md
+
+# OpenCode — ask the agent:
+# "Create a PRD for microservices architecture migration"
 ```
 
 ### Converting Existing Documents
+
 ```bash
-# Normalize strategic document from file
+# Claude Code
 /prometh-prd quarterly-planning-doc.pdf
 # Output: prometh-docs/prds/quarterly-planning-initiative-prd.md
 
-# Normalize implementation requirements  
 /prometh-spec feature-requirements.md
 # Output: prometh-docs/specs/feature-user-authentication-spec.md
+
+# OpenCode — ask the agent:
+# "Normalize this strategic document into a PRD" (then paste/reference the file)
+# "Create a SPEC from feature-requirements.md"
 ```
 
 ### Generating Project Documentation
+
 ```bash
-# Auto-detect project type and generate README
+# Claude Code slash commands
 /prometh-doc readme
-# Analyzes repository structure and creates comprehensive README.md
-
-# Generate operational runbook
 /prometh-doc runbook
-# Creates runbook based on system configuration analysis
-
-# Generate deep-dive concept documentation
 /prometh-doc concept
-# Creates comprehensive technical documentation for team onboarding
-# Output: prometh-docs/concepts/[project-name]-concept.md
+
+# OpenCode — ask the agent:
+# "Generate a README for this project"
+# "Create an operational runbook"
+# "Write concept documentation for onboarding"
 ```
 
 ## Complete Implementation Workflow
@@ -459,6 +505,7 @@ This separation ensures that strategic planning remains focused on business valu
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) - Official Claude CLI tool
 - [Claude API](https://docs.anthropic.com/en/api) - Anthropic's Claude API documentation
+- [OpenCode](https://opencode.ai) - Open source AI coding agent for the terminal
 
 ---
 
