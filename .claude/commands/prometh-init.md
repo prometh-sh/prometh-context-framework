@@ -1,6 +1,6 @@
 ---
 description: Initialize Prometh Context Framework in a project with validation and directory setup
-allowed-tools: Read, Write, LS, Glob, MultiEdit, Bash
+allowed-tools: ["Read", "Write", "LS", "Glob", "MultiEdit", "Bash"]
 ---
 
 # Prometh Framework Initialization Command
