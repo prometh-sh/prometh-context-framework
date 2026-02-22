@@ -20,7 +20,7 @@ A documentation-first AI tooling framework that provides structured **slash comm
 
 ## See It In Action
 
-[![Prometh Context Framework Demo](https://img.youtube.com/vi/TdOTGgLPWuk/maxresdefault.jpg)](https://youtu.be/TdOTGgLPWuk)
+https://github.com/user-attachments/assets/bd6d5bbf-948e-4eb7-96b3-1a4077994633
 
 ## Architecture Overview
 
