@@ -29,15 +29,15 @@ The framework supports two directory structures:
 
 ---
 
-## Available Commands
+## Available Slash Commands
 
-All commands require PROMETH.md or PROMETH.local.md in project root. Use `/prometh-init` if missing.
+All slash commands require PROMETH.md or PROMETH.local.md in project root. Use `/prometh-init` if missing.
 
 ### Framework Setup
 
 #### `/prometh-init`
-**Purpose**: Initialize Prometh Context Framework in any project  
-**Prerequisites**: Requires existing CLAUDE.md or CLAUDE.local.md (created via `/init`)  
+**Purpose**: Initialize Prometh Context Framework in any project
+**Prerequisites**: Requires existing CLAUDE.md or CLAUDE.local.md (created via `/init`)
 **Usage**: `/prometh-init`
 
 **What it does:**
@@ -46,65 +46,6 @@ All commands require PROMETH.md or PROMETH.local.md in project root. Use `/prome
 - Initializes PROMETH.md or PROMETH.local.md tracking file for document inventory
 - Sets up project-wide documentation workflow
 - Provides context-aware guidance based on project state
-
----
-
-### Strategic Planning (PRDs)
-
-#### `/prometh-prd`
-**Purpose**: Create strategic Product Requirements Documents  
-**Input Types**: Strategic descriptions, file paths (PDF/markdown/text), interactive prompts  
-**Usage**: 
-- `/prometh-prd` - Interactive mode with prompts
-- `/prometh-prd strategic-document.pdf` - Normalize existing file
-- `/prometh-prd` + paste strategic content - Process text input
-
-**Use Cases:**
-- Quarterly planning and roadmap initiatives
-- Market positioning and competitive strategy
-- Cross-functional initiatives requiring alignment
-- Major feature launches with business impact
-- Strategic technical decisions affecting multiple teams
-
-**Output**: Comprehensive PRD using unified `prometh-prd` template in `prometh-docs/prds/` (or `prometh-docs.local/prds/`)
-
----
-
-### Implementation Planning (SPECs)
-
-#### `/prometh-spec`
-**Purpose**: Create implementation specifications with 3-phase workflow  
-**Input Types**: Implementation descriptions, user stories, bug reports, file paths  
-**Usage**:
-- `/prometh-spec` - Interactive mode with prompts
-- `/prometh-spec user-story.md` - Normalize existing file
-- `/prometh-spec --from-prd mobile-strategy-prd.md` - Generate SPECs from PRD
-- `/prometh-spec` + paste implementation requirements - Process text input
-
-**Implementation Types:** Feature/Bug Fix/Enhancement/Technical Task
-
-**3-Phase Workflow:**
-- **Phase 1: Planning** - Requirements analysis, technical design, resource planning
-- **Phase 2: Task Breakdown** - Detailed development tasks, acceptance criteria, dependency mapping
-- **Phase 3: Implementation** - Core development, testing, deployment, validation
-
-**Output**: Comprehensive SPEC using unified `prometh-spec` template in `prometh-docs/specs/` (or `prometh-docs.local/specs/`)
-
----
-
-### Documentation Generation
-
-#### `/prometh-doc`
-**Purpose**: Generate technical documentation with auto-analysis  
-**Types**: `readme` and `runbook` documentation  
-**Usage**:
-- `/prometh-doc readme` - Generate comprehensive README.md
-- `/prometh-doc runbook` - Generate operational runbook
-
-**Features:**
-- Analyzes repository structure and system configuration
-- Uses unified templates for consistent documentation
-- Integrates with existing project context
 
 ---
 
@@ -149,11 +90,76 @@ All commands require PROMETH.md or PROMETH.local.md in project root. Use `/prome
 
 ---
 
+## Available Skills
+
+Skills can be invoked explicitly via slash commands OR contextually — just describe what you need in conversation and Claude will load the appropriate skill automatically.
+
+### Strategic Planning (PRDs) — `prometh-prd` skill
+
+**Purpose**: Create strategic Product Requirements Documents
+**Input Types**: Strategic descriptions, file paths (PDF/markdown/text), interactive prompts
+**Usage**:
+- `/prometh-prd` — Interactive mode with prompts
+- `/prometh-prd strategic-document.pdf` — Normalize existing file
+- `/prometh-prd` + paste strategic content — Process text input
+- Or naturally: *"Create a PRD for our new mobile platform"*
+
+**Use Cases:**
+- Quarterly planning and roadmap initiatives
+- Market positioning and competitive strategy
+- Cross-functional initiatives requiring alignment
+- Major feature launches with business impact
+- Strategic technical decisions affecting multiple teams
+
+**Output**: Comprehensive PRD using unified `prometh-prd` template in `prometh-docs/prds/` (or `prometh-docs.local/prds/`)
+
+---
+
+### Implementation Planning (SPECs) — `prometh-spec` skill
+
+**Purpose**: Create implementation specifications with 3-phase workflow
+**Input Types**: Implementation descriptions, user stories, bug reports, file paths
+**Usage**:
+- `/prometh-spec` — Interactive mode with prompts
+- `/prometh-spec user-story.md` — Normalize existing file
+- `/prometh-spec --from-prd mobile-strategy-prd.md` — Generate SPECs from PRD
+- `/prometh-spec` + paste implementation requirements — Process text input
+- Or naturally: *"Create a SPEC for the user authentication feature"*
+
+**Implementation Types:** Feature/Bug Fix/Enhancement/Technical Task
+
+**3-Phase Workflow:**
+- **Phase 1: Planning** - Requirements analysis, technical design, resource planning
+- **Phase 2: Task Breakdown** - Detailed development tasks, acceptance criteria, dependency mapping
+- **Phase 3: Implementation** - Core development, testing, deployment, validation
+
+**Output**: Comprehensive SPEC using unified `prometh-spec` template in `prometh-docs/specs/` (or `prometh-docs.local/specs/`)
+
+---
+
+### Documentation Generation — `prometh-doc` skill
+
+**Purpose**: Generate technical documentation with auto-analysis
+**Types**: `readme`, `runbook`, and `concept` documentation
+**Usage**:
+- `/prometh-doc readme` — Generate comprehensive README.md
+- `/prometh-doc runbook` — Generate operational runbook
+- `/prometh-doc concept` — Generate deep-dive concept documentation
+- `/prometh-doc` — Interactive menu to select type
+- Or naturally: *"Generate a README for this project"*
+
+**Features:**
+- Analyzes repository structure and system configuration
+- Uses unified templates for consistent documentation
+- Integrates with existing project context
+
+---
+
 ## Workflow Examples
 
 ### 1. Strategic Initiative → Implementation
 ```bash
-# Create strategic PRD
+# Create strategic PRD (skill invoked via slash or naturally)
 /prometh-prd
 # Input: "Launch comprehensive mobile platform for customer self-service"
 
@@ -198,12 +204,18 @@ All commands require PROMETH.md or PROMETH.local.md in project root. Use `/prome
 /prometh-status
 ```
 
+### 5. Generate Concept Documentation
+```bash
+# Deep-dive documentation for new team members / architecture review
+/prometh-doc concept
+```
+
 ---
 
 ## Key Features
 
 ### ✅ **CLAUDE.md Validation**
-All commands require CLAUDE.md or CLAUDE.local.md in project root. Use `/init` to create if missing.
+All commands and skills require CLAUDE.md or CLAUDE.local.md in project root. Use `/init` to create if missing.
 
 ### 📊 **Integrated Tracking**
 Tracking files (PROMETH.md or PROMETH.local.md) maintain:
@@ -216,12 +228,14 @@ Tracking files (PROMETH.md or PROMETH.local.md) maintain:
 - Automatic PRD vs SPEC scope detection
 - Implementation type classification (Feature/Bug/Enhancement/Task)
 - Content validation and workflow guidance
+- Skills auto-invoked based on conversation context
 
 ### 📁 **Organized Structure**
 ```
 prometh-docs/       # (or prometh-docs.local/)
 ├── prds/           # Strategic Product Requirements
-└── specs/          # Implementation Specifications
+├── specs/          # Implementation Specifications
+└── concepts/       # Concept documentation
 
 PROMETH.md          # Project tracking and inventory (or PROMETH.local.md)
 ```
@@ -231,6 +245,7 @@ PROMETH.md          # Project tracking and inventory (or PROMETH.local.md)
 - `prometh-spec`: Implementation template with 3-phase workflow
 - `prometh-doc-readme`: Project documentation template
 - `prometh-doc-runbook`: Operational procedures template
+- `prometh-doc-concept`: Technology stack, architecture, and domain concept documentation
 
 ---
 
@@ -248,6 +263,7 @@ PROMETH.md          # Project tracking and inventory (or PROMETH.local.md)
 ### Manual Installation
 ```bash
 # Copy to your Claude Code directory
+cp -r .claude/skills/prometh-*/  ~/.claude/skills/
 cp .claude/output-styles/prometh-*.md ~/.claude/output-styles/
 cp .claude/commands/prometh-*.md ~/.claude/commands/
 ```

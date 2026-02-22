@@ -132,6 +132,40 @@ safe_copy() {
     fi
 }
 
+# Function to install Claude Code skills
+install_claude_skills() {
+    echo
+    echo -e "${YELLOW}Installing skills...${NC}"
+    if [ -d "$REPO_DIR/.claude/skills" ]; then
+        for skill_dir in "$REPO_DIR/.claude/skills"/*/; do
+            if [ -d "$skill_dir" ]; then
+                skill_name=$(basename "$skill_dir")
+                mkdir -p "$CLAUDE_DIR/skills/$skill_name"
+                local skill_file="$skill_dir/SKILL.md"
+                if [ -f "$skill_file" ]; then
+                    local dest="$CLAUDE_DIR/skills/$skill_name/SKILL.md"
+                    if [ -f "$dest" ]; then
+                        echo -e "  ${YELLOW}⚠️  Skill already exists:${NC} $skill_name/SKILL.md"
+                        read -p "  Overwrite? (y/N): " -n 1 -r
+                        echo
+                        if [[ $REPLY =~ ^[Yy]$ ]]; then
+                            cp "$skill_file" "$dest"
+                            echo -e "  ${GREEN}✅ Replaced:${NC} $skill_name/SKILL.md"
+                        else
+                            echo -e "  ${BLUE}⏭️  Skipped:${NC} $skill_name/SKILL.md"
+                        fi
+                    else
+                        cp "$skill_file" "$dest"
+                        echo -e "  ${GREEN}✅ Installed:${NC} $skill_name/SKILL.md"
+                    fi
+                fi
+            fi
+        done
+    else
+        echo -e "  ${YELLOW}⚠️  No .claude/skills directory found in repository${NC}"
+    fi
+}
+
 # Function to install Claude Code components
 install_claude() {
     echo
@@ -141,6 +175,7 @@ install_claude() {
     # Create Claude directories
     mkdir -p "$CLAUDE_DIR/commands"
     mkdir -p "$CLAUDE_DIR/output-styles"
+    mkdir -p "$CLAUDE_DIR/skills"
 
     echo -e "${YELLOW}Installing commands...${NC}"
     if [ -d "$REPO_DIR/.claude/commands" ]; then
@@ -166,6 +201,8 @@ install_claude() {
     else
         echo -e "  ${YELLOW}⚠️  No output-styles directory found in repository${NC}"
     fi
+
+    install_claude_skills
 }
 
 # Function to install OpenCode skills
@@ -238,6 +275,13 @@ verify_installations() {
         echo -e "  Commands: ${CLAUDE_DIR}/commands/"
         ls -la "$CLAUDE_DIR/commands/" 2>/dev/null | grep -E "\.md$" | awk '{print "    ✓ " $9}' || echo "    (none found)"
 
+        echo -e "  Skills: ${CLAUDE_DIR}/skills/"
+        for skill_dir in "$CLAUDE_DIR/skills"/*/; do
+            if [ -f "${skill_dir}SKILL.md" ]; then
+                echo "    ✓ $(basename "$skill_dir")/SKILL.md"
+            fi
+        done
+
         echo -e "  Output Styles: ${CLAUDE_DIR}/output-styles/"
         ls -la "$CLAUDE_DIR/output-styles/" 2>/dev/null | grep -E "\.md$" | awk '{print "    ✓ " $9}' || echo "    (none found)"
     fi
@@ -262,22 +306,23 @@ show_completion() {
     echo
     echo -e "${GREEN}🎉 Setup complete!${NC}"
     echo
-    echo -e "${BLUE}Available Commands (Claude Code & OpenCode):${NC}"
+    echo -e "${BLUE}Available Slash Commands (Claude Code & OpenCode):${NC}"
     echo "  /prometh-init      - Initialize framework in any project"
     echo "  /prometh-build     - Execute SPEC with guided implementation"
     echo "  /prometh-status    - Display project documentation dashboard"
     echo "  /prometh-help      - Display comprehensive command reference"
     echo
-    echo -e "${BLUE}Available Skills (OpenCode) / Commands (Claude Code):${NC}"
+    echo -e "${BLUE}Available Skills (Claude Code & OpenCode):${NC}"
     echo "  prometh-prd        - Create or normalize strategic PRDs"
     echo "  prometh-spec       - Create or normalize implementation SPECs"
     echo "  prometh-doc        - Generate technical documentation"
+    echo "  (Invoke via /prometh-prd, /prometh-spec, /prometh-doc or naturally in conversation)"
     echo
     echo -e "${BLUE}Getting Started:${NC}"
     echo "1. Navigate to your project directory"
     echo "2. Run '/prometh-init' to set up Prometh framework"
-    echo "3. Create strategic PRDs with '/prometh-prd' (Claude Code) or prometh-prd skill (OpenCode)"
-    echo "4. Generate implementation SPECs with '/prometh-spec'"
+    echo "3. Create strategic PRDs: /prometh-prd or ask 'create a PRD for...'"
+    echo "4. Generate implementation SPECs: /prometh-spec or ask 'create a SPEC for...'"
     echo "5. Execute SPECs with '/prometh-build'"
     echo "6. Monitor progress with '/prometh-status'"
     echo

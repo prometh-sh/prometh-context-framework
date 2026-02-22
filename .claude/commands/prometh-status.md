@@ -203,7 +203,7 @@ Generated with: Prometh Context Framework by Prometh
 📚 Documentation Gap:
 1. Generate project README: /prometh-doc readme
 2. Create operational runbook: /prometh-doc runbook
-3. Document architecture decisions: /prometh-doc architecture
+3. Document architecture decisions: /prometh-doc concept
 ```
 
 ## Error Handling

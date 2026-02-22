@@ -13,12 +13,13 @@ The Prometh Context Framework is a documentation-first AI tooling framework — 
 ./setup.sh
 
 # Non-interactive
-./setup.sh --claude      # Claude Code: ~/.claude/commands/ and ~/.claude/output-styles/
-./setup.sh --opencode    # OpenCode: ~/.config/opencode/commands/
+./setup.sh --claude      # Claude Code: ~/.claude/commands/, ~/.claude/skills/, ~/.claude/output-styles/
+./setup.sh --opencode    # OpenCode: ~/.config/opencode/commands/ and ~/.config/opencode/skills/
 ./setup.sh --all         # Both platforms
 
-# Verify
+# Verify Claude Code
 ls ~/.claude/commands/prometh-*
+ls ~/.claude/skills/prometh-*/SKILL.md
 ls ~/.claude/output-styles/prometh-*
 
 # Lint setup script
@@ -32,10 +33,12 @@ There is no test runner. To validate a command file: check YAML frontmatter vali
 
 ```
 .claude/
-  commands/          # 7 Claude Code slash commands (prometh-*.md)
-  output-styles/     # 5 output templates referenced by commands
+  commands/          # 4 Claude Code slash commands (prometh-init, build, status, help)
+  skills/            # 3 Claude Code skills (prometh-prd, spec, doc) — each in own directory with SKILL.md
+  output-styles/     # 5 output templates referenced by commands and skills
 .opencode/
-  commands/          # 7 OpenCode slash commands (self-contained, templates embedded inline)
+  commands/          # 4 OpenCode slash commands (self-contained)
+  skills/            # 3 OpenCode Agent Skills (self-contained with embedded templates)
 setup.sh             # Multi-platform installation script
 CLAUDE.md            # This file
 AGENTS.md            # OpenCode / general agent instructions
@@ -44,9 +47,24 @@ AGENTS.md            # OpenCode / general agent instructions
 ## Architecture and Key Concepts
 
 ### Dual-platform design
-- **Claude Code** commands in `.claude/commands/` reference separate output-style templates from `.claude/output-styles/` via frontmatter.
-- **OpenCode** commands in `.opencode/commands/` are **self-contained** — output templates must be embedded inline because OpenCode has no output-styles directory.
-- When adding a new command, always create it in both `.claude/commands/` and `.opencode/commands/`.
+Both platforms share the same architectural split between **slash commands** and **skills**:
+
+| Type | Claude Code | OpenCode | Purpose |
+|------|-------------|----------|---------|
+| Slash commands | `.claude/commands/` | `.opencode/commands/` | `prometh-init`, `build`, `status`, `help` |
+| Skills | `.claude/skills/<name>/SKILL.md` | `.opencode/skills/<name>/SKILL.md` | `prometh-prd`, `spec`, `doc` |
+
+**Claude Code specifics:**
+- Commands and skills use separate YAML frontmatter; skills reference output-style templates from `.claude/output-styles/`
+- Skills can be auto-invoked by Claude when contextually relevant (based on `description` field)
+- Output-style templates live separately in `.claude/output-styles/`
+
+**OpenCode specifics:**
+- Skills are **self-contained** — output templates must be embedded inline (no output-styles directory)
+- Commands in `.opencode/commands/` are also self-contained
+
+When adding a new command: create in both `.claude/commands/` and `.opencode/commands/`.
+When adding a new skill: create `SKILL.md` in both `.claude/skills/<name>/` and `.opencode/skills/<name>/`.
 
 ### Template variables in commands
 | Variable | Resolves to |
@@ -75,7 +93,8 @@ All commands must check in this order and exit clearly on failure:
 
 | Artifact | Convention | Example |
 |----------|-----------|---------|
-| Command files | `prometh-<verb>.md` | `prometh-spec.md` |
+| Command files | `prometh-<verb>.md` | `prometh-build.md` |
+| Skill directories | `prometh-<verb>/SKILL.md` | `prometh-prd/SKILL.md` |
 | Output style files | `prometh-<noun>.md` or `prometh-<noun>-<type>.md` | `prometh-doc-runbook.md` |
 | Generated PRDs | `<kebab-name>-prd.md` | `mobile-strategy-prd.md` |
 | Generated SPECs | `<type>-<kebab-name>-spec.md` | `feature-user-auth-spec.md` |
@@ -122,7 +141,9 @@ Generated with: **Prometh Context Framework by Prometh**
 ## Contributing
 
 1. Branch from `main`: `git checkout -b feature/<name>` or `fix/<name>`
-2. Changes affecting commands go in both `.claude/` and `.opencode/`
-3. Run `./setup.sh --all` to verify installation
-4. Update `CHANGELOG.md` under `[Unreleased]` (Keep a Changelog format)
-5. Commit format: `<Category>: <concise imperative description>` — e.g., `Add: /prometh-build phase resume support`
+2. Changes affecting slash commands: update both `.claude/commands/` and `.opencode/commands/`
+3. Changes affecting skills: update both `.claude/skills/<name>/SKILL.md` and `.opencode/skills/<name>/SKILL.md` (note: OpenCode skills embed templates inline; Claude Code skills reference output-styles)
+4. Changes to output-style templates: only `.claude/output-styles/` (no OpenCode equivalent; OpenCode embeds inline)
+5. Run `./setup.sh --all` to verify installation
+6. Update `CHANGELOG.md` under `[Unreleased]` (Keep a Changelog format)
+7. Commit format: `<Category>: <concise imperative description>` — e.g., `Add: prometh-prd skill for Claude Code`
