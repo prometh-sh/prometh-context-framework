@@ -92,17 +92,16 @@ All slash commands require PROMETH.md or PROMETH.local.md in project root. Use `
 
 ## Available Skills
 
-Skills can be invoked explicitly via slash commands OR contextually — just describe what you need in conversation and Claude will load the appropriate skill automatically.
+Skills are invoked contextually — describe what you need in conversation and Claude loads the right skill automatically. There is no `/prometh-prd`, `/prometh-spec`, or `/prometh-doc` slash command.
 
 ### Strategic Planning (PRDs) — `prometh-prd` skill
 
 **Purpose**: Create strategic Product Requirements Documents
 **Input Types**: Strategic descriptions, file paths (PDF/markdown/text), interactive prompts
-**Usage**:
-- `/prometh-prd` — Interactive mode with prompts
-- `/prometh-prd strategic-document.pdf` — Normalize existing file
-- `/prometh-prd` + paste strategic content — Process text input
-- Or naturally: *"Create a PRD for our new mobile platform"*
+**How to invoke** (natural conversation):
+- *"Create a PRD for our new mobile platform"*
+- *"Normalize this strategic document into a PRD"* (then paste or reference the file)
+- *"Convert quarterly-planning.pdf into a PRD"*
 
 **Use Cases:**
 - Quarterly planning and roadmap initiatives
@@ -119,12 +118,11 @@ Skills can be invoked explicitly via slash commands OR contextually — just des
 
 **Purpose**: Create implementation specifications with 3-phase workflow
 **Input Types**: Implementation descriptions, user stories, bug reports, file paths
-**Usage**:
-- `/prometh-spec` — Interactive mode with prompts
-- `/prometh-spec user-story.md` — Normalize existing file
-- `/prometh-spec --from-prd mobile-strategy-prd.md` — Generate SPECs from PRD
-- `/prometh-spec` + paste implementation requirements — Process text input
-- Or naturally: *"Create a SPEC for the user authentication feature"*
+**How to invoke** (natural conversation):
+- *"Create a SPEC for the user authentication feature"*
+- *"Normalize this user story into a SPEC"* (then paste or reference the file)
+- *"Derive a SPEC from prometh-docs/prds/mobile-strategy-prd.md"*
+- *"Convert this bug report into a SPEC"*
 
 **Implementation Types:** Feature/Bug Fix/Enhancement/Technical Task
 
@@ -141,12 +139,11 @@ Skills can be invoked explicitly via slash commands OR contextually — just des
 
 **Purpose**: Generate technical documentation with auto-analysis
 **Types**: `readme`, `runbook`, and `concept` documentation
-**Usage**:
-- `/prometh-doc readme` — Generate comprehensive README.md
-- `/prometh-doc runbook` — Generate operational runbook
-- `/prometh-doc concept` — Generate deep-dive concept documentation
-- `/prometh-doc` — Interactive menu to select type
-- Or naturally: *"Generate a README for this project"*
+**How to invoke** (natural conversation):
+- *"Generate a README for this project"*
+- *"Write an operational runbook for the deployment process"*
+- *"Write concept documentation for new team members"*
+- *"Generate documentation"* — triggers interactive type selection
 
 **Features:**
 - Analyzes repository structure and system configuration
@@ -158,56 +155,63 @@ Skills can be invoked explicitly via slash commands OR contextually — just des
 ## Workflow Examples
 
 ### 1. Strategic Initiative → Implementation
-```bash
-# Create strategic PRD (skill invoked via slash or naturally)
-/prometh-prd
-# Input: "Launch comprehensive mobile platform for customer self-service"
+```
+# 1. Create strategic PRD (say this in conversation)
+"Create a PRD for our mobile platform for customer self-service"
+→ prometh-prd skill creates: prometh-docs/prds/PRD-20260223-mobile-platform.md
 
-# Generate implementation SPECs from PRD
-/prometh-spec --from-prd prometh-docs/prds/mobile-customer-platform-prd.md
+# 2. Generate implementation SPEC from PRD (say this in conversation)
+"Derive a SPEC from prometh-docs/prds/PRD-20260223-mobile-platform.md"
+→ prometh-spec skill creates: prometh-docs/specs/SPC-20260223-mobile-platform.md
 
-# Check project status
+# 3. Check project status (slash command)
 /prometh-status
 ```
 
 ### 2. Bug Report → SPEC
-```bash
-# Convert bug report to implementation SPEC
-/prometh-spec critical-payment-bug.pdf
+```
+# Convert bug report to implementation SPEC (say this in conversation)
+"Convert critical-payment-bug.pdf into a SPEC"
+→ prometh-spec skill creates SPEC
 
-# Generate project documentation
-/prometh-doc readme
+# Generate project documentation (say this in conversation)
+"Generate a README for this project"
+→ prometh-doc skill creates README.md
 ```
 
 ### 3. Document Normalization
-```bash
-# Normalize existing strategic document
-/prometh-prd quarterly-planning-deck.pdf
+```
+# Normalize existing strategic document (say this in conversation)
+"Normalize quarterly-planning-deck.pdf into a PRD"
+→ prometh-prd skill normalizes into PRD format
 
-# Normalize existing user story
-/prometh-spec existing-user-story.md
+# Normalize existing user story (say this in conversation)
+"Convert existing-user-story.md into a SPEC"
+→ prometh-spec skill normalizes into SPEC format
 ```
 
 ### 4. Complete Implementation Workflow
-```bash
-# Create strategic PRD
-/prometh-prd
-# Input: "Launch comprehensive mobile platform"
+```
+# 1. Create strategic PRD (say this in conversation)
+"Create a PRD for our mobile platform"
+→ prometh-prd skill creates PRD
 
-# Generate implementation SPEC from PRD
-/prometh-spec --from-prd prometh-docs/prds/mobile-platform-prd.md
+# 2. Derive implementation SPEC from PRD (say this in conversation)
+"Derive a SPEC from prometh-docs/prds/PRD-20260223-mobile-platform.md"
+→ prometh-spec skill creates SPEC
 
-# Execute SPEC with guided implementation
-/prometh-build prometh-docs/specs/mobile-platform-implementation-spec.md
+# 3. Execute SPEC with guided implementation (slash command)
+/prometh-build prometh-docs/specs/SPC-20260223-mobile-platform.md
 
-# Monitor overall project status
+# 4. Monitor overall project status (slash command)
 /prometh-status
 ```
 
 ### 5. Generate Concept Documentation
-```bash
-# Deep-dive documentation for new team members / architecture review
-/prometh-doc concept
+```
+# Deep-dive documentation for new team members (say this in conversation)
+"Write concept documentation for new team members"
+→ prometh-doc skill creates concept doc in prometh-docs/concepts/
 ```
 
 ---
@@ -285,17 +289,18 @@ cp .claude/commands/prometh-*.md ~/.claude/commands/
 - User stories requiring detailed implementation
 
 ### Document Lifecycle
-1. **PRD Creation** → Strategic planning and stakeholder alignment (`/prometh-prd`)
-2. **SPEC Generation** → Implementation planning from PRDs (`/prometh-spec`)
-3. **Guided Implementation** → Execute SPEC phases with tracking (`/prometh-build`) 
-4. **Documentation** → Generate README/runbooks as needed (`/prometh-doc`)
-5. **Status Tracking** → Monitor progress via `/prometh-status`
+1. **PRD Creation** → Strategic planning and stakeholder alignment (`prometh-prd` skill — invoked naturally)
+2. **SPEC Generation** → Implementation planning from PRDs (`prometh-spec` skill — invoked naturally)
+3. **Guided Implementation** → Execute SPEC phases with tracking (`/prometh-build` slash command)
+4. **Documentation** → Generate README/runbooks as needed (`prometh-doc` skill — invoked naturally)
+5. **Status Tracking** → Monitor progress via `/prometh-status` slash command
 
 ### Complete Implementation Flow
 ```
 Strategic Vision (PRD) → Implementation Plan (SPEC) → Guided Execution (BUILD) → Delivery
-       ↓                        ↓                         ↓                    ↓
-  /prometh-prd            /prometh-spec            /prometh-build         Completed
+       ↓                        ↓                            ↓                       ↓
+  prometh-prd skill        prometh-spec skill          /prometh-build            Completed
+  (conversation)           (conversation)              (slash command)
 ```
 
 ---

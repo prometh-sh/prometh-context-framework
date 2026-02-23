@@ -44,6 +44,21 @@ fi
 - `PROMETH.local.md` takes precedence over `PROMETH.md`
 - Use resolved variables (`$DOCS_DIR` and `$TRACKING_FILE`) for all file operations
 
+## Configuration Resolution
+
+**After resolving the tracking file**, read the `## Document Configuration` section:
+
+```
+1. Open ${TRACKING_FILE} and locate the ## Document Configuration section
+2. Extract the YAML block under ### Metadata Template
+   → Store as METADATA_TEMPLATE (set to nil if section or block is absent/empty)
+3. Extract the YAML block under ### Filename Patterns
+   → Store as FILENAME_CONFIG (set to nil if section or block is absent/empty)
+```
+
+These two variables govern filename generation and metadata injection for all
+documents created in this session.
+
 ## Processing Logic
 
 ### Input Handling
@@ -55,11 +70,13 @@ fi
 
 ### Document Processing
 1. Content analysis and implementation type classification
-2. Apply unified `prometh-spec` output style with 3-phase workflow
-3. Ensure `${DOCS_DIR}/specs/` directory exists
-4. Generate comprehensive SPEC with implementation workflow
-5. Create descriptive filename from content analysis
-6. Update tracking file with SPEC information and traceability
+2. Read METADATA_TEMPLATE and FILENAME_CONFIG from TRACKING_FILE
+3. Apply unified `prometh-spec` output style with 3-phase workflow
+4. Ensure `${DOCS_DIR}/specs/` directory exists
+5. Generate comprehensive SPEC with implementation workflow
+6. Apply configured filename pattern or fall back to legacy format
+7. Inject YAML frontmatter if METADATA_TEMPLATE is present
+8. Update tracking file with SPEC information and traceability
 
 ## Supported Input Types
 - **File paths**: PDF, markdown, text, Word documents, existing specs
@@ -91,23 +108,47 @@ The skill automatically classifies content into implementation types:
 
 ## Filename Generation Logic
 
-Extract meaningful names from content analysis:
-- Convert to lowercase and use hyphens
-- Remove common words (the, a, an, for, to, with, etc.)
-- Keep 2-4 key descriptive words that capture implementation intent
-- Use type-based prefixes:
+### Name Slug Rules (apply in all cases)
 
-### Filename Patterns:
+Extract a meaningful slug from the document title or content:
+- Convert to lowercase and replace spaces with hyphens
+- Remove common stop-words (the, a, an, for, to, with, of, and, or, in, on, at, etc.)
+- Keep 2–5 key descriptive words that capture the implementation intent
+- Result: `{NAME}` token (e.g. `user-auth`, `payment-retry-logic`)
+
+### Configured Pattern (when FILENAME_CONFIG is present)
+
+Read `spec_pattern` from FILENAME_CONFIG and substitute tokens:
+
+| Token | Value |
+|-------|-------|
+| `{DATE}` | Current date as `YYYYMMDD` (e.g. `20260223`) |
+| `{DATETIME}` | Current datetime as `YYYYMMDDHHMM` (e.g. `202602231830`) |
+| `{NAME}` | Slugified document name (see rules above) |
+
+**Default configured pattern:** `SPC-{DATE}-{NAME}.md`
+
+Examples with default pattern:
+- "Add user profile photo upload" → `SPC-20260223-user-profile-photo-upload.md`
+- "Fix login button not working on mobile" → `SPC-20260223-fix-login-button-mobile.md`
+- "Improve search performance" → `SPC-20260223-improve-search-performance.md`
+- "Setup Redis caching system" → `SPC-20260223-setup-redis-caching.md`
+
+### Legacy Fallback (when FILENAME_CONFIG is absent)
+
+If no `## Document Configuration` section or `spec_pattern` key is found in the
+tracking file, fall back to the original type-prefixed format:
+
 - **Features**: `feature-[extracted-name]-spec.md`
 - **Bug Fixes**: `fix-[extracted-issue]-spec.md`
 - **Enhancements**: `enhance-[extracted-name]-spec.md`
 - **Technical Tasks**: `task-[extracted-name]-spec.md`
 
-### Examples:
-- "Add user profile photo upload" → `feature-user-profile-photo-upload-spec.md`
-- "Fix login button not working on mobile" → `fix-login-button-mobile-spec.md`
-- "Improve search performance" → `enhance-search-performance-spec.md`
-- "Setup Redis caching system" → `task-setup-redis-caching-spec.md`
+Print an info message when falling back:
+```
+ℹ️  No filename configuration found in ${TRACKING_FILE}. Using legacy filename format.
+   To configure: add a ## Document Configuration section with a ### Filename Patterns block.
+```
 
 ## Template Application
 
@@ -191,6 +232,50 @@ If input content appears to be strategic rather than implementation-focused:
 - **Strategic indicators**: Market analysis, business objectives, cross-functional alignment
 - **Response**: Suggest using the `prometh-prd` skill instead
 - **Message**: "This content appears to be strategic in nature. Consider using the `prometh-prd` skill for Product Requirements Documents."
+
+## Metadata Injection
+
+Before writing the final document file, inject YAML frontmatter if configured:
+
+### When to inject
+
+- METADATA_TEMPLATE is present (non-nil, non-empty)
+- **AND** the destination is inside `${DOCS_DIR}` (i.e. `${DOCS_DIR}/specs/`)
+
+### Injection procedure
+
+1. Clone METADATA_TEMPLATE
+2. Compute and set the following dynamic fields:
+   - `title`: extracted from the first `# H1` heading of the generated document
+   - `created`: current datetime as ISO 8601 (e.g. `2026-02-23T18:30:29`)
+   - `uuid`: newly generated UUID v4 (e.g. `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx`)
+3. Prepend the populated block as a YAML frontmatter fence at the very top of the document:
+
+```
+---
+title: "Add User Authentication"
+created: "2026-02-23T18:30:29"
+author: "Your Name"
+focus: "Personal"
+tags: []
+project:
+  - name: "Your Project Name"
+    uuid: "YOUR-PROJECT-UUID"
+status: "Draft"
+uuid: "GENERATED-UUID-V4-PER-DOCUMENT"
+related: []
+---
+```
+
+4. Write the combined frontmatter + document body to the output file.
+
+### When METADATA_TEMPLATE is absent
+
+Skip injection and print:
+```
+ℹ️  No metadata template found in ${TRACKING_FILE}. Skipping metadata injection.
+   To enable: add a ## Document Configuration section with a ### Metadata Template block.
+```
 
 ## Error Handling
 

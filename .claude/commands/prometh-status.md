@@ -178,16 +178,21 @@ Generated with: Prometh Context Framework by Prometh
 **No Documents Yet:**
 ```
 🚀 Getting Started:
-1. Create your first strategic initiative: /prometh-prd
-2. Or jump to implementation: /prometh-spec
-3. Generate project documentation: /prometh-doc readme
+1. Create your first strategic initiative:
+   → say "Create a PRD for [your initiative]" (prometh-prd skill)
+2. Or jump to implementation:
+   → say "Create a SPEC for [your task]" (prometh-spec skill)
+3. Generate project documentation:
+   → say "Generate a README for this project" (prometh-doc skill)
 ```
 
 **PRDs but No SPECs:**
 ```
 ⚡ Ready for Implementation:
-1. Create SPECs from existing PRDs: /prometh-spec --from-prd [prd-file.md]
-2. Create additional implementation tasks: /prometh-spec
+1. Derive SPECs from existing PRDs:
+   → say "Derive a SPEC from [prd-file.md]" (prometh-spec skill)
+2. Create additional implementation tasks:
+   → say "Create a SPEC for [task]" (prometh-spec skill)
 ```
 
 **Many Draft Documents:**
@@ -201,9 +206,12 @@ Generated with: Prometh Context Framework by Prometh
 **Missing Documentation:**
 ```
 📚 Documentation Gap:
-1. Generate project README: /prometh-doc readme
-2. Create operational runbook: /prometh-doc runbook
-3. Document architecture decisions: /prometh-doc concept
+1. Generate project README:
+   → say "Generate a README for this project" (prometh-doc skill)
+2. Create operational runbook:
+   → say "Write an operational runbook" (prometh-doc skill)
+3. Document architecture decisions:
+   → say "Write concept documentation for this project" (prometh-doc skill)
 ```
 
 ## Error Handling

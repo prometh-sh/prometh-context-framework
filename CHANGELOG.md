@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - OpenCode Agent Skills for document creation: `prometh-prd`, `prometh-spec`, `prometh-doc` (`.opencode/skills/`)
 - `install_opencode_skills()` function in `setup.sh` to copy skills to `~/.config/opencode/skills/`
 - Skills verification step in `setup.sh` `verify_installations()` output
+- `## Document Configuration` section in `PROMETH.md` / `PROMETH.local.md` tracking file template (created by `/prometh-init`) with two sub-sections:
+  - `### Metadata Template` — YAML frontmatter block injected into every new document created inside `prometh-docs/` or `prometh-docs.local/` for RAG indexing; fields `title`, `created`, and `uuid` are computed automatically per document
+  - `### Filename Patterns` — configurable filename patterns for PRDs (`PRD-{DATE}-{NAME}.md`), SPECs (`SPC-{DATE}-{NAME}.md`), and Concept docs (`{DATETIME}-{NAME}.md`) with `{DATE}`, `{DATETIME}`, and `{NAME}` token support
+- `## Document Configuration` section to `README.md` with full usage guide, metadata field reference table, filename token table, customization examples, and a copy-paste migration block for existing projects
 
 ### Changed
 - Migrated OpenCode `prometh-prd`, `prometh-spec`, and `prometh-doc` from slash commands to self-contained Agent Skills
@@ -20,6 +24,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved .gitignore to explicitly include .claude/settings.local.json pattern
 - Updated README.md to clarify that docs/ and PROMETH.md are created by /prometh-init
 - Enhanced documentation clarity for public release
+- All three skills (`prometh-prd`, `prometh-spec`, `prometh-doc`) on both `.claude/` and `.opencode/` platforms now read `METADATA_TEMPLATE` and `FILENAME_CONFIG` from the tracking file before creating any document; fall back to legacy filename patterns when config is absent
+- `prometh-doc` skill applies filename patterns and metadata injection to Concept docs only; README.md and RUNBOOK.md always use fixed names and are never given frontmatter
+- All "next steps" guidance in commands (`prometh-init`, `prometh-build`, `prometh-status`) and skill output formats corrected to use natural-language skill invocation instead of stale `/prometh-prd`, `/prometh-spec`, `/prometh-doc` slash syntax
+- `README.md` `## Document Lifecycle` filename conventions updated to reflect the new configurable pattern table
+- `prometh-doc` skill `## Usage` section rewritten to describe natural-language invocation; stale `## Command Options` section removed
 
 ### Removed
 - `.opencode/commands/prometh-prd.md` (replaced by `.opencode/skills/prometh-prd/SKILL.md`)
