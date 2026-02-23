@@ -44,13 +44,35 @@ fi
 - `PROMETH.local.md` takes precedence over `PROMETH.md`
 - Use resolved variables (`$DOCS_DIR` and `$TRACKING_FILE`) for all file operations
 
-## Usage
+## Configuration Resolution
 
-```bash
-/prometh-doc [type] [options]
+**After resolving the tracking file**, read the `## Document Configuration` section:
+
+```
+1. Open ${TRACKING_FILE} and locate the ## Document Configuration section
+2. Extract the YAML block under ### Metadata Template
+   → Store as METADATA_TEMPLATE (set to nil if section or block is absent/empty)
+3. Extract the YAML block under ### Filename Patterns
+   → Store as FILENAME_CONFIG (set to nil if section or block is absent/empty)
 ```
 
-**Note**: If `[type]` is not provided, present an interactive menu to select the documentation type.
+README and RUNBOOK files are always excluded from both filename patterns and
+metadata injection regardless of configuration.
+
+## Usage
+
+This skill is invoked naturally in conversation — there is no `/prometh-doc` slash command.
+
+**How to invoke:**
+- *"Generate a README for this project"* → readme type
+- *"Write an operational runbook"* → runbook type
+- *"Write concept documentation for new team members"* → concept type
+- *"Generate documentation"* → triggers interactive type selection menu
+
+**Options** (include in your request):
+- `--include-risks` — add risk assessment sections
+- `--scope [service|environment|full-stack]` — documentation scope
+- `--output [path]` — specify custom output path
 
 ## Document Types
 
@@ -67,8 +89,9 @@ fi
 3. **Concept Documentation** (`concept`)
    - Deep-dive documentation: technology stack, architecture, domain concepts
    - Comprehensive onboarding guide for new team members
-   - Saved to: `${DOCS_DIR}/concepts/[concept-name].md`
+   - Saved to: `${DOCS_DIR}/concepts/[concept-name].md` (filename governed by `concept_pattern` — see Filename Generation)
    - Template: `prometh-doc-concept` output style
+   - Metadata: YAML frontmatter injected if METADATA_TEMPLATE is configured (see Metadata Injection)
 
 ## Processing Logic
 
@@ -207,16 +230,12 @@ Please create comprehensive concept documentation using the 'prometh-doc-concept
 10. Reference specific files with clickable links
 
 ### File Output
-- **Default Location**: `${DOCS_DIR}/concepts/[project-name]-concept.md`
+- **Default Location**: `${DOCS_DIR}/concepts/[concept-name].md` (filename governed by `concept_pattern` — see Filename Generation)
 - **Custom Output**: `--output` flag to specify custom path
 - **Naming Convention**: Use kebab-case for concept names
 - **Directory Creation**: Creates `concepts/` subdirectory if it doesn't exist
+- **Metadata**: Inject YAML frontmatter if METADATA_TEMPLATE is configured (see Metadata Injection)
 
-## Command Options
-
-- `--include-risks` — Add risk assessment sections
-- `--scope [service|environment|full-stack]` — Documentation scope
-- `--output [path]` — Specify custom output file or directory
 
 ## Tracking File Management
 
@@ -240,6 +259,91 @@ Update the "Last Updated" timestamp.
 **Privacy Note**: Use relative paths, never absolute paths or user directories.
 
 **Error Handling for Tracking**: If tracking file is unwriteable, warn but never block documentation creation.
+
+## Filename Generation (Concept docs only)
+
+README and RUNBOOK filenames are always fixed. Only Concept docs use this logic.
+
+### Name Slug Rules (apply in all cases)
+
+Extract a meaningful slug from the document title or topic:
+- Convert to lowercase and replace spaces with hyphens
+- Remove common stop-words (the, a, an, for, to, with, of, and, or, in, on, at, etc.)
+- Keep 2–5 key descriptive words that capture the concept topic
+- Result: `{NAME}` token (e.g. `architecture-overview`, `authentication-flow`)
+
+### Configured Pattern (when FILENAME_CONFIG is present)
+
+Read `concept_pattern` from FILENAME_CONFIG and substitute tokens:
+
+| Token | Value |
+|-------|-------|
+| `{DATE}` | Current date as `YYYYMMDD` (e.g. `20260223`) |
+| `{DATETIME}` | Current datetime as `YYYYMMDDHHMM` (e.g. `202602231830`) |
+| `{NAME}` | Slugified document name (see rules above) |
+
+**Default configured pattern:** `{DATETIME}-{NAME}.md`
+
+Examples with default pattern:
+- "Architecture Overview" → `202602231830-architecture-overview.md`
+- "Authentication Flow" → `202602231830-authentication-flow.md`
+- "Database Schema Design" → `202602231830-database-schema-design.md`
+
+### Legacy Fallback (when FILENAME_CONFIG is absent)
+
+If no `## Document Configuration` section or `concept_pattern` key is found:
+- Format: `[project-name]-concept.md` (plain kebab-case name, no date prefix)
+
+Print an info message when falling back:
+```
+ℹ️  No filename configuration found in ${TRACKING_FILE}. Using legacy filename format.
+   To configure: add a ## Document Configuration section with a ### Filename Patterns block.
+```
+
+## Metadata Injection (Concept docs only)
+
+README and RUNBOOK files are always excluded. Only documents written inside
+`${DOCS_DIR}/concepts/` receive metadata injection.
+
+### When to inject
+
+- METADATA_TEMPLATE is present (non-nil, non-empty)
+- **AND** the destination is `${DOCS_DIR}/concepts/`
+
+### Injection procedure
+
+1. Clone METADATA_TEMPLATE
+2. Compute and set the following dynamic fields:
+   - `title`: extracted from the first `# H1` heading of the generated document
+   - `created`: current datetime as ISO 8601 (e.g. `2026-02-23T18:30:29`)
+   - `uuid`: newly generated UUID v4 (e.g. `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx`)
+3. Prepend the populated block as a YAML frontmatter fence at the very top of the document:
+
+```
+---
+title: "Architecture Overview"
+created: "2026-02-23T18:30:29"
+author: "Your Name"
+focus: "Personal"
+tags: []
+project:
+  - name: "Your Project Name"
+    uuid: "YOUR-PROJECT-UUID"
+status: "Draft"
+uuid: "GENERATED-UUID-V4-PER-DOCUMENT"
+related: []
+---
+```
+
+4. Write the combined frontmatter + document body to the output file.
+
+### When METADATA_TEMPLATE is absent
+
+Skip injection for README/RUNBOOK silently. For Concept docs, print:
+```
+ℹ️  No metadata template found in ${TRACKING_FILE}. Skipping metadata injection.
+   To enable: add a ## Document Configuration section with a ### Metadata Template block.
+```
 
 ## Error Handling
 

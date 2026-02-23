@@ -312,9 +312,9 @@ Continue? (y/n):
 🔄 Tracking file Updated: All tracking information synchronized
 
 💡 What's Next:
-• Generate project documentation: /prometh-doc readme
+• Generate project documentation: say "Generate a README for this project" (prometh-doc skill)
 • View project status: /prometh-status
-• Create related SPECs: /prometh-spec --from-prd [PRD-file]
+• Create related SPECs: say "Derive a SPEC from [PRD-file]" (prometh-spec skill)
 • Review completed work in tracking file
 
 Implementation session complete! 🚀

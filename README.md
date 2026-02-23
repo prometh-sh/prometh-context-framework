@@ -238,9 +238,18 @@ prometh-context-framework/
 
 **SPEC types**: `Feature` · `Bug Fix` · `Enhancement` · `Technical Task`
 
-**Filename conventions:**
-- PRDs: `[kebab-name]-prd.md`
-- SPECs: `[feature|fix|enhance|task]-[kebab-name]-spec.md`
+**Filename conventions** (when `## Document Configuration` is set in `PROMETH.md`):
+
+| Document type | Default pattern | Example |
+|---------------|-----------------|---------|
+| PRD | `PRD-{DATE}-{NAME}.md` | `PRD-20260223-mobile-strategy.md` |
+| SPEC | `SPC-{DATE}-{NAME}.md` | `SPC-20260223-user-authentication.md` |
+| Concept doc | `{DATETIME}-{NAME}.md` | `202602231830-architecture-overview.md` |
+| README | `README.md` (fixed) | — |
+| RUNBOOK | `RUNBOOK.md` (fixed) | — |
+
+Tokens: `{DATE}` = `YYYYMMDD`, `{DATETIME}` = `YYYYMMDDHHMM`, `{NAME}` = slugified title.
+Without configuration, skills fall back to legacy patterns (`[name]-prd.md`, `feature-[name]-spec.md`).
 
 ## Configuration
 
@@ -271,6 +280,118 @@ If both exist, `.local` variants always take precedence.
 ### Migrating from legacy `docs/` directory
 
 Run `/prometh-init` — it detects an existing `docs/` directory and offers to migrate it automatically.
+
+## Document Configuration
+
+The `## Document Configuration` section in `PROMETH.md` or `PROMETH.local.md` controls two behaviours for all skills — **metadata injection** and **filename patterns**. Both sub-sections are optional; if absent, skills fall back to legacy defaults.
+
+When you run `/prometh-init` this section is created automatically. For existing projects initialized before this feature was added, paste it manually (see [Adding to an existing PROMETH.md](#adding-to-an-existing-promethmd)).
+
+### Metadata Template
+
+Every new document created inside `prometh-docs/` or `prometh-docs.local/` (PRDs, SPECs, Concept docs) receives a YAML frontmatter block at the top, populated from this template plus three fields computed at creation time:
+
+| Field | Source |
+|-------|--------|
+| `title` | Extracted from the first `# H1` heading of the generated document |
+| `created` | ISO 8601 timestamp at creation time (e.g. `2026-02-23T18:30:29`) |
+| `uuid` | Freshly generated UUID v4 per document |
+| All other fields | Copied from the template in `PROMETH.md` |
+
+> README.md and RUNBOOK.md written to the project root are **never** given metadata frontmatter.
+> If the `### Metadata Template` block is absent or empty, injection is skipped with an `ℹ️` message.
+
+**Example resulting frontmatter on a generated document:**
+
+```yaml
+---
+title: "Mobile App Platform Strategy"
+created: "2026-02-23T18:30:29"
+author: "Your Name"
+focus: "Personal"
+tags:
+  - mobile
+  - strategy
+project:
+  - name: "Your Project Name"
+    uuid: "YOUR-PROJECT-UUID"
+status: "Draft"
+uuid: "GENERATED-UUID-V4-PER-DOCUMENT"
+related: []
+---
+```
+
+### Filename Patterns
+
+Controls the filename format for PRDs, SPECs, and Concept docs. Supported tokens:
+
+| Token | Expands to |
+|-------|-----------|
+| `{DATE}` | Current date — `YYYYMMDD` (e.g. `20260223`) |
+| `{DATETIME}` | Current datetime — `YYYYMMDDHHMM` (e.g. `202602231830`) |
+| `{NAME}` | Slugified title — lowercase, hyphens, stop-words removed (e.g. `mobile-app-strategy`) |
+
+**Default patterns (set by `/prometh-init`):**
+
+```yaml
+prd_pattern: "PRD-{DATE}-{NAME}.md"
+spec_pattern: "SPC-{DATE}-{NAME}.md"
+concept_pattern: "{DATETIME}-{NAME}.md"
+```
+
+You can customize any pattern freely. For example, to prefix with a project code:
+
+```yaml
+prd_pattern: "ACME-PRD-{DATE}-{NAME}.md"
+spec_pattern: "ACME-SPC-{DATE}-{NAME}.md"
+concept_pattern: "{DATE}-{NAME}.md"
+```
+
+### Adding to an existing PROMETH.md
+
+If your project was initialized before this feature was added, paste the following block into `PROMETH.md` or `PROMETH.local.md` **between** the `## Project Configuration` section and the `## Document Inventory` section:
+
+```markdown
+## Document Configuration
+
+*Project-level configuration read by all Prometh skills before creating any document.
+Both sub-sections are optional — if absent, skills fall back to legacy defaults.*
+
+### Metadata Template
+
+*YAML frontmatter injected into every new document created inside `prometh-docs/` or
+`prometh-docs.local/`. Remove or leave this block empty to disable metadata injection.*
+
+```yaml
+author: "Your Name"
+focus: "Personal"
+tags: []
+project:
+  - name: "Your Project Name"
+    uuid: "YOUR-PROJECT-UUID"
+status: Draft
+related: []
+```
+
+> `title`, `created`, and `uuid` are computed automatically at document creation time
+> and are never stored here.
+
+### Filename Patterns
+
+*Filename patterns applied when skills generate new documents. Supported tokens:
+`{DATE}` (YYYYMMDD), `{DATETIME}` (YYYYMMDDHHMM), `{NAME}` (slugified title).*
+
+```yaml
+prd_pattern: "PRD-{DATE}-{NAME}.md"
+spec_pattern: "SPC-{DATE}-{NAME}.md"
+concept_pattern: "{DATETIME}-{NAME}.md"
+```
+
+> README.md and RUNBOOK.md always use fixed names regardless of this config.
+> Remove this block to fall back to legacy patterns (e.g. `mobile-strategy-prd.md`).
+```
+
+Fill in `author`, `focus`, and `project` with your own values. The `tags`, `related`, and `status` fields can be left at their defaults — skills will copy them into each new document as-is.
 
 ## Contributing
 

@@ -189,6 +189,44 @@ TRACKING_FILE="PROMETH.local.md"
 - **AGENTS.local.md Found**: [Yes/No]
 - **Initialization Date**: [Current Date]
 
+## Document Configuration
+
+*Project-level configuration read by all Prometh skills before creating any document.
+Both sub-sections are optional — if absent, skills fall back to legacy defaults.*
+
+### Metadata Template
+
+*YAML frontmatter injected into every new document created inside `prometh-docs/` or
+`prometh-docs.local/`. Remove or leave this block empty to disable metadata injection.*
+
+```yaml
+author: ""
+focus: ""
+tags: []
+project:
+  - name: ""
+    uuid: ""
+status: Draft
+related: []
+```
+
+> `title`, `created`, and `uuid` are computed automatically at document creation time
+> and are never stored here.
+
+### Filename Patterns
+
+*Filename patterns applied when skills generate new documents. Supported tokens:
+`{DATE}` (YYYYMMDD), `{DATETIME}` (YYYYMMDDHHMM), `{NAME}` (slugified title).*
+
+```yaml
+prd_pattern: "PRD-{DATE}-{NAME}.md"
+spec_pattern: "SPC-{DATE}-{NAME}.md"
+concept_pattern: "{DATETIME}-{NAME}.md"
+```
+
+> README.md and RUNBOOK.md always use fixed names regardless of this config.
+> Remove this block to fall back to legacy patterns (e.g. `mobile-strategy-prd.md`).
+
 ## Document Inventory
 
 ### Product Requirements Documents (PRDs)
@@ -228,17 +266,17 @@ TRACKING_FILE="PROMETH.local.md"
 
 Run one of these commands to get started:
 
-**Strategic Planning:**
-- `/prometh-prd` - Create new strategic PRD from description
-- `/prometh-prd [filename.pdf]` - Normalize existing strategic document
+**Strategic Planning** (`prometh-prd` skill — invoked naturally in conversation):
+- *"Create a PRD for [your initiative]"*
+- *"Normalize [filename.pdf] into a PRD"*
 
-**Implementation Planning:**
-- `/prometh-spec` - Create new implementation SPEC from description
-- `/prometh-spec [filename.md]` - Normalize existing implementation document
+**Implementation Planning** (`prometh-spec` skill — invoked naturally in conversation):
+- *"Create a SPEC for [your task]"*
+- *"Convert [filename.md] into a SPEC"*
 
-**Documentation:**
-- `/prometh-doc readme` - Generate comprehensive project README
-- `/prometh-doc runbook` - Create operational runbook
+**Documentation** (`prometh-doc` skill — invoked naturally in conversation):
+- *"Generate a README for this project"*
+- *"Write an operational runbook"*
 
 ---
 
@@ -288,15 +326,15 @@ After successful initialization, display context-aware next steps based on proje
 🚀 Getting Started:
 
 1. Strategic Planning First:
-   /prometh-prd
+   → say "Create a PRD for [your initiative]" (prometh-prd skill)
    📝 Create your first PRD for Epic-level strategic initiatives
 
 2. Or Jump to Implementation:
-   /prometh-spec
+   → say "Create a SPEC for [your task]" (prometh-spec skill)
    ⚡ Create implementation SPECs for immediate development tasks
 
 3. Project Documentation:
-   /prometh-doc readme
+   → say "Generate a README for this project" (prometh-doc skill)
    📚 Generate comprehensive project documentation
 ```
 
@@ -308,9 +346,9 @@ Found existing documents in your project:
 • [List found documents that could be normalized]
 
 Recommendations:
-1. /prometh-prd [document.pdf]    - Normalize strategic documents to PRD format
-2. /prometh-spec [document.md]    - Convert requirements to SPEC format
-3. /prometh-doc readme           - Generate updated project documentation
+1. say "Normalize [document.pdf] into a PRD" (prometh-prd skill)
+2. say "Convert [document.md] into a SPEC" (prometh-spec skill)
+3. say "Generate a README for this project" (prometh-doc skill)
 ```
 
 **For Projects with PRDs but no SPECs:**
@@ -321,10 +359,10 @@ Found PRDs in ${DOCS_DIR}/prds/:
 • [List existing PRD files]
 
 Next Steps:
-1. /prometh-spec --from-prd ${DOCS_DIR}/prds/[prd-file.md]
+1. say "Derive a SPEC from ${DOCS_DIR}/prds/[prd-file.md]" (prometh-spec skill)
    🔗 Create implementation SPECs from existing PRDs
 
-2. /prometh-spec
+2. say "Create a SPEC for [task]" (prometh-spec skill)
    ➕ Create additional implementation SPECs
 ```
 
@@ -337,13 +375,13 @@ Your project has strategic documents (PRDs) and implementation plans (SPECs).
 Maintenance Tasks:
 1. Update document status in PROMETH.md
 2. Create new documents as needed:
-   • /prometh-prd    - New strategic initiatives
-   • /prometh-spec   - New implementation tasks
-   • /prometh-doc    - Technical documentation
+   • say "Create a PRD for [initiative]" (prometh-prd skill)
+   • say "Create a SPEC for [task]" (prometh-spec skill)
+   • say "Generate documentation" (prometh-doc skill)
 
 3. Generate documentation:
-   • /prometh-doc readme   - Update project README
-   • /prometh-doc runbook  - Create operational guides
+   • say "Generate a README for this project" (prometh-doc skill)
+   • say "Write an operational runbook" (prometh-doc skill)
 ```
 
 ### 7. Error Handling

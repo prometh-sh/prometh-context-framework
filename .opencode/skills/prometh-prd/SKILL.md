@@ -44,6 +44,21 @@ fi
 - `PROMETH.local.md` takes precedence over `PROMETH.md`
 - Use resolved variables (`$DOCS_DIR` and `$TRACKING_FILE`) for all file operations
 
+## Configuration Resolution
+
+**After resolving the tracking file**, read the `## Document Configuration` section:
+
+```
+1. Open ${TRACKING_FILE} and locate the ## Document Configuration section
+2. Extract the YAML block under ### Metadata Template
+   → Store as METADATA_TEMPLATE (set to nil if section or block is absent/empty)
+3. Extract the YAML block under ### Filename Patterns
+   → Store as FILENAME_CONFIG (set to nil if section or block is absent/empty)
+```
+
+These two variables govern filename generation and metadata injection for all
+documents created in this session.
+
 ## Processing Logic
 
 ### Input Handling
@@ -53,12 +68,14 @@ fi
 
 ### Document Processing
 1. **Directory Resolution**: Determine DOCS_DIR and TRACKING_FILE using the logic above
-2. **Content Analysis**: Analyze input to validate strategic scope
-3. **Template Application**: Apply the unified PRD template (embedded below)
-4. **Directory Verification**: Ensure `${DOCS_DIR}/prds/` directory exists
-5. **Document Generation**: Create comprehensive PRD with proper formatting
-6. **Filename Generation**: Create descriptive filename from content analysis
-7. **Tracking File Update**: Update the tracking file with new PRD information
+2. **Configuration Resolution**: Read METADATA_TEMPLATE and FILENAME_CONFIG from TRACKING_FILE
+3. **Content Analysis**: Analyze input to validate strategic scope
+4. **Template Application**: Apply the unified PRD template (embedded below)
+5. **Directory Verification**: Ensure `${DOCS_DIR}/prds/` directory exists
+6. **Document Generation**: Create comprehensive PRD with proper formatting
+7. **Filename Generation**: Apply configured pattern or fall back to legacy format
+8. **Metadata Injection**: Prepend YAML frontmatter if METADATA_TEMPLATE is present
+9. **Tracking File Update**: Update the tracking file with new PRD information
 
 ## Supported Input Types
 - **File paths**: PDF, markdown, text, Word documents, etc.
@@ -86,16 +103,44 @@ If input is determined to be tactical rather than strategic, suggest loading the
 
 ## Filename Generation Logic
 
-Extract meaningful names from content analysis:
-- Convert to lowercase and use hyphens
-- Remove common words (the, a, an, for, to, with, etc.)
-- Keep 2-4 key descriptive words that capture strategic intent
-- Format: `[extracted-name]-prd.md`
+### Name Slug Rules (apply in all cases)
 
-### Examples:
-- "Mobile app platform strategy" → `mobile-app-platform-strategy-prd.md`
-- "Customer onboarding experience redesign" → `customer-onboarding-experience-redesign-prd.md`
-- "AI-powered personalization implementation" → `ai-personalization-implementation-prd.md`
+Extract a meaningful slug from the document title or content:
+- Convert to lowercase and replace spaces with hyphens
+- Remove common stop-words (the, a, an, for, to, with, of, and, or, in, on, at, etc.)
+- Keep 2–5 key descriptive words that capture the strategic intent
+- Result: `{NAME}` token (e.g. `mobile-strategy`, `customer-onboarding-redesign`)
+
+### Configured Pattern (when FILENAME_CONFIG is present)
+
+Read `prd_pattern` from FILENAME_CONFIG and substitute tokens:
+
+| Token | Value |
+|-------|-------|
+| `{DATE}` | Current date as `YYYYMMDD` (e.g. `20260223`) |
+| `{DATETIME}` | Current datetime as `YYYYMMDDHHMM` (e.g. `202602231830`) |
+| `{NAME}` | Slugified document name (see rules above) |
+
+**Default configured pattern:** `PRD-{DATE}-{NAME}.md`
+
+Examples with default pattern:
+- "Mobile app platform strategy" → `PRD-20260223-mobile-app-platform-strategy.md`
+- "Customer onboarding experience redesign" → `PRD-20260223-customer-onboarding-redesign.md`
+- "AI-powered personalization" → `PRD-20260223-ai-personalization.md`
+
+### Legacy Fallback (when FILENAME_CONFIG is absent)
+
+If no `## Document Configuration` section or `prd_pattern` key is found in the
+tracking file, fall back to the original format:
+
+- Format: `[extracted-name]-prd.md`
+- Examples: `mobile-app-platform-strategy-prd.md`, `customer-onboarding-redesign-prd.md`
+
+Print an info message when falling back:
+```
+ℹ️  No filename configuration found in ${TRACKING_FILE}. Using legacy filename format.
+   To configure: add a ## Document Configuration section with a ### Filename Patterns block.
+```
 
 ## Tracking File Management
 
@@ -120,6 +165,50 @@ Update the "Last Updated" timestamp at the top of the tracking file.
 - Use relative paths (${DOCS_DIR}/prds/filename.md) not absolute paths
 - Never include user directories or private file paths
 - Keep all content shareable with team members
+
+## Metadata Injection
+
+Before writing the final document file, inject YAML frontmatter if configured:
+
+### When to inject
+
+- METADATA_TEMPLATE is present (non-nil, non-empty)
+- **AND** the destination is inside `${DOCS_DIR}` (i.e. `${DOCS_DIR}/prds/`)
+
+### Injection procedure
+
+1. Clone METADATA_TEMPLATE
+2. Compute and set the following dynamic fields:
+   - `title`: extracted from the first `# H1` heading of the generated document
+   - `created`: current datetime as ISO 8601 (e.g. `2026-02-23T18:30:29`)
+   - `uuid`: newly generated UUID v4 (e.g. `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx`)
+3. Prepend the populated block as a YAML frontmatter fence at the very top of the document:
+
+```
+---
+title: "Mobile App Platform Strategy"
+created: "2026-02-23T18:30:29"
+author: "Your Name"
+focus: "Personal"
+tags: []
+project:
+  - name: "Your Project Name"
+    uuid: "YOUR-PROJECT-UUID"
+status: "Draft"
+uuid: "GENERATED-UUID-V4-PER-DOCUMENT"
+related: []
+---
+```
+
+4. Write the combined frontmatter + document body to the output file.
+
+### When METADATA_TEMPLATE is absent
+
+Skip injection and print:
+```
+ℹ️  No metadata template found in ${TRACKING_FILE}. Skipping metadata injection.
+   To enable: add a ## Document Configuration section with a ### Metadata Template block.
+```
 
 ## Error Handling
 
@@ -363,7 +452,7 @@ Date: [Current Date]
 Tracking: Added to tracking file inventory
 
 💡 Next Steps:
-- Create implementation SPECs: load prometh-spec skill → --from-prd ${DOCS_DIR}/prds/[filename]-prd.md
+- Create implementation SPECs: say "Derive a SPEC from ${DOCS_DIR}/prds/[filename]-prd.md" (prometh-spec skill)
 - View project status: /prometh-status
 ```
 
