@@ -373,6 +373,7 @@ status: Draft
 related: []
 ```
 
+```
 > `title`, `created`, and `uuid` are computed automatically at document creation time
 > and are never stored here.
 
@@ -387,6 +388,7 @@ spec_pattern: "SPC-{DATE}-{NAME}.md"
 concept_pattern: "{DATETIME}-{NAME}.md"
 ```
 
+```
 > README.md and RUNBOOK.md always use fixed names regardless of this config.
 > Remove this block to fall back to legacy patterns (e.g. `mobile-strategy-prd.md`).
 ```
