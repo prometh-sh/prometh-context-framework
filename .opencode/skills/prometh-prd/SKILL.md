@@ -161,10 +161,17 @@ Add new entry to the PRD inventory table:
 
 Update the "Last Updated" timestamp at the top of the tracking file.
 
-## Privacy Note
-- Use relative paths (${DOCS_DIR}/prds/filename.md) not absolute paths
-- Never include user directories or private file paths
-- Keep all content shareable with team members
+## Sensitive Data Protection
+
+When generating documents, **never** include:
+- API keys, secrets, tokens, passwords, or credentials
+- Environment variable **values** (reference names only, e.g. `$DATABASE_URL`)
+- Private hostnames, IP addresses, or internal URLs
+- PII (personal emails, account IDs, private names)
+- Database connection strings or `.env` file contents
+- Absolute file paths or user home directories
+
+Use placeholder values where examples are needed (e.g. `sk-...`, `your-api-key-here`, `https://your-domain.example.com`).
 
 ## Metadata Injection
 

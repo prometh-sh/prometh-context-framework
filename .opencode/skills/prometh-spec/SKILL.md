@@ -148,13 +148,17 @@ After creating or normalizing a SPEC:
 - Add to recent activity
 - Update "Last Updated" timestamp
 
-## Privacy Note
+## Sensitive Data Protection
 
-When updating the tracking file:
+When generating documents, **never** include:
+- API keys, secrets, tokens, passwords, or credentials
+- Environment variable **values** (reference names only, e.g. `$DATABASE_URL`)
+- Private hostnames, IP addresses, or internal URLs
+- PII (personal emails, account IDs, private names)
+- Database connection strings or `.env` file contents
+- Absolute file paths or user home directories
 
-- Use relative paths only (`${DOCS_DIR}/specs/filename.md`)
-- Never include user home directories or private paths
-- Keep all content shareable with team members
+Use placeholder values where examples are needed (e.g. `sk-...`, `your-api-key-here`, `https://your-domain.example.com`).
 
 ## Metadata Injection
 
