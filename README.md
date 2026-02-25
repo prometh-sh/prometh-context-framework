@@ -47,10 +47,12 @@ The framework follows the same structure on both platforms: **4 slash commands**
 - **`prometh-doc`** — Generate README, Runbook, or Concept documentation
 
 ### Output Style Templates (Claude Code)
-Five reusable templates referenced by skills:
+Seven reusable templates referenced by skills:
 - `prometh-prd` — Unified PRD template (14 sections)
 - `prometh-spec` — Unified SPEC template with 3-phase workflow
-- `prometh-doc-readme` — Comprehensive README template
+- `prometh-doc-readme` — Lean README landing page (5-min read, links to companions)
+- `prometh-doc-readme-getting-started` — Full tutorial walkthrough for `docs/getting-started.md`
+- `prometh-doc-readme-contributing` — Contributor guide for `CONTRIBUTING.md`
 - `prometh-doc-runbook` — Operational procedures template
 - `prometh-doc-concept` — Technology, architecture, and domain deep-dive template
 
@@ -193,10 +195,12 @@ prometh-context-framework/
 │   │   │   └── SKILL.md
 │   │   └── prometh-doc/
 │   │       └── SKILL.md
-│   └── output-styles/         # 5 output templates (referenced by skills)
+│   └── output-styles/         # 7 output templates (referenced by skills)
 │       ├── prometh-prd.md
 │       ├── prometh-spec.md
 │       ├── prometh-doc-readme.md
+│       ├── prometh-doc-readme-getting-started.md
+│       ├── prometh-doc-readme-contributing.md
 │       ├── prometh-doc-runbook.md
 │       └── prometh-doc-concept.md
 ├── .opencode/
@@ -229,6 +233,7 @@ prometh-context-framework/
 - **Claude Code skills** reference output-style templates from `~/.claude/output-styles/` — templates live separately from skill logic
 - **OpenCode skills** are fully self-contained — templates are embedded inline in each SKILL.md
 - On both platforms, skills (`prometh-prd`, `prometh-spec`, `prometh-doc`) are invoked contextually by the agent or by describing your intent in conversation — not via `/` slash syntax
+- **README generation** produces 3 commit-ready files: `README.md` (lean landing page), `docs/getting-started.md` (full tutorial), and `CONTRIBUTING.md` (contributor guide)
 
 ## Document Lifecycle
 

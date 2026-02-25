@@ -64,7 +64,7 @@ metadata injection regardless of configuration.
 This skill is invoked naturally in conversation — there is no `/prometh-doc` slash command.
 
 **How to invoke:**
-- *"Generate a README for this project"* → readme type
+- *"Generate a README for this project"* → readme type (produces README.md + docs/getting-started.md + CONTRIBUTING.md)
 - *"Write an operational runbook"* → runbook type
 - *"Write concept documentation for new team members"* → concept type
 - *"Generate documentation"* → triggers interactive type selection menu
@@ -77,9 +77,13 @@ This skill is invoked naturally in conversation — there is no `/prometh-doc` s
 ## Document Types
 
 1. **README Documentation** (`readme`)
-   - Comprehensive project overview, quick start, installation, usage
-   - Saved to: Project root as `README.md`
-   - Template: `prometh-doc-readme` output style
+   - Produces **three commit-ready files** in one operation:
+     - `README.md` — lean landing page (5-min read): value prop, demo, quick install, links
+     - `docs/getting-started.md` — full guided walkthrough (tutorial)
+     - `CONTRIBUTING.md` — contribution guidelines, dev setup, PR process
+   - These files go to the **project root / `docs/`** — NOT to `${DOCS_DIR}`.
+     No metadata injection, no filename patterns applied.
+   - Templates: `prometh-doc-readme`, `prometh-doc-readme-getting-started`, `prometh-doc-readme-contributing`
 
 2. **Runbook Documentation** (`runbook`)
    - Operational procedures, monitoring, incident response, recovery
@@ -104,10 +108,11 @@ This skill is invoked naturally in conversation — there is no `/prometh-doc` s
 
 What type of documentation would you like to generate?
 
-1. README - High-level project overview
-   • Quick start guide and installation instructions
-   • Features and basic usage examples
-   • Saved to: README.md (project root)
+1. README - Project landing page + companion docs
+   • README.md: lean overview, demo, quick install, links (5-min read)
+   • docs/getting-started.md: full guided walkthrough (tutorial)
+   • CONTRIBUTING.md: dev setup, PR process, coding standards
+   • All saved to project root / docs/ — ready to commit
 
 2. Runbook - Operational procedures
    • Monitoring, troubleshooting, and incident response
@@ -140,7 +145,7 @@ Handle existing files gracefully (create backups or review copies as needed).
 
 ## README Generation
 
-When generating README documentation:
+When generating README documentation, produce **three files** in one operation.
 
 ### Repository Analysis
 - **Project Type Detection**: Examine codebase to determine project characteristics
@@ -148,16 +153,28 @@ When generating README documentation:
 - **Dependency Detection**: Identify frameworks, libraries, and tools used
 - **Structure Analysis**: Understand project organization and architecture
 
-### Template Application
-Apply the `prometh-doc-readme` output style:
-```
-Please create comprehensive README documentation using the 'prometh-doc-readme' output style based on this repository analysis:
+### File 1: README.md (project root)
+Apply the `prometh-doc-readme` output style. This is the **landing page** — lean, scannable,
+≤300 lines. It links to `docs/getting-started.md` and `CONTRIBUTING.md` for detail.
 
-[repository structure and analysis results]
-```
+### File 2: docs/getting-started.md
+Apply the `prometh-doc-readme-getting-started` output style. This is the **full tutorial**:
+step-by-step walkthrough from install through first real usage. Create `docs/` directory if needed.
+
+### File 3: CONTRIBUTING.md (project root)
+Apply the `prometh-doc-readme-contributing` output style. This is the **contributor guide**:
+dev environment setup, branch strategy, commit format, PR process, code quality.
+GitHub auto-links this file in the repository UI.
+
+### Important constraints
+- These files go to **project root** (`README.md`, `CONTRIBUTING.md`) or **`docs/`** (`getting-started.md`)
+- They are **NOT** stored in `${DOCS_DIR}` — they are project source files, not Prometh-tracked docs
+- No metadata injection, no filename patterns — names are always fixed
+- No tracking file entry for these files
 
 ### Smart File Handling
-- **Existing README**: If README.md exists, create README-new.md for review
+- **Existing README**: If README.md exists, create README-new.md for review; same for CONTRIBUTING.md
+- **Existing docs/getting-started.md**: Create docs/getting-started-new.md for review
 - **Backup Creation**: Preserve existing documentation before updates
 
 ## Runbook Generation
@@ -256,7 +273,15 @@ Add new entry to the Technical Documentation table:
 
 Update the "Last Updated" timestamp.
 
-**Privacy Note**: Use relative paths, never absolute paths or user directories.
+**Sensitive Data Protection**: When generating documents, **never** include:
+- API keys, secrets, tokens, passwords, or credentials
+- Environment variable **values** (reference names only, e.g. `$DATABASE_URL`)
+- Private hostnames, IP addresses, or internal URLs
+- PII (personal emails, account IDs, private names)
+- Database connection strings or `.env` file contents
+- Absolute file paths or user home directories
+
+Use placeholder values where examples are needed (e.g. `sk-...`, `your-api-key-here`, `https://your-domain.example.com`).
 
 **Error Handling for Tracking**: If tracking file is unwriteable, warn but never block documentation creation.
 
@@ -355,13 +380,29 @@ Skip injection for README/RUNBOOK silently. For Concept docs, print:
 
 ## Output Format
 
-After successful documentation creation:
+After successful documentation creation, report varies by type:
+
+**README type** (3 files created):
 ```
 ✅ Documentation Created Successfully
 
-Type: [README/Runbook/Concept]
+Type: README (landing page + companion docs)
+Files:
+  README.md              → project root (landing page)
+  docs/getting-started.md → full tutorial walkthrough
+  CONTRIBUTING.md        → contributor guide (GitHub auto-linked)
+Date: [Current Date]
+
+These files are ready to commit. No tracking file entry added.
+```
+
+**Runbook / Concept type** (1 file created):
+```
+✅ Documentation Created Successfully
+
+Type: [Runbook/Concept]
 File: [output-file-path]
-Template: [prometh-doc-readme/prometh-doc-runbook/prometh-doc-concept]
+Template: [prometh-doc-runbook/prometh-doc-concept]
 Date: [Current Date]
 Tracking: Added to tracking file inventory
 
