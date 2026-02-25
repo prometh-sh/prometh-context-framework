@@ -52,10 +52,14 @@ metadata injection or configured filename patterns.
 
 ### 1. README
 
-- **Output**: `README.md` in project root
-- **Purpose**: High-level project overview, quick start, installation
-- **Audience**: Developers, users, contributors
-- **Sections**: Features, demo, installation, usage, API reference, troubleshooting, etc.
+- **Output**: Three commit-ready files in one operation:
+  - `README.md` — lean landing page (5-min read): value prop, demo, quick install, links
+  - `docs/getting-started.md` — full guided tutorial walkthrough
+  - `CONTRIBUTING.md` — contributor guide (GitHub auto-links this file)
+- **Purpose**: Complete project documentation set for a new open-source or team project
+- **Audience**: README → visitors; getting-started → new users; CONTRIBUTING → contributors
+- **Important**: These files go to project root / `docs/` — NOT to `${DOCS_DIR}`.
+  No metadata injection, no filename patterns, no tracking file entry.
 
 ### 2. Runbook
 
@@ -81,7 +85,8 @@ If type not specified in the conversation, display interactive menu:
 ```
 📚 Documentation Type Selection
 
-1. README - High-level project overview and quick start
+1. README - Landing page + companion docs (3 files)
+   README.md + docs/getting-started.md + CONTRIBUTING.md
 2. Runbook - Operational procedures and incident response
 3. Concept - Deep-dive technical documentation for onboarding
 
@@ -106,14 +111,21 @@ Generate comprehensive documentation based on analysis and template.
 
 ### Step 5: File Management
 
-- Create file in appropriate location
-- For Concept docs: apply configured filename pattern or legacy name; create `${DOCS_DIR}/concepts/` directory if needed
-- For README/Runbook: always write to project root with fixed name (`README.md` / `RUNBOOK.md`) — filename patterns and metadata injection do **not** apply
+- **README type**: Create three files:
+  - `README.md` in project root (lean landing page)
+  - `docs/getting-started.md` (full tutorial; create `docs/` if needed)
+  - `CONTRIBUTING.md` in project root
+  - If any file exists, create a `-new` variant for review (e.g., `README-new.md`)
+  - These files go to **project root / `docs/`** — NOT to `${DOCS_DIR}`
+  - No metadata injection, no filename patterns, no tracking file entry
+- **Runbook**: write to project root with fixed name `RUNBOOK.md`
+- **Concept docs**: apply configured filename pattern or legacy name; create `${DOCS_DIR}/concepts/` directory if needed
+- Filename patterns and metadata injection do **not** apply to README, CONTRIBUTING, or RUNBOOK
 
 ### Step 5b: Metadata Injection (Concept docs only)
 
 - If METADATA_TEMPLATE is present, inject YAML frontmatter before writing (see Metadata Injection section)
-- README and RUNBOOK files are always excluded from metadata injection
+- README, CONTRIBUTING, and RUNBOOK files are always excluded from metadata injection
 
 ### Step 6: Tracking File Update
 
@@ -126,7 +138,7 @@ If tracking file exists:
 ## Supported Invocation Styles
 
 ```
-readme      → Creates README.md directly
+readme      → Creates README.md + docs/getting-started.md + CONTRIBUTING.md
 runbook     → Creates RUNBOOK.md directly
 concept     → Creates concept documentation with auto-naming
 (none)      → Shows interactive menu to select type
@@ -139,13 +151,17 @@ concept     → Creates concept documentation with auto-naming
 - `--output [path]` — Specify custom output path/filename
 - `--scope [service|environment|full-stack]` — Documentation scope
 
-## Privacy Note
+## Sensitive Data Protection
 
-When updating the tracking file:
+When generating documents, **never** include:
+- API keys, secrets, tokens, passwords, or credentials
+- Environment variable **values** (reference names only, e.g. `$DATABASE_URL`)
+- Private hostnames, IP addresses, or internal URLs
+- PII (personal emails, account IDs, private names)
+- Database connection strings or `.env` file contents
+- Absolute file paths or user home directories
 
-- Use relative paths only (e.g., `${DOCS_DIR}/concepts/name.md`)
-- Never include absolute paths or user home directories
-- Keep all content shareable with team members
+Use placeholder values where examples are needed (e.g. `sk-...`, `your-api-key-here`, `https://your-domain.example.com`).
 
 ## Repository Analysis Requirements
 
@@ -264,266 +280,378 @@ Skip injection silently for README/RUNBOOK. For Concept docs, print:
 
 ---
 
-## Embedded Template 1: README
+## Embedded Template 1: README (lean landing page)
 
-Use this comprehensive template for README generation. Auto-populate based on repository analysis:
+Use this template for `README.md`. Target ≤300 lines — it is the landing page, not the manual.
+Link to `docs/getting-started.md` and `CONTRIBUTING.md` for detail instead of duplicating it here.
+
+---
 
 # [Project Name]
 
-> [Brief, compelling description of what the project does]
+> [One sentence: what it does and who it's for]
 
-[GitHub badges: license, version, build status, etc.]
+[![License](https://img.shields.io/badge/License-[LICENSE]-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-[VERSION]-green.svg)](https://github.com/[USERNAME]/[REPO]/releases)
 
-## Features
+[Optional: `![Demo](docs/images/demo.gif)` if project has a visual component]
 
-- [Key capability 1]
-- [Key capability 2]
-- [Key capability 3]
-- [Distinguishing features]
+## What it does
 
-## Demo
+[2–4 bullets covering core value. Focus on outcomes, not features.]
 
-[Link to live demo if available]
+- **[Capability 1]**: [What problem it solves]
+- **[Capability 2]**: [What problem it solves]
+- **[Capability 3]**: [What problem it solves]
 
-### Screenshots
+## Quick start
 
-[Images or animated GIFs showing project in action]
+```bash
+# Install
+[install command — ≤3 lines]
+
+# First use
+[the single most important command]
+```
+
+→ For a complete walkthrough, see [Getting Started](docs/getting-started.md).
 
 ## Installation
 
 ### Prerequisites
 
-- [Required software/language version]
-- [Required tools and dependencies]
-- [System requirements if applicable]
+- [Requirement 1] [version]
+- [Requirement 2] [version]
 
-### Using Package Manager
+### Install
 
 ```bash
-# npm
-npm install [project-name]
-
-# yarn
-yarn add [project-name]
-
-# pip
-pip install [project-name]
-
-# Homebrew
-brew install [project-name]
+[install steps — ≤10 lines; link to getting-started.md if platform-specific detail is needed]
 ```
 
-### Manual Installation
+### Verify
+
+```bash
+[verification command]
+# Expected: [expected output]
+```
+
+## Usage
+
+[Show 2–3 most common invocations only.]
+
+```bash
+[primary command example]
+[secondary command example]
+```
+
+→ Full usage examples: [Getting Started](docs/getting-started.md).
+
+## Key features
+
+| Feature | Description |
+|---------|-------------|
+| [Feature 1] | [One-line description] |
+| [Feature 2] | [One-line description] |
+| [Feature 3] | [One-line description] |
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Getting Started](docs/getting-started.md) | Full install walkthrough, tutorial, examples |
+| [Contributing](CONTRIBUTING.md) | Dev setup, branch strategy, PR process |
+| [Changelog](CHANGELOG.md) | Version history |
+
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for dev setup, branch naming, commit format, and PR guidelines.
+
+## License
+
+[License name] — see [LICENSE](LICENSE) for details.
+
+---
+
+Generated with: **Prometh Context Framework by Prometh**
+
+---
+
+## Embedded Template 2: Getting Started
+
+Use this template for `docs/getting-started.md`. Task-oriented tutorial — the reader follows
+steps and arrives at a working result. Not a reference document.
+
+---
+
+# Getting Started with [Project Name]
+
+> From installation to [specific first milestone] in under 30 minutes.
+
+## Prerequisites
+
+- **[Tool 1]** [version] — [install link]
+- **[Tool 2]** [version] — [install link]
+
+Verify:
+
+```bash
+[tool-1] --version   # Expected: [version]
+[tool-2] --version   # Expected: [version]
+```
+
+## Step 1: Installation
+
+### Option A: [Primary method]
+
+```bash
+[install command]
+```
+
+### Option B: From source
 
 ```bash
 git clone [repository-url]
 cd [project-directory]
-[build-command]
-[install-command]
+[build/install command]
 ```
 
-### Verification
+### Verify installation
 
 ```bash
-[command-to-verify-installation]
+[verification command]
+# Expected: [exact expected output]
 ```
 
-## Quick Start
+## Step 2: [Initial setup]
 
-1. [First step with command]
-2. [Second step with command]
-3. [Third step - basic usage]
-
-## Usage
-
-### CLI Usage
+[What the user must do before first use.]
 
 ```bash
-[command] [options]
-[example-command-1]
-[example-command-2]
+[setup command]
 ```
 
-### Programmatic Usage
+**What this creates:**
 
-```[language]
-import [library] from '[package]'
-
-// Example code
+```
+[directory or file tree]
 ```
 
-### Common Use Cases
+### Configuration
 
-- [Use case 1]: [brief description]
-- [Use case 2]: [brief description]
+```[format]
+[minimal required configuration with comments]
+```
 
-## Configuration
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `[setting1]` | [What it controls] | `[default]` |
+| `[setting2]` | [What it controls] | `[default]` |
 
-### Configuration Files
-
-- `[config-file-1]`: [description]
-- `[config-file-2]`: [description]
-
-### Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `[VAR_1]` | [Description] | [Default] |
-| `[VAR_2]` | [Description] | [Default] |
-
-### CLI Options
+## Step 3: Your first [primary action]
 
 ```bash
---option1         Description of option 1
---option2 VALUE   Description of option 2
+[primary command]
 ```
 
-## API Reference
-
-### Functions/Classes
-
-```[language]
-class/function Name
-  Description and usage
-  Parameters
-  Returns
-  Examples
-```
-
-### REST API Endpoints
+Expected output:
 
 ```
-GET /api/endpoint1          Description
-POST /api/endpoint2         Description
-  Request: [structure]
-  Response: [structure]
+[exact expected output]
 ```
 
-## Examples
+[Explain what happened — 2–4 sentences.]
 
-### Example 1: [Scenario]
+## Step 4: [Second key workflow]
 
 ```bash
-# Setup
-# Execution
-# Expected output
+[command]
 ```
 
-### Example 2: [Different Scenario]
+[Show result and explain briefly.]
 
-```[language]
-// Code example
-// Explanation
-```
+## Common workflows
 
-## Contributing
-
-### Development Setup
+### [Workflow A]
 
 ```bash
-git clone [repository-url]
-cd [project]
-npm install  # or equivalent
-npm run dev  # or equivalent
+[command sequence]
 ```
 
-### Development Workflow
-
-1. Create feature branch: `git checkout -b feature/my-feature`
-2. Make changes and test
-3. Commit: `git commit -m "description"`
-4. Push: `git push origin feature/my-feature`
-5. Open Pull Request
-
-### Code Quality Standards
-
-- [Testing requirements]
-- [Linting standards]
-- [Documentation requirements]
-
-## Testing
-
-### Running Tests
+### [Workflow B]
 
 ```bash
-npm test                     # Run all tests
-npm run test:unit            # Unit tests
-npm run test:integration     # Integration tests
+[command sequence]
 ```
 
-### Test Coverage
+## CLI reference
 
-```bash
-npm run coverage
-```
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--[option-1]` | `-[o]` | [What it does] | `[default]` |
+| `--[option-2]` | `-[o]` | [What it does] | `[default]` |
 
-### Writing Tests
+## Environment variables
 
-[Guidelines for writing tests in this project]
-
-## Deployment
-
-### Production Deployment
-
-#### Docker
-
-```bash
-docker build -t [image-name] .
-docker run [image-name]
-```
-
-#### Cloud Platforms
-
-- **AWS**: [Deployment instructions]
-- **GCP**: [Deployment instructions]
-- **Azure**: [Deployment instructions]
-- **Heroku**: [Deployment instructions]
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `[VAR_1]` | [Purpose] | `[default]` | Yes/No |
+| `[VAR_2]` | [Purpose] | `[default]` | Yes/No |
 
 ## Troubleshooting
 
-### Common Issues
+### [Common issue 1]
 
-**Issue**: [Problem description]
+**Symptom:** [What the user sees]
 
-- **Cause**: [Root cause]
-- **Solution**: [Step-by-step resolution]
-
-**Issue**: [Another problem]
-
-- **Solution**: [How to fix]
-
-### Debug Mode
-
+**Fix:**
 ```bash
-[debug-command-or-env-var]
+[fix command]
 ```
 
-### Getting Help
+### [Common issue 2]
 
-- [Link to documentation]
-- [Link to issues page]
-- [Support contact information]
+**Symptom:** [What the user sees]
 
-## FAQ
+**Fix:** [Resolution steps]
 
-**Q: [Common question 1]**
-A: [Answer with details]
+### Getting help
 
-**Q: [Common question 2]**
-A: [Answer with explanation]
+- Search [existing issues](https://github.com/[username]/[repo]/issues)
+- Open a [new issue](https://github.com/[username]/[repo]/issues/new)
 
-## Changelog
+## Next steps
 
-See [CHANGELOG.md](./CHANGELOG.md) for version history.
+- Read the [README](../README.md) for a project overview
+- Contribute back → [CONTRIBUTING.md](../CONTRIBUTING.md)
 
-## License
+---
 
-This project is licensed under the [LICENSE-TYPE] License - see [LICENSE](./LICENSE) file for details.
+Generated with: **Prometh Context Framework by Prometh**
 
-## Support
+---
 
-- [Full Documentation](./docs)
-- [Report Issues](./issues)
+## Embedded Template 3: Contributing
+
+Use this template for `CONTRIBUTING.md`. GitHub auto-links this file in the repository UI.
+Must be welcoming, concrete, and unambiguous.
+
+---
+
+# Contributing to [Project Name]
+
+Thank you for your interest in contributing!
+
+## Getting Help
+
+- **Questions**: [GitHub Discussions](https://github.com/[username]/[repo]/discussions)
+- **Bugs**: [GitHub Issues](https://github.com/[username]/[repo]/issues)
+
+## Development Setup
+
+### Prerequisites
+
+- **[Tool 1]** [version]
+- **[Tool 2]** [version]
+
+### Fork and clone
+
+```bash
+git clone https://github.com/YOUR-USERNAME/[repo-name].git
+cd [repo-name]
+git remote add upstream https://github.com/[username]/[repo-name].git
+```
+
+### Install dependencies
+
+```bash
+[dependency install command]
+```
+
+### Verify setup
+
+```bash
+[test command]     # Expected: all tests pass
+[lint command]     # Expected: no errors
+```
+
+## Branch Strategy
+
+| Type | Pattern | Example |
+|------|---------|---------|
+| Feature | `feature/<description>` | `feature/dark-mode` |
+| Bug fix | `fix/<description>` | `fix/login-redirect` |
+| Docs | `docs/<description>` | `docs/update-api-ref` |
+
+Always branch from `main`:
+
+```bash
+git checkout main
+git pull upstream main
+git checkout -b feature/your-feature
+```
+
+## Commit Format
+
+```
+<Category>: <imperative description>
+```
+
+| Category | When |
+|----------|------|
+| `Add` | New feature or file |
+| `Fix` | Bug fix |
+| `Update` | Enhancement to existing feature |
+| `Remove` | Deletion |
+| `Refactor` | Restructuring without behavior change |
+| `Docs` | Documentation only |
+| `Test` | Tests only |
+| `Chore` | Build, CI, tooling |
+
+Examples:
+```
+Add: dark mode toggle to settings panel
+Fix: redirect loop after login when session expires
+Docs: add platform-specific notes to getting-started
+```
+
+## Pull Request Process
+
+1. Rebase on latest `main`:
+```bash
+git fetch upstream
+git rebase upstream/main
+```
+2. Push and open a PR on GitHub
+3. Fill in the PR description; link related issues with `Fixes #123`
+4. Respond to review feedback; maintainer merges on approval
+
+### PR checklist
+
+- [ ] Tests pass: `[test command]`
+- [ ] No lint errors: `[lint command]`
+- [ ] Documentation updated if public API changed
+- [ ] `CHANGELOG.md` updated under `[Unreleased]` for user-visible changes
+
+## Code Quality
+
+```bash
+[lint command]     # Check for issues
+[format command]   # Auto-fix formatting
+[test command]     # Run all tests
+```
+
+## Reporting Bugs
+
+Include: OS + version, [tool] version, minimal reproduction steps, expected vs actual behavior.
+
+→ [Open a bug report](https://github.com/[username]/[repo]/issues/new)
+
+## Requesting Features
+
+Describe the problem you're solving, the solution you'd like, and any alternatives considered.
+
+→ [Open a feature request](https://github.com/[username]/[repo]/issues/new)
 
 ---
 
@@ -1246,12 +1374,25 @@ Generated with: **Prometh Context Framework by Prometh**
 
 After successful documentation generation:
 
+**README type** (3 files created):
 ```
 ✅ Documentation Generated Successfully
 
-Type: [README|Runbook|Concept]
+Type: README (landing page + companion docs)
+Files:
+  README.md               → project root (landing page, 5-min read)
+  docs/getting-started.md → full tutorial walkthrough
+  CONTRIBUTING.md         → contributor guide (GitHub auto-linked)
+
+These files are ready to commit. No tracking file entry added.
+```
+
+**Runbook / Concept type** (1 file created):
+```
+✅ Documentation Generated Successfully
+
+Type: [Runbook|Concept]
 File: [path/to/file.md]
-Size: [Approximate line count]
 Location: [Where file was created]
 
 The documentation has been created and is ready for review.
@@ -1260,7 +1401,6 @@ The documentation has been created and is ready for review.
 - Review generated documentation
 - Add any project-specific details
 - Update tracking file with new documentation
-- Share with team: /prometh-status
 ```
 
 ## Processing Instructions
