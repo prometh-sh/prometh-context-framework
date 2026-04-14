@@ -81,12 +81,58 @@ All slash commands require PROMETH.md or PROMETH.local.md in project root. Use `
 - `/prometh-status --brief` - Condensed view
 - `/prometh-status --counts` - Document counts only
 - `/prometh-status --health` - Health metrics and suggestions
+- `/prometh-status --include-archive` - Also include `prds/archive/` and `specs/archive/` (combinable with other flags)
 
 **Dashboard Features:**
 - Document inventory summary (PRDs, SPECs, documentation)
 - Recent activity feed with chronological updates
 - Traceability matrix showing PRD → SPEC relationships
+- Harness panel: active contract, progress summary, sensor counts, agent-file sync check
 - Health metrics and context-aware next step suggestions
+
+---
+
+## Harness Engineering Commands
+
+These commands close the feedback loop around the feedforward guides above. They manage the progress file (cross-session memory), contracts (testable definitions of done), feedback sensors, and contract evaluation.
+
+#### `/prometh-progress [update|reset]`
+**Purpose**: View or update the progress file that bridges context windows
+**Usage**:
+- `/prometh-progress` - Display current progress state
+- `/prometh-progress update` - Refresh progress from git log, diff, and active contract
+- `/prometh-progress reset` - Reset progress to an initial template (with confirmation)
+
+#### `/prometh-contract <name>`
+**Purpose**: Generate a sprint or feature contract with testable acceptance criteria
+**Usage**:
+- `/prometh-contract sprint-7` - Create a contract named sprint-7
+- `/prometh-contract auth-rewrite` - Create a feature contract
+
+**Contract contents**: metadata, scope, acceptance criteria table (with verification method and type — computational/inferential/manual), required sensors, out of scope, red flags and risk assessment.
+
+#### `/prometh-eval [contract-name]`
+**Purpose**: Evaluate the codebase against an active contract's acceptance criteria
+**Usage**:
+- `/prometh-eval` - Evaluate the active contract
+- `/prometh-eval sprint-7` - Evaluate a specific contract
+
+Runs each criterion (computational checks via their verification command, inferential via semantic analysis, manual flagged for human) and writes Status updates, Evaluation Notes, and an Evaluation Summary back into the contract plus a summary into `PROMETH-PROGRESS.local.md`.
+
+#### `/prometh-sensor add <name> <cmd> --type <t> --when <w>`
+**Purpose**: Register a feedback sensor in the harness
+**Usage**:
+- `/prometh-sensor add terraform-validate "mise run terraform:validate" --type computational --when pre-commit`
+- `/prometh-sensor add terratest "mise run terraform:test" --type computational --when pipeline`
+- `/prometh-sensor add arch-review "Review against concept doc" --type inferential --when pre-pr`
+
+Computational pre-commit sensors are dual-written to both the harness manifest and the `### Sensors` block in `CLAUDE.md` / `AGENTS.md` so the agent runs them every session.
+
+#### `/prometh-sensor list`
+**Purpose**: Display all registered sensors grouped by timing (pre-commit, pipeline, pre-pr).
+
+#### `/prometh-sensor remove <name>`
+**Purpose**: Remove a sensor from the harness (removes from both manifest and agent file if applicable).
 
 ---
 

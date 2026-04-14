@@ -1,6 +1,6 @@
 ---
-description: Display comprehensive project documentation status dashboard with inventory summary, recent activity, traceability matrix, and health metrics. Supports --brief, --counts, and --health options.
-argument-hint: "[--brief|--counts|--health]"
+description: Display comprehensive project documentation status dashboard with inventory summary, recent activity, traceability matrix, and health metrics. Supports --brief, --counts, --health, and --include-archive options.
+argument-hint: "[--brief|--counts|--health] [--include-archive]"
 allowed-tools: ["Read", "LS", "Bash"]
 ---
 
@@ -79,6 +79,25 @@ fi
 - **Staleness Indicators**: Documents that haven't been updated recently
 - **Workflow Status**: Distribution of documents across implementation phases
 
+### 6. Harness Status Panel
+
+Feedback loop health from the Prometh harness engineering extension. This panel is hidden under `--brief`; it is shown by default and under `--health`.
+
+- **Active Contract**: name, total criteria count, last evaluation pass/fail/partial/manual split, and `Overall` result if an `## Evaluation Summary` block is present
+- **Progress Summary**: value of `## Current State` → `Status`, `Branch`, and `Last updated` from `PROMETH-PROGRESS.local.md` (project root). If the file's `Branch:` differs from the current git branch, flag as `BRANCH DRIFT` so the user knows to run `/prometh-progress update`.
+- **Sensors Registered**: counts grouped by timing
+  - Pre-commit (computational)
+  - Pipeline (computational)
+  - Pre-PR (inferential)
+- **Harness Health**: presence of required harness artifacts
+  - `PROMETH-PROGRESS.local.md` exists at project root?
+  - `.gitignore` excludes `PROMETH-PROGRESS.local.md`?
+  - `${TRACKING_FILE}` contains a `## Harness Configuration` section?
+  - If the manifest references an active contract, does the contract file exist?
+- **Agent File Sync**: compares the `` - `<cmd>` `` bullets inside the `## Prometh Harness Protocol` → `### Sensors` block of `CLAUDE.md` (or `AGENTS.md`) against the rows in the `#### Computational (run before commit)` table of the manifest
+  - `IN SYNC` when the set of commands matches exactly
+  - `DRIFT` otherwise — list the missing and extra entries so the user can re-run `/prometh-sensor` to fix
+
 ## Processing Logic
 
 ### 1. ${TRACKING_FILE} Analysis
@@ -98,6 +117,51 @@ fi
 3. Identify orphaned files not tracked in ${TRACKING_FILE}
 4. Check for missing files referenced in tracking
 5. Validate directory structure integrity
+6. By default, EXCLUDE ${DOCS_DIR}/prds/archive/ and ${DOCS_DIR}/specs/archive/
+   from inventory counts, traceability, and recent-activity sections.
+   When --include-archive is passed, include them and label the archived
+   rows as "(archived)" in the dashboard output.
+```
+
+### Archive Handling
+
+Archived PRDs and SPECs live under `${DOCS_DIR}/prds/archive/` and `${DOCS_DIR}/specs/archive/`. They represent `Completed` or `Deprecated` documents retained for traceability but removed from the active workspace.
+
+- **Default behavior**: archive subdirectories are skipped when walking the filesystem and when rendering the Document Inventory, Traceability Matrix, Recent Activity, and Workflow Distribution panels.
+- **With `--include-archive`**: walk archive subdirectories as well; display archived entries alongside active ones with an `(archived)` suffix; add an "Archived" row to the inventory totals.
+- **Counts panel**: `--counts` respects `--include-archive` — archived docs are shown on a separate line when included.
+- **Health panel**: staleness detection never flags archived docs (they are expected to be stale).
+
+### 3. Harness Panel Collection
+
+Skip this collection step entirely when the user passed `--brief` or `--counts`.
+
+```
+1. Read PROMETH-PROGRESS.local.md at project root
+   - Extract Current State -> Status
+   - Extract Current State -> Branch
+   - Extract Current State -> Last updated
+   - Compare Branch against `git rev-parse --abbrev-ref HEAD` → flag BRANCH DRIFT if different
+2. Read ${TRACKING_FILE} -> ## Harness Configuration -> ### Contracts -> Active:
+   - If a contract path is listed, read that file
+   - Extract total criteria count from ## Acceptance Criteria
+   - Extract ## Evaluation Summary counts and Overall if present
+3. Read ${TRACKING_FILE} -> ## Harness Configuration -> ### Sensors (Feedback)
+   - Count rows in each of the three tables (skip placeholder rows)
+4. Harness Health checks:
+   - PROMETH-PROGRESS.local.md exists at project root
+   - .gitignore excludes PROMETH-PROGRESS.local.md
+   - Harness Configuration section present in tracking file
+   - If an Active contract path is set, verify the file exists
+5. Agent file sync check:
+   - Detect CLAUDE.md (preferred) or AGENTS.md in project root
+   - Parse bullets inside ## Prometh Harness Protocol -> ### Sensors
+     (lines of the form `- ` + backtick-wrapped command + backtick)
+   - Parse the Command column of the #### Computational (run before commit) table
+   - Diff the two sets:
+       agent_only = bullets not in registry
+       registry_only = registry commands not in bullets
+   - IN SYNC when both sets are empty, else DRIFT with lists
 ```
 
 ### 3. Dashboard Rendering
@@ -255,9 +319,11 @@ Generated with: Prometh Context Framework by Prometh
 
 ### Quick Stats Display:
 ```bash
-/prometh-status --brief    # Condensed one-line summary
-/prometh-status --counts   # Just the document counts
-/prometh-status --health   # Only health metrics and suggestions
+/prometh-status --brief            # Condensed one-line summary
+/prometh-status --counts           # Just the document counts
+/prometh-status --health           # Only health metrics and suggestions
+/prometh-status --include-archive  # Also walk prds/archive/ and specs/archive/
+                                    # (combinable with the flags above)
 ```
 
 ### Integration Points:
