@@ -80,7 +80,8 @@ All slash commands require PROMETH.md or PROMETH.local.md in project root. Use `
 - `/prometh-status` - Full status dashboard
 - `/prometh-status --brief` - Condensed view
 - `/prometh-status --counts` - Document counts only
-- `/prometh-status --health` - Health metrics and suggestions
+- `/prometh-status --health` - Health metrics + harness readiness scorecard (adopted projects)
+- `/prometh-status --harness` - Harness readiness scorecard only (13 checks across Guides, Sensors, Contracts, Progress, Codebase)
 - `/prometh-status --include-archive` - Also include `prds/archive/` and `specs/archive/` (combinable with other flags)
 
 **Dashboard Features:**

@@ -50,12 +50,12 @@ Harness Protocol    ──┘             │
 - **Guides** live in `prometh-docs/` (or `prometh-docs.local/`) and in the `## Prometh Harness Protocol` section that `/prometh-init` injects directly into `CLAUDE.md` / `AGENTS.md`.
 - **Sensors** are registered via `/prometh-sensor add` and dual-written into both the manifest (`PROMETH.md`) and the agent file's inline `### Sensors` block, so every session automatically runs them before committing.
 - **Contracts** codify what *done* means for a unit of work with testable acceptance criteria; `/prometh-eval` runs those criteria against the codebase and records results.
-- **Progress** (`PROMETH-PROGRESS.local.md` at the project root) is the cross-session memory that a fresh agent reads at session start and writes at session end. It is **per-worktree and always gitignored** — each branch/worktree maintains its own state, never shared, never committed.
+- **Progress** (`PROMETH-PROGRESS.local.md` at the project root) is the cross-session memory that a fresh agent reads at session start and writes at session end. It is **per-worktree and always gitignored** — each branch/worktree maintains its own state, never shared, never committed. An optional YAML front-matter header (`status`, `branch`, `last_updated`, `active_contract`, `schema_version`) gives orchestrators and dashboards a stable parse surface without invoking an LLM.
 - **Humans** remain in the loop — when failures repeat, the human iterates on the guides and sensors, not on each individual agent run.
 
 ## Architecture Overview
 
-The framework follows the same structure on both platforms: **9 slash commands** for workflow and harness operations, **3 skills** for document generation.
+The framework follows the same structure on both platforms: **8 slash commands** for workflow and harness operations, **3 skills** for document generation.
 
 | Type | Claude Code | OpenCode | What it does |
 |------|-------------|----------|--------------|
@@ -245,13 +245,14 @@ The `## Prometh Harness Protocol` in your agent file instructs every new session
 ### Monitoring project status
 
 ```bash
-/prometh-status           # Full dashboard (inventory + harness panel)
-/prometh-status --brief   # Condensed one-line summary
-/prometh-status --counts  # Document counts only
-/prometh-status --health  # Health metrics, harness sync check, and suggestions
+/prometh-status            # Full dashboard (inventory + harness panel)
+/prometh-status --brief    # Condensed one-line summary
+/prometh-status --counts   # Document counts only
+/prometh-status --health   # Doc health + harness readiness scorecard (adopted projects)
+/prometh-status --harness  # Harness readiness scorecard only (13 checks)
 ```
 
-The harness panel reports active contract state, progress summary, sensor counts by timing, harness health, and an **agent-file sync check** that diffs the inline `### Sensors` block against the computational pre-commit rows in the manifest so drift is caught before it matters.
+The harness panel reports active contract state, progress summary, sensor counts by timing, harness health, and an **agent-file sync check** that diffs the inline `### Sensors` block against the computational pre-commit rows in the manifest so drift is caught before it matters. The `--harness` readiness scorecard runs 13 checks across Guides, Sensors, Contracts, Progress, and Codebase, and auto-detects docs-only vs. harness-adopted projects.
 
 ## Complete Workflow
 
@@ -302,7 +303,7 @@ Strategic Vision  →  Plan  →  Contract  →  Guided Execution  →  Evaluati
 ```
 prometh-context-framework/
 ├── .claude/
-│   ├── commands/              # 9 slash commands
+│   ├── commands/              # 8 slash commands
 │   │   ├── prometh-init.md
 │   │   ├── prometh-build.md
 │   │   ├── prometh-status.md
@@ -325,7 +326,7 @@ prometh-context-framework/
 │       ├── prometh-doc-runbook.md
 │       └── prometh-doc-concept.md
 ├── .opencode/
-│   ├── commands/              # 9 slash commands (self-contained)
+│   ├── commands/              # 8 slash commands (self-contained)
 │   └── skills/                # 3 agent skills (templates embedded inline)
 │       ├── prometh-prd/SKILL.md
 │       ├── prometh-spec/SKILL.md

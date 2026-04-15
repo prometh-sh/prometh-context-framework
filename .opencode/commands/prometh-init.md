@@ -401,15 +401,24 @@ see the Sensors (Feedback) section in the harness manifest.
 
 **Progress File Creation (`PROMETH-PROGRESS.local.md`):**
 
-Create `PROMETH-PROGRESS.local.md` at the **project root** — not inside `${DOCS_DIR}`. Only create it if it does not already exist (never clobber an existing progress file). Use the current branch from `git rev-parse --abbrev-ref HEAD 2>/dev/null` (fall back to `main` if the repo is not initialized):
+Create `PROMETH-PROGRESS.local.md` at the **project root** — not inside `${DOCS_DIR}`. Only create it if it does not already exist (never clobber an existing progress file). Use the current branch from `git rev-parse --abbrev-ref HEAD 2>/dev/null` (fall back to `main` if the repo is not initialized). The YAML front-matter header is auto-populated at creation time (branch from git, date from today, `active_contract` empty because no contract exists yet):
 
 ```markdown
+---
+status: Initialized
+branch: [Current branch from git]
+last_updated: [ISO date]
+active_contract: ""
+schema_version: 1
+---
+
 # Progress
 
 ## Current State
 - Status: Initialized
 - Branch: [Current branch from git]
 - Last updated: [ISO date]
+- Active contract: none
 
 ## Completed
 - Project harness initialized via Prometh Context Framework

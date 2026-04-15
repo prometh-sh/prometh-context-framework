@@ -36,7 +36,7 @@ Generate a sprint or feature contract that codifies what "done" means for a chun
 ### 1. Gather scope
 
 Ask the user for:
-- **Ticket IDs** (optional, comma-separated, e.g. `KC-4044, KNF-0330`)
+- **Ticket IDs** (optional, comma-separated, e.g. `PROJ-123, PROJ-456`)
 - **Feature description or sprint goal** — what is being built or changed, and why
 - **Relevant code paths or components** — which files, modules, or services are in scope
 
