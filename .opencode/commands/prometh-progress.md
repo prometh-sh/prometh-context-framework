@@ -12,6 +12,32 @@ View or update the progress file that persists state across agent sessions. The 
 
 The progress file is **always** `PROMETH-PROGRESS.local.md` at the project root, regardless of whether the project uses committed (`prometh-docs/`) or local (`prometh-docs.local/`) documentation mode.
 
+## Machine-Readable Header (YAML front matter)
+
+Every progress file begins with an optional YAML front-matter block that mirrors the most important fields from `## Current State` plus the active contract path from the manifest. This gives orchestrators, dashboards, and other tooling a stable parse surface without having to regex the prose body.
+
+```yaml
+---
+status: In Progress
+branch: feat/pth-0355-pcf-prometh-status-harness
+last_updated: 2026-04-15
+active_contract: prometh-docs.local/contracts/pth-0355.md
+schema_version: 1
+---
+```
+
+Field rules:
+
+- `status` — mirrors the `- Status:` bullet under `## Current State`. The bullet stays the source of truth for humans; the header is a derived mirror.
+- `branch` — mirrors `- Branch:`. Orchestrators compare this against their own dispatch branch to detect drift **before** launching an agent.
+- `last_updated` — ISO date, mirrors `- Last updated:`.
+- `active_contract` — path to the active contract from `${TRACKING_FILE}` → `## Harness Configuration → ### Contracts → Active:`. Empty string when `Active: none`.
+- `schema_version` — integer, currently `1`. Future fields must not break `1` readers.
+
+The header is treated as **derived output**, not a manually maintained region: every `/prometh-progress update` and `/prometh-progress reset` re-derives every field from git, the prose body, and the manifest. Do not hand-edit it.
+
+**Backward compatibility:** legacy progress files written before the header was introduced have no front-matter block. `/prometh-progress` (display) tolerates a missing header — print a one-line note (`progress file has no machine-readable header; it will be added on next update`) and continue. `/prometh-progress update` synthesizes and prepends the header on its next run.
+
 **Why at root, always `.local`:**
 
 - Progress is ephemeral per-worktree session state, not project documentation.
@@ -77,21 +103,38 @@ Do not paraphrase — faithfully reproduce the content so the user can trust the
      - Known issues: preserve and extend
    - Update `- Last updated:` to the current ISO date
    - Update `- Branch:` to the current branch
+   - Update `- Active contract:` to the manifest's `Contracts → Active:` value (or `none`)
 5. If a contract is active, append or update a subsection titled `### Contract: {name}` under `## Current State` listing which criteria are now met vs. still pending.
-6. Write the updated content back to `PROMETH-PROGRESS.local.md`, preserving the top-level markdown structure (headings, ordering).
-7. Report a short summary of what changed in the file to the user.
+6. Re-derive the YAML front-matter header from the refreshed body and git/manifest state:
+   - `status` ← `- Status:` bullet value
+   - `branch` ← `git rev-parse --abbrev-ref HEAD`
+   - `last_updated` ← current ISO date
+   - `active_contract` ← manifest `Contracts → Active:` path (empty string if `none`)
+   - `schema_version: 1`
+   If the existing file has no header, prepend a new one. If it has one, overwrite it in place. Never preserve stale header values.
+7. Write the updated content back to `PROMETH-PROGRESS.local.md`, preserving the top-level markdown structure (headings, ordering).
+8. Report a short summary of what changed in the file to the user.
 
 ### Argument `reset`: rewrite to initial template
 
 1. Ask the user to confirm: "This will replace `PROMETH-PROGRESS.local.md` with a fresh initial template. Continue? (y/N)"
-2. If confirmed, overwrite the file with:
+2. If confirmed, overwrite the file with (header fields populated from current git branch, today's ISO date, and the manifest's `Contracts → Active:` value — use empty string when `Active: none`):
    ```markdown
+   ---
+   status: Initialized
+   branch: [current git branch]
+   last_updated: [current ISO date]
+   active_contract: [manifest active contract path, or empty string]
+   schema_version: 1
+   ---
+
    # Progress
 
    ## Current State
    - Status: Initialized
    - Branch: [current git branch]
    - Last updated: [current ISO date]
+   - Active contract: [same path as header, or "none"]
 
    ## Completed
    - Progress reset via /prometh-progress reset
@@ -120,6 +163,8 @@ Do not paraphrase — faithfully reproduce the content so the user can trust the
 - When moving items between sections, do not drop context (keep the original phrasing).
 - If the working tree is clean and there are no new commits since the last update, say so and make no changes.
 - On branch drift (progress file `Branch:` ≠ current git branch), always warn and recommend `update`.
+- Tolerate legacy progress files without a YAML front-matter header: display command prints a one-line note, and the next `update` synthesizes the header. Never fail because the header is missing.
+- Treat the YAML front matter as derived output — always re-derive on `update` and `reset`, never merge stale values from an existing header.
 
 ## Example Usage
 

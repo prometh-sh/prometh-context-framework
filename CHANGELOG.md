@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Optional YAML front-matter header on `PROMETH-PROGRESS.local.md` (`status`, `branch`, `last_updated`, `active_contract`, `schema_version`) for orchestrator and tooling consumption (e.g. OpenAI Symphony-style dispatchers). Backward-compatible: legacy progress files without a header continue to work and receive a header on the next `/prometh-progress update`. The header is treated as derived output — re-derived on every `update`/`reset` from git, the prose body, and the manifest.
+- `/prometh-status --harness` readiness scorecard with 13 checks across Guides (agent file, Harness Protocol section, concept docs), Sensors (registered pre-commit sensors, agent file commands, agent/registry sync), Contracts (directory, active contract), Progress (progress file + gitignore, staleness grading), and Codebase (git, test sensor heuristic, CI config). Auto-detects docs-only vs. harness-adopted projects and renders a dormant line instead of failing checks for docs-only projects. Also surfaces under `--health` when the project is harness-adopted.
 - OpenCode Agent Skills for document creation: `prometh-prd`, `prometh-spec`, `prometh-doc` (`.opencode/skills/`)
 - `install_opencode_skills()` function in `setup.sh` to copy skills to `~/.config/opencode/skills/`
 - Skills verification step in `setup.sh` `verify_installations()` output
@@ -17,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `## Document Configuration` section to `README.md` with full usage guide, metadata field reference table, filename token table, customization examples, and a copy-paste migration block for existing projects
 
 ### Changed
+- Replaced project-specific example ticket IDs (`KC-4044, KNF-0330`) in `/prometh-contract` with generic placeholders (`PROJ-123, PROJ-456`) on both `.claude/` and `.opencode/` command files
 - Migrated OpenCode `prometh-prd`, `prometh-spec`, and `prometh-doc` from slash commands to self-contained Agent Skills
 - `setup.sh` `install_opencode()` now creates `~/.config/opencode/skills/` directory and installs skills alongside commands
 - Updated `AGENTS.md` to document skills structure, naming conventions, frontmatter rules, and platform differences

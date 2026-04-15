@@ -1,5 +1,5 @@
 ---
-description: Display comprehensive project documentation status dashboard with inventory summary, recent activity, traceability matrix, and health metrics. Supports --brief, --counts, --health, and --include-archive options.
+description: Display comprehensive project documentation status dashboard with inventory summary, recent activity, traceability matrix, and health metrics. Supports --brief, --counts, --health, --harness, and --include-archive options.
 ---
 
 # Status Dashboard Command
@@ -96,6 +96,86 @@ Feedback loop health from the Prometh harness engineering extension. This panel 
   - `IN SYNC` when the set of commands matches exactly
   - `DRIFT` otherwise — list the missing and extra entries so the user can re-run `/prometh-sensor` to fix
 
+### 6b. Harness Readiness Scorecard
+
+Full audit of harness engineering prerequisites. Rendered in full under `--harness`
+and under `--health` (when the project is harness-adopted). Under the default run,
+only a single one-line summary is appended at the end of the Harness Status Panel.
+Hidden entirely under `--brief` and `--counts`.
+
+**Harness Adoption Detection.** A project is **harness-adopted** when any of:
+
+1. `${TRACKING_FILE}` contains a `## Harness Configuration` section with at least
+   one non-placeholder row in any sensor table, OR
+2. `PROMETH-PROGRESS.local.md` exists at project root, OR
+3. The manifest's `Contracts → Active:` is a real path (not `none`) and the
+   referenced contract file exists on disk.
+
+Otherwise the project is **docs-only**. When docs-only:
+
+- Under `--harness`: render only the dormant line
+  `Harness: not adopted — run /prometh-sensor add or /prometh-contract {name} to enable`
+  and exit. Do **not** run any check.
+- Under `--health`: show doc health as normal and append the same dormant line
+  in place of the scorecard.
+- Under default: omit the harness summary line entirely.
+
+**Checks (13 total).** Reuse data already collected in section 6 wherever possible;
+only new reads are called out explicitly.
+
+Guides (Feedforward):
+
+- **G1** Agent instruction file exists (`AGENTS.md` or `CLAUDE.md` at project root).
+  **NEW read.**
+- **G2** `## Prometh Harness Protocol` section present in the G1 file. **NEW read.**
+- **G3** At least one `.md` file under `${DOCS_DIR}/concepts/`. **NEW read.**
+
+Sensors (Feedback):
+
+- **S1** At least one non-placeholder row in the `#### Computational (run before commit)`
+  table of `${TRACKING_FILE}`. **Reuse section 6 parse.**
+- **S2** The `## Prometh Harness Protocol → ### Sensors` block in the G1 file
+  contains at least one `` - `<cmd>` `` bullet that is not the literal
+  placeholder `` - `<command>` ``. **NEW read.**
+- **S3** Agent bullets match registry commands exactly — reuses the existing
+  `IN SYNC`/`DRIFT` result from section 6. Skip (mark n/a) when S1 fails.
+
+Contracts:
+
+- **C1** `${DOCS_DIR}/contracts/` directory exists. **NEW read.**
+- **C2** Manifest `Contracts → Active:` is a path and that file exists.
+  Warning (not failure) when `Active: none`. **Reuse section 6 parse.**
+
+Progress:
+
+- **P1** `PROMETH-PROGRESS.local.md` exists at project root AND `.gitignore`
+  excludes it. Both halves required. **Reuse existing reads from section 6;
+  add explicit `.gitignore` check if not already performed.**
+- **P2** Parse `Last updated:` from the progress file. Pass if within 7 days,
+  warning if 7–30 days, fail if >30 days. **Reuse section 6 read; grade here.**
+
+Codebase:
+
+- **R1** `.git/` directory exists at project root. **NEW read.**
+- **R2** Heuristic: at least one sensor row in any manifest sensor table whose
+  `Name` or `Command` column contains the substring `test` (case-insensitive).
+  Fix hint explicitly notes this is a heuristic. **NEW scan over existing data.**
+- **R3** CI config present — any of `.github/workflows/*.yml`, `.gitlab-ci.yml`,
+  `.azure-pipelines.yml`, or `Jenkinsfile` at project root. Warning only — not
+  every project uses repo-local CI. **NEW read.**
+
+**Result line.** Render `Result: X/13 passing · Y warnings · Z gaps`.
+
+**Priority fixes.** Surface up to 3 items ordered by:
+
+1. Fails before warnings.
+2. Within each tier: Guides > Sensors > Contracts > Progress > Codebase.
+
+If all 13 checks pass, replace the priority block with
+`✅ Harness ready for autonomous agent work`.
+
+**Legend:** `[x]` pass · `[!]` warning · `[ ]` fail.
+
 ## Processing Logic
 
 ### 1. ${TRACKING_FILE} Analysis
@@ -160,6 +240,24 @@ Skip this collection step entirely when the user passed `--brief` or `--counts`.
        agent_only = bullets not in registry
        registry_only = registry commands not in bullets
    - IN SYNC when both sets are empty, else DRIFT with lists
+6. Harness Readiness Scorecard collection (only when --harness or --health
+   is active AND the project is harness-adopted per section 6b detection):
+   - G1: detect AGENTS.md or CLAUDE.md at project root
+   - G2: grep the G1 file for the literal string "## Prometh Harness Protocol"
+   - G3: count `.md` files under ${DOCS_DIR}/concepts/ (directory may not exist)
+   - S2: parse the ### Sensors block of the G1 file; count bullets of the form
+         `- ` + backtick-wrapped command; exclude the literal placeholder
+         `- `<command>``
+   - P1 (gitignore half): grep .gitignore for a line matching
+         PROMETH-PROGRESS.local.md
+   - P2 (grading): compute age in days from Last updated; <=7 pass,
+         8..30 warn, >30 fail
+   - R1: check for .git/ at project root
+   - R2: case-insensitive substring search for "test" in the Name or Command
+         columns of any sensor table in the manifest
+   - R3: check for any of:
+         .github/workflows/*.yml, .gitlab-ci.yml, .azure-pipelines.yml,
+         Jenkinsfile
 ```
 
 ### 3. Dashboard Rendering
@@ -225,12 +323,53 @@ Staleness Indicators:
   • X documents not updated in 30+ days
   • X documents missing recent activity
 
+🛡️  HARNESS READINESS            (--harness or --health, harness-adopted only)
+─────────────────────
+Guides (Feedforward)
+  [x] G1 Agent instruction file (AGENTS.md)
+  [x] G2 Harness Protocol section injected
+  [ ] G3 No concept docs — run /prometh-doc concept
+
+Sensors (Feedback)
+  [x] S1 3 computational pre-commit sensors registered
+  [x] S2 Agent file has real sensor commands
+  [!] S3 Agent/registry DRIFT — missing: `mise run lint`; run /prometh-sensor to resync
+
+Contracts
+  [x] C1 Contracts directory exists
+  [!] C2 No active contract — run /prometh-contract {name}
+
+Progress
+  [x] P1 PROMETH-PROGRESS.local.md present and gitignored
+  [!] P2 Last updated 9 days ago — run /prometh-progress update
+
+Codebase
+  [x] R1 Git initialized
+  [x] R2 Test sensor discoverable (heuristic: `mise run terraform:test`)
+  [!] R3 No CI config found (warning)
+
+Result: 9/13 passing · 3 warnings · 1 gap
+Priority:
+  1. G3 Add a concept doc (/prometh-doc concept)
+  2. S3 Resync sensors (/prometh-sensor)
+  3. P2 Update progress (/prometh-progress update)
+
 💡 SUGGESTED NEXT ACTIONS
 ─────────────────────────
 [Context-aware suggestions based on current project state]
 
 ════════════════════════════════════════════════════════════════
 Generated with: Prometh Context Framework by Prometh
+```
+
+When all 13 checks pass, replace the `Priority:` block with
+`✅ Harness ready for autonomous agent work`.
+
+When the project is docs-only (no harness adoption), replace the entire
+`🛡️  HARNESS READINESS` block with the dormant line:
+
+```
+🛡️  HARNESS: not adopted — run /prometh-sensor add or /prometh-contract {name} to enable
 ```
 
 ## Context-Aware Suggestions
@@ -283,6 +422,8 @@ Generated with: Prometh Context Framework by Prometh
 - **Missing directories**: Report directory issues and suggest `/prometh-init` to repair
 - **File sync issues**: Report discrepancies between ${TRACKING_FILE} and file system
 - **Empty project**: Display welcome message with getting started guidance
+- **Harness adoption undetected**: Under `--harness` and `--health`, render only
+  the dormant "not adopted" line. Never fail scorecard checks on a docs-only project.
 
 ## Health Assessment Logic
 
@@ -319,9 +460,16 @@ Generated with: Prometh Context Framework by Prometh
 ```bash
 /prometh-status --brief            # Condensed one-line summary
 /prometh-status --counts           # Just the document counts
-/prometh-status --health           # Only health metrics and suggestions
+/prometh-status --health           # Health metrics + harness readiness scorecard
+/prometh-status --harness          # Harness readiness scorecard only (skip inventory)
 /prometh-status --include-archive  # Also walk prds/archive/ and specs/archive/
                                     # (combinable with the flags above)
+
+Flag interactions:
+- `--harness --brief` collapses the scorecard to a single line:
+  `Harness: X/13 · Y warnings · Z gaps`
+- `--harness --counts` — `--harness` wins, `--counts` is ignored.
+- `--brief` and `--counts` on their own skip the harness section entirely.
 ```
 
 ### Integration Points:
