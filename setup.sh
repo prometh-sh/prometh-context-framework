@@ -316,7 +316,8 @@ show_completion() {
     echo "  prometh-prd        - Create or normalize strategic PRDs"
     echo "  prometh-spec       - Create or normalize implementation SPECs"
     echo "  prometh-doc        - Generate technical documentation"
-    echo "  (Invoke via /prometh-prd, /prometh-spec, /prometh-doc or naturally in conversation)"
+    echo "  prometh-planner    - Create Pixel Planner project plans with Gantt timelines"
+    echo "  (Invoke via /prometh-prd, /prometh-spec, /prometh-doc, /prometh-planner or naturally in conversation)"
     echo
     echo -e "${BLUE}Getting Started:${NC}"
     echo "1. Navigate to your project directory"

@@ -1,55 +1,56 @@
 ---
-description: View, update, or reset the harness progress file that bridges context windows across agent sessions
-argument-hint: "[update|reset]"
+description: View, update, or reset the harness progress file scoped to a specific contract
+argument-hint: "--contract <file> [update|reset]"
 allowed-tools: ["Read", "Write", "Edit", "Bash"]
 ---
 
 # Prometh Progress Command
 
-View or update the progress file that persists state across agent sessions. The progress file is the most important "memory" artifact in the harness — it is what a fresh agent reads at session start to understand where the previous session left off.
+View or update the progress file that persists state across agent sessions and is scoped to a specific contract. The progress file is the most important "memory" artifact in the harness — it is what a fresh agent reads at session start to understand where the previous session left off.
 
 ## Progress File Location
 
-The progress file is **always** `PROMETH-PROGRESS.local.md` at the project root, regardless of whether the project uses committed (`prometh-docs/`) or local (`prometh-docs.local/`) documentation mode.
+The progress file is **always** `PROMETH-PROGRESS.local.md` at the project root. There is exactly one progress file at any time, and it is scoped to the currently active contract. This ensures no merge conflicts, no per-worktree collisions, and a clear single source of truth.
 
-## Machine-Readable Header (YAML front matter)
+**Why at root, always `.local`, and always one per contract:**
 
-Every progress file begins with an optional YAML front-matter block that mirrors the most important fields from `## Current State` plus the active contract path from the manifest. This gives orchestrators, dashboards, and other tooling a stable parse surface without having to regex the prose body.
-
-```yaml
----
-status: In Progress
-branch: feat/pth-0355-pcf-prometh-status-harness
-last_updated: 2026-04-15
-active_contract: prometh-docs.local/contracts/pth-0355.md
-schema_version: 1
----
-```
-
-Field rules:
-
-- `status` — mirrors the `- Status:` bullet under `## Current State`. The bullet stays the source of truth for humans; the header is a derived mirror.
-- `branch` — mirrors `- Branch:`. Orchestrators compare this against their own dispatch branch to detect drift **before** launching an agent.
-- `last_updated` — ISO date, mirrors `- Last updated:`.
-- `active_contract` — path to the active contract from `${TRACKING_FILE}` → `## Harness Configuration → ### Contracts → Active:`. Empty string when `Active: none`.
-- `schema_version` — integer, currently `1`. Future fields must not break `1` readers.
-
-The header is treated as **derived output**, not a manually maintained region: every `/prometh-progress update` and `/prometh-progress reset` re-derives every field from git, the prose body, and the manifest. Do not hand-edit it.
-
-**Backward compatibility:** legacy progress files written before the header was introduced have no front-matter block. `/prometh-progress` (display) tolerates a missing header — print a one-line note (`progress file has no machine-readable header; it will be added on next update`) and continue. `/prometh-progress update` synthesizes and prepends the header on its next run.
-
-**Why at root, always `.local`:**
-
-- Progress is ephemeral per-worktree session state, not project documentation.
-- Placing it inside `prometh-docs/` would cause merge conflicts on every branch.
-- Placing it inside `prometh-docs.local/` would collide when users symlink the local docs directory across worktrees.
-- The `.local.` infix guarantees it is never committed (matches industry convention: `.env.local`, `settings.local.json`).
-- Each git worktree gets its own `PROMETH-PROGRESS.local.md` — no sharing, no conflicts.
+- Progress is ephemeral per-contract state, not project documentation.
+- The `.local` infix guarantees it is never committed (matches industry convention: `.env.local`, `settings.local.json`).
+- Exactly one contract is active at a time; switching contracts requires completing or resetting the previous one.
+- Each git worktree can have its own active contract, and each contract session is tracked independently by the `active_contract` field in the header.
 
 ## Preconditions
 
-1. `CLAUDE.md` or `CLAUDE.local.md` exists in project root. If neither is present, exit with an error directing the user to run `/prometh-init`.
-2. Documentation directory exists (resolve for reading the harness manifest):
+1. `--contract <file>` argument is required. If absent, exit immediately with:
+   ```
+   ❌ Missing required argument: --contract <file>
+   Usage: /prometh-progress --contract <path/to/contract.md> [update|reset]
+
+   The progress file is scoped to a specific contract. You must specify which contract to track.
+   ```
+   If provided, verify the contract file exists. If it does not, exit with:
+   ```
+   ❌ Contract file not found: <path>
+   Ensure the path is correct and the file exists.
+   ```
+
+2. Active contract guard: If `PROMETH-PROGRESS.local.md` already exists at project root, read its `active_contract:` field from the YAML front matter:
+   - If `active_contract` ≠ the `--contract` argument path, block with:
+     ```
+     ❌ A progress session for a different contract is already active.
+        Active contract:    prometh-docs.local/contracts/001.md
+        Requested contract: prometh-docs.local/contracts/002.md
+
+     Complete or reset the active session before starting a new one:
+       /prometh-progress --contract prometh-docs.local/contracts/001.md
+       /prometh-progress --contract prometh-docs.local/contracts/001.md reset
+     ```
+   - If `active_contract` matches the `--contract` argument, proceed normally.
+   - If no file exists, proceed to auto-create (first run for this contract).
+
+3. `CLAUDE.md` or `CLAUDE.local.md` exists in project root. If neither is present, exit with an error directing the user to run `/prometh-init`.
+
+4. Documentation directory exists (resolve for reading the harness manifest):
    ```bash
    if [ -d "prometh-docs.local" ]; then
      DOCS_DIR="prometh-docs.local"
@@ -60,7 +61,8 @@ The header is treated as **derived output**, not a manually maintained region: e
      exit 1
    fi
    ```
-3. `PROMETH-PROGRESS.local.md` exists at project root. If missing (new worktree or first run), auto-create it using the initial template from the `reset` branch below, then continue with the requested action.
+
+5. On first run for this contract (no progress file exists), auto-create `PROMETH-PROGRESS.local.md` at project root using the initial template from the `reset` branch below, with `active_contract` pre-populated from the `--contract` argument path.
 
 ## Argument Handling
 
@@ -112,19 +114,23 @@ Do not paraphrase — faithfully reproduce the content so the user can trust the
    - `active_contract` ← manifest `Contracts → Active:` path (empty string if `none`)
    - `schema_version: 1`
    If the existing file has no header, prepend a new one. If it has one, overwrite it in place. Never preserve stale header values.
-7. Write the updated content back to `PROMETH-PROGRESS.local.md`, preserving the top-level markdown structure (headings, ordering).
-8. Report a short summary of what changed in the file to the user.
+ 7. Write the updated content back to `PROMETH-PROGRESS.local.md`, preserving the top-level markdown structure (headings, ordering).
+ 8. Report a short summary of what changed in the file to the user.
+ 9. **Completion check**: After writing, evaluate whether all criteria in the active contract are in a terminal state (`Pass` or `Manual`). If yes:
+    - Report: `✅ All contract criteria are complete (Pass or Manual). Closing progress session.`
+    - Delete `PROMETH-PROGRESS.local.md`
+    - Confirm to the user that the session is closed and the file has been removed.
 
 ### Argument `reset`: rewrite to initial template
 
-1. Ask the user to confirm: "This will replace `PROMETH-PROGRESS.local.md` with a fresh initial template. Continue? (y/N)"
-2. If confirmed, overwrite the file with (header fields populated from current git branch, today's ISO date, and the manifest's `Contracts → Active:` value — use empty string when `Active: none`):
+1. Ask the user to confirm: "This will replace `PROMETH-PROGRESS.local.md` with a fresh initial template for contract `--contract`. Continue? (y/N)"
+2. If confirmed, overwrite the file with (header fields populated from current git branch, today's ISO date, and the `--contract` argument path):
    ```markdown
    ---
    status: Initialized
    branch: [current git branch]
    last_updated: [current ISO date]
-   active_contract: [manifest active contract path, or empty string]
+   active_contract: [--contract argument path]
    schema_version: 1
    ---
 
@@ -134,7 +140,7 @@ Do not paraphrase — faithfully reproduce the content so the user can trust the
    - Status: Initialized
    - Branch: [current git branch]
    - Last updated: [current ISO date]
-   - Active contract: [same path as header, or "none"]
+   - Active contract: [--contract argument path]
 
    ## Completed
    - Progress reset via /prometh-progress reset
@@ -158,6 +164,8 @@ Do not paraphrase — faithfully reproduce the content so the user can trust the
 ## Rules
 
 - The progress file is **always** `PROMETH-PROGRESS.local.md` at the project root. Never place it inside `prometh-docs/` or `prometh-docs.local/`.
+- `--contract <file>` is mandatory on every invocation. Exit with an error if absent or if the file does not exist.
+- Only one progress session is active at a time. If a progress file exists for a different contract, block with an error and name the active contract. Switching contracts requires completing or resetting the previous session.
 - Always preserve the markdown structure — do not reorder top-level headings.
 - Never invent commit hashes — only record hashes that actually appear in `git log`.
 - When moving items between sections, do not drop context (keep the original phrasing).
@@ -165,16 +173,17 @@ Do not paraphrase — faithfully reproduce the content so the user can trust the
 - On branch drift (progress file `Branch:` ≠ current git branch), always warn and recommend `update`.
 - Tolerate legacy progress files without a YAML front-matter header: display command prints a one-line note, and the next `update` synthesizes the header. Never fail because the header is missing.
 - Treat the YAML front matter as derived output — always re-derive on `update` and `reset`, never merge stale values from an existing header.
+- When all contract criteria reach `Pass` or `Manual` status, the progress file is automatically removed on the next `update`. The session is closed.
 
 ## Example Usage
 
 ```bash
-# Display current progress
-/prometh-progress
+# Display current progress for a contract
+/prometh-progress --contract prometh-docs.local/contracts/sprint-7.md
 
 # Update progress with session results
-/prometh-progress update
+/prometh-progress --contract prometh-docs.local/contracts/sprint-7.md update
 
 # Reset progress to initial template
-/prometh-progress reset
+/prometh-progress --contract prometh-docs.local/contracts/sprint-7.md reset
 ```

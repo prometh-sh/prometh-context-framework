@@ -4,35 +4,7 @@ description: Register, list, or remove feedback sensors in the Prometh harness (
 
 # Prometh Sensor Command
 
-Register, list, and remove feedback sensors for the harness. Sensors are checks that run AFTER the agent acts to enable self-correction. This command dual-writes: the full registry lives in `PROMETH.md` / `PROMETH.local.md`, while the executable short list of computational pre-commit sensors is mirrored into the `## Prometh Harness Protocol` section of `AGENTS.md` / `CLAUDE.md` so the agent reads them automatically every session.
-
-## Preconditions
-
-1. `AGENTS.md` or `CLAUDE.md` exists in project root. If missing, instruct the user to run `/prometh-init`.
-2. Resolve the documentation directory and tracking file:
-   ```bash
-   if [ -d "prometh-docs.local" ]; then
-     DOCS_DIR="prometh-docs.local"
-   elif [ -d "prometh-docs" ]; then
-     DOCS_DIR="prometh-docs"
-   else
-     echo "❌ Prometh not initialized. Run /prometh-init first."
-     exit 1
-   fi
-
-   # Manifest may live inside DOCS_DIR (local mode) or at project root (committed mode)
-   if [ -f "${DOCS_DIR}/PROMETH.local.md" ]; then
-     MANIFEST="${DOCS_DIR}/PROMETH.local.md"
-   elif [ -f "PROMETH.local.md" ]; then
-     MANIFEST="PROMETH.local.md"
-   elif [ -f "PROMETH.md" ]; then
-     MANIFEST="PROMETH.md"
-   else
-     echo "❌ Harness manifest not found. Run /prometh-init to create it."
-     exit 1
-   fi
-   ```
-3. Detect the agent instruction file (AGENTS.md preferred for OpenCode, CLAUDE.md as fallback).
+Register, list, and remove feedback sensors for the harness. Sensors are checks that run AFTER the agent acts to enable self-correction. The full registry lives in `PROMETH.md` / `PROMETH.local.md`, which the agent reads at session start.
 
 ## Subcommands
 
@@ -68,21 +40,11 @@ Inferential table columns: `| {name} | {description} | {ISO date} |`.
 
 If the target table still contains the `*No sensors registered yet*` placeholder row, remove that row as part of the insert.
 
-**Agent file update (only for computational + pre-commit):**
-
-Locate the `## Prometh Harness Protocol` → `### Sensors` block in the agent file. Inside that block:
-
-1. If the placeholder line `- *No sensors registered yet - use \`/prometh-sensor add\` to register*` exists, replace it with `` - `{command}` ``.
-2. Otherwise, append `` - `{command}` `` as a new bullet at the end of the existing list, before the `For the full sensor registry...` line.
-
-Do not touch any other section of the agent file.
-
 **Confirmation:**
-Report both writes to the user:
+Report the write to the user:
 ```
 ✅ Sensor `{name}` registered
-  • Registry: {MANIFEST}
-  • Agent file: {AGENT_FILE} (only for pre-commit computational sensors)
+  • Registry: PROMETH.md (or PROMETH.local.md)
 ```
 
 ### `list`
@@ -112,18 +74,15 @@ Remove a sensor from the harness.
 Process:
 1. Scan all three tables in the manifest for a row whose first column matches `{name}`.
 2. If not found, report and exit.
-3. Record whether the matched row was in the `Computational (run before commit)` table — this determines whether the agent file also needs updating.
-4. Remove the row from the manifest table. If removing that row leaves the table with zero data rows, re-insert the `*No sensors registered yet*` placeholder row.
-5. If the sensor was computational pre-commit: open the agent file, find the corresponding `` - `{command}` `` bullet inside the `### Sensors` block, and remove it. If removing that bullet leaves the block with zero bullets, restore the placeholder line `- *No sensors registered yet - use \`/prometh-sensor add\` to register*`.
-6. Confirm the removal and report both file locations that were updated.
+3. Remove the row from the manifest table. If removing that row leaves the table with zero data rows, re-insert the `*No sensors registered yet*` placeholder row.
+4. Confirm the removal and report that the manifest was updated.
 
 ## Rules
 
 - Sensor names must be unique within the harness across all three tables.
 - Prefer `mise run {task}` format for computational sensors — it handles PATH, env vars, and tool versions consistently.
-- The agent file (CLAUDE.md / AGENTS.md) only gets computational pre-commit sensors inline. Pipeline and inferential sensors stay in the manifest only — the agent does not need to run those during a normal coding session.
-- Always keep the manifest and agent file in sync: every `add` and `remove` that touches a pre-commit computational sensor must update both.
-- Do not inject emojis or bold text into the generated tables or agent file content — follow PCF markdown conventions.
+- The agent reads the full sensor registry from the manifest (`PROMETH.md` / `PROMETH.local.md`) at session start.
+- Do not inject emojis or bold text into the generated tables — follow PCF markdown conventions.
 - Preserve the existing manifest structure; never reorder top-level headings.
 
 ## Example Usage

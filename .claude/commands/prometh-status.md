@@ -94,9 +94,6 @@ Feedback loop health from the Prometh harness engineering extension. This panel 
   - `.gitignore` excludes `PROMETH-PROGRESS.local.md`?
   - `${TRACKING_FILE}` contains a `## Harness Configuration` section?
   - If the manifest references an active contract, does the contract file exist?
-- **Agent File Sync**: compares the `` - `<cmd>` `` bullets inside the `## Prometh Harness Protocol` → `### Sensors` block of `CLAUDE.md` (or `AGENTS.md`) against the rows in the `#### Computational (run before commit)` table of the manifest
-  - `IN SYNC` when the set of commands matches exactly
-  - `DRIFT` otherwise — list the missing and extra entries so the user can re-run `/prometh-sensor` to fix
 
 ### 6b. Harness Readiness Scorecard
 
@@ -122,25 +119,17 @@ Otherwise the project is **docs-only**. When docs-only:
   in place of the scorecard.
 - Under default: omit the harness summary line entirely.
 
-**Checks (13 total).** Reuse data already collected in section 6 wherever possible;
+**Checks (9 total).** Reuse data already collected in section 6 wherever possible;
 only new reads are called out explicitly.
 
 Guides (Feedforward):
 
-- **G1** Agent instruction file exists (`CLAUDE.md` or `AGENTS.md` at project root).
-  **NEW read.**
-- **G2** `## Prometh Harness Protocol` section present in the G1 file. **NEW read.**
 - **G3** At least one `.md` file under `${DOCS_DIR}/concepts/`. **NEW read.**
 
 Sensors (Feedback):
 
 - **S1** At least one non-placeholder row in the `#### Computational (run before commit)`
   table of `${TRACKING_FILE}`. **Reuse section 6 parse.**
-- **S2** The `## Prometh Harness Protocol → ### Sensors` block in the G1 file
-  contains at least one `` - `<cmd>` `` bullet that is not the literal
-  placeholder `` - `<command>` ``. **NEW read.**
-- **S3** Agent bullets match registry commands exactly — reuses the existing
-  `IN SYNC`/`DRIFT` result from section 6. Skip (mark n/a) when S1 fails.
 
 Contracts:
 
@@ -166,14 +155,14 @@ Codebase:
   `.azure-pipelines.yml`, or `Jenkinsfile` at project root. Warning only — not
   every project uses repo-local CI. **NEW read.**
 
-**Result line.** Render `Result: X/13 passing · Y warnings · Z gaps`.
+**Result line.** Render `Result: X/9 passing · Y warnings · Z gaps`.
 
 **Priority fixes.** Surface up to 3 items ordered by:
 
 1. Fails before warnings.
 2. Within each tier: Guides > Sensors > Contracts > Progress > Codebase.
 
-If all 13 checks pass, replace the priority block with
+If all 9 checks pass, replace the priority block with
 `✅ Harness ready for autonomous agent work`.
 
 **Legend:** `[x]` pass · `[!]` warning · `[ ]` fail.
@@ -232,28 +221,15 @@ Skip this collection step entirely when the user passed `--brief` or `--counts`.
    - PROMETH-PROGRESS.local.md exists at project root
    - .gitignore excludes PROMETH-PROGRESS.local.md
    - Harness Configuration section present in tracking file
-   - If an Active contract path is set, verify the file exists
-5. Agent file sync check:
-   - Detect CLAUDE.md (preferred) or AGENTS.md in project root
-   - Parse bullets inside ## Prometh Harness Protocol -> ### Sensors
-     (lines of the form `- ` + backtick-wrapped command + backtick)
-   - Parse the Command column of the #### Computational (run before commit) table
-   - Diff the two sets:
-       agent_only = bullets not in registry
-       registry_only = registry commands not in bullets
-   - IN SYNC when both sets are empty, else DRIFT with lists
+    - If an Active contract path is set, verify the file exists
 6. Harness Readiness Scorecard collection (only when --harness or --health
    is active AND the project is harness-adopted per section 6b detection):
-   - G1: detect CLAUDE.md or AGENTS.md at project root
-   - G2: grep the G1 file for the literal string "## Prometh Harness Protocol"
-   - G3: count `.md` files under ${DOCS_DIR}/concepts/ (directory may not exist)
-   - S2: parse the ### Sensors block of the G1 file; count bullets of the form
-         `- ` + backtick-wrapped command; exclude the literal placeholder
-         `- `<command>``
-   - P1 (gitignore half): grep .gitignore for a line matching
-         PROMETH-PROGRESS.local.md
-   - P2 (grading): compute age in days from Last updated; <=7 pass,
-         8..30 warn, >30 fail
+    - G3: count `.md` files under ${DOCS_DIR}/concepts/ (directory may not exist)
+    - S1: parse the #### Computational (run before commit) table of the manifest
+    - P1 (gitignore half): grep .gitignore for a line matching
+          PROMETH-PROGRESS.local.md
+    - P2 (grading): compute age in days from Last updated; <=7 pass,
+          8..30 warn, >30 fail
    - R1: check for .git/ at project root
    - R2: case-insensitive substring search for "test" in the Name or Command
          columns of any sensor table in the manifest
@@ -328,14 +304,10 @@ Staleness Indicators:
 🛡️  HARNESS READINESS            (--harness or --health, harness-adopted only)
 ─────────────────────
 Guides (Feedforward)
-  [x] G1 Agent instruction file (CLAUDE.md)
-  [x] G2 Harness Protocol section injected
   [ ] G3 No concept docs — run /prometh-doc concept
 
 Sensors (Feedback)
   [x] S1 3 computational pre-commit sensors registered
-  [x] S2 Agent file has real sensor commands
-  [!] S3 Agent/registry DRIFT — missing: `mise run lint`; run /prometh-sensor to resync
 
 Contracts
   [x] C1 Contracts directory exists
@@ -350,11 +322,10 @@ Codebase
   [x] R2 Test sensor discoverable (heuristic: `mise run terraform:test`)
   [!] R3 No CI config found (warning)
 
-Result: 9/13 passing · 3 warnings · 1 gap
+Result: 6/9 passing · 2 warnings · 1 gap
 Priority:
   1. G3 Add a concept doc (/prometh-doc concept)
-  2. S3 Resync sensors (/prometh-sensor)
-  3. P2 Update progress (/prometh-progress update)
+  2. P2 Update progress (/prometh-progress update)
 
 💡 SUGGESTED NEXT ACTIONS
 ─────────────────────────
