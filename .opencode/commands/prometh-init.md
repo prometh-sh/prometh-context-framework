@@ -1,5 +1,5 @@
 ---
-description: Initialize Prometh Context Framework in a project with validation, directory setup, and harness protocol injection
+description: Initialize Prometh Context Framework in a project with validation, directory setup, progress tracking, and Harness Protocol section
 ---
 
 # Prometh Framework Initialization Command
@@ -50,33 +50,17 @@ fi
 - If either exists, skip prompts and use existing structure
 - If legacy `docs/` exists, offer migration (see Migration section below)
 
-### 1. AGENTS.md Validation
+### 1. Project Validation
 
-**MANDATORY FIRST STEP**: Check for AGENTS.md or AGENTS.local.md in the project root:
+Check that the project has basic setup:
 
 ```bash
-# Check for required configuration files
-ls AGENTS.md AGENTS.local.md 2>/dev/null
+# Check for at least one of: .git, pyproject.toml, package.json, go.mod, Gemfile, etc.
+# to confirm this is a project root. If none found, continue anyway but warn the user
+# that Prometh should be initialized in a project root directory.
 ```
 
-**If NEITHER file exists:**
-```
-❌ Prometh Context Framework Error
-
-AGENTS.md or AGENTS.local.md not found in project root.
-
-Please initialize your project with OpenCode first:
-• Run '/init' in OpenCode to create AGENTS.md with project configuration
-• Or create AGENTS.local.md for local development overrides
-
-These files are required for Prometh commands to ensure proper context and configuration.
-
-Learn more: https://opencode.ai/docs/
-
-After creating AGENTS.md, run '/prometh-init' again to continue setup.
-```
-
-**If files exist, proceed to next step.**
+If not in a project root, continue with a non-blocking ℹ️ notice.
 
 ### 2. Directory Structure Selection
 
@@ -110,6 +94,7 @@ Based on user selection, create the required directory structure:
 # Option 1: Committed documentation (user chose 1)
 mkdir -p prometh-docs/prds/archive
 mkdir -p prometh-docs/specs/archive
+mkdir -p prometh-docs/plans
 mkdir -p prometh-docs/concepts
 mkdir -p prometh-docs/runbooks
 mkdir -p prometh-docs/adrs
@@ -119,6 +104,7 @@ DOCS_DIR="prometh-docs"
 # Option 2: Local-only documentation (user chose 2)
 mkdir -p prometh-docs.local/prds/archive
 mkdir -p prometh-docs.local/specs/archive
+mkdir -p prometh-docs.local/plans
 mkdir -p prometh-docs.local/concepts
 mkdir -p prometh-docs.local/runbooks
 mkdir -p prometh-docs.local/adrs
@@ -129,8 +115,10 @@ DOCS_DIR="prometh-docs.local"
 **Verification:**
 - Check that `${DOCS_DIR}/prds/` and `${DOCS_DIR}/prds/archive/` were created successfully
 - Check that `${DOCS_DIR}/specs/` and `${DOCS_DIR}/specs/archive/` were created successfully
+- Check that `${DOCS_DIR}/plans/` was created successfully
 - Check that `${DOCS_DIR}/contracts/archive/` was created successfully
 - Archive directories hold `Completed` or `Deprecated` PRDs/SPECs moved out of the active workspace
+- Plans directory holds `PLN-YYYYMMDD-<slug>.md` Pixel Planner project plan files
 - Report any creation failures
 
 **Store the selected directory for use in subsequent steps.**
@@ -253,6 +241,13 @@ concept_pattern: "{DATETIME}-{NAME}.md"
 |------|---------|------|------------|--------|-------------|--------------|
 | *No SPECs created yet* |
 
+### Project Plans (Pixel Planner)
+*High-level project plans with Gantt timelines, phases, and milestone tracking*
+
+| Plan | Project | Status | Created | Last Updated |
+|------|---------|--------|---------|--------------|
+| *No plans created yet* |
+
 ### Technical Documentation
 *Project documentation, runbooks, and operational guides*
 
@@ -282,6 +277,7 @@ concept_pattern: "{DATETIME}-{NAME}.md"
 - ADRs: ${DOCS_DIR}/adrs/
 - PRDs: ${DOCS_DIR}/prds/
 - Specs: ${DOCS_DIR}/specs/
+- Plans: ${DOCS_DIR}/plans/
 
 ### Sensors (Feedback)
 
@@ -307,6 +303,7 @@ concept_pattern: "{DATETIME}-{NAME}.md"
 
 ### Progress
 - File: PROMETH-PROGRESS.local.md (project root, always gitignored)
+- Created and managed by: `/prometh-progress` command
 - Update: end of each agent session via `/prometh-progress update`
 - Note: per-worktree ephemeral state — never committed, never symlinked across worktrees
 
@@ -315,6 +312,27 @@ concept_pattern: "{DATETIME}-{NAME}.md"
 - High: *none registered*
 - Medium: *none registered*
 - Low: *none registered*
+
+## Harness Protocol
+
+### Session Start
+1. Read `## Harness Configuration` section above for configuration, sensors, contracts, and progress state
+2. Read `PROMETH-PROGRESS.local.md` at project root for current session state (per-worktree ephemeral file)
+3. If the progress file's `Branch:` field differs from the current git branch, run `/prometh-progress update` before proceeding
+4. If an active contract exists in `${DOCS_DIR}/contracts/`, read it and understand the acceptance criteria
+5. Do not begin implementation until progress state is understood
+
+### Session End
+1. Update `PROMETH-PROGRESS.local.md` at project root with:
+   - What was completed (include commit hashes if applicable)
+   - What remains
+   - Blockers or decisions pending
+   - Codebase state (clean / tests passing / known issues)
+2. If a contract is active, note which criteria are now met
+
+### Sensors
+Before committing or creating a PR, run these checks (listed in `Sensors (Feedback)` above):
+- *No sensors registered yet - use `/prometh-sensor add` to register*
 
 ## Recent Activity
 
@@ -336,43 +354,34 @@ Run one of these commands to get started:
 - *"Generate a README for this project"*
 - *"Write an operational runbook"*
 
----
+## Next Steps
 
-*Generated with: Prometh Context Framework by Prometh*
-```
+Run one of these commands to get started:
 
-### 5.5. Harness Protocol Injection
+**Strategic Planning** (`prometh-prd` skill — invoked naturally in conversation):
+- *"Create a PRD for [your initiative]"*
+- *"Normalize [filename.pdf] into a PRD"*
 
-**Purpose**: Inject the Prometh Harness Protocol into the agent instruction file so every future session reads progress, contracts, and sensor state at start and updates them at end. This makes the agent file the single harness entry point — no hooks, no external runner.
+**Implementation Planning** (`prometh-spec` skill — invoked naturally in conversation):
+- *"Create a SPEC for [your task]"*
+- *"Convert [filename.md] into a SPEC"*
 
-**Agent File Detection:**
-```bash
-# OpenCode variant prefers AGENTS.md, falls back to CLAUDE.md for compat
-if [ -f "AGENTS.md" ]; then
-  AGENT_FILE="AGENTS.md"
-elif [ -f "CLAUDE.md" ]; then
-  AGENT_FILE="CLAUDE.md"
-elif [ -f "CLAUDE.local.md" ]; then
-  AGENT_FILE="CLAUDE.local.md"
-else
-  AGENT_FILE="AGENTS.md"
-fi
-```
+**Documentation** (`prometh-doc` skill — invoked naturally in conversation):
+- *"Generate a README for this project"*
+- *"Write an operational runbook"*
 
-If the chosen agent file does not yet exist, create a minimal stub containing only the `# Project Agent Instructions` heading plus the Harness Protocol section below.
+## Harness Protocol
 
-**Harness Protocol Section Template:**
-
-Compose this text, substituting `${DOCS_DIR}` with the resolved path (`prometh-docs` or `prometh-docs.local`) and `${TRACKING_FILE}` with the resolved manifest filename (`PROMETH.md` or `PROMETH.local.md`):
+The following `## Harness Protocol` section should be added to your `${TRACKING_FILE}` to guide agent sessions. It is already included in the tracking file template created by this command — no additional action needed. This section teaches your agent what to do at session start and end:
 
 ```markdown
-## Prometh Harness Protocol
+## Harness Protocol
 
 ### Session Start
-1. Read `${TRACKING_FILE}` at project root for harness configuration
-2. Read `PROMETH-PROGRESS.local.md` at project root for current state (per-worktree ephemeral file)
+1. Read `## Harness Configuration` section of this file for configuration, sensors, contracts, and progress state
+2. Read `PROMETH-PROGRESS.local.md` at project root for current session state (per-worktree ephemeral file)
 3. If the progress file's `Branch:` field differs from the current git branch, run `/prometh-progress update` before proceeding
-4. If an active contract exists in `${DOCS_DIR}/contracts/`, read it
+4. If an active contract exists in `${DOCS_DIR}/contracts/`, read it and understand the acceptance criteria
 5. Do not begin implementation until progress state is understood
 
 ### Session End
@@ -384,77 +393,14 @@ Compose this text, substituting `${DOCS_DIR}` with the resolved path (`prometh-d
 2. If a contract is active, note which criteria are now met
 
 ### Sensors
-Before committing or creating a PR, run these checks:
+Before committing or creating a PR, run these checks (listed in `## Harness Configuration → Sensors` below):
 - *No sensors registered yet - use `/prometh-sensor add` to register*
-
-For the full sensor registry and inferential review instructions,
-see the Sensors (Feedback) section in the harness manifest.
 ```
 
-**Injection Logic (Idempotent):**
-1. Read the current contents of `${AGENT_FILE}`
-2. Search for an existing `## Prometh Harness Protocol` heading
-3. **If found**: replace everything from that heading up to the next top-level `##` heading (or end of file) with the new section
-4. **If not found**: append the new section to the end of the file, preceded by a blank line separator
-5. Write the updated file back
-6. Verify the section is present exactly once after the operation
-
-**Progress File Creation (`PROMETH-PROGRESS.local.md`):**
-
-Create `PROMETH-PROGRESS.local.md` at the **project root** — not inside `${DOCS_DIR}`. Only create it if it does not already exist (never clobber an existing progress file). Use the current branch from `git rev-parse --abbrev-ref HEAD 2>/dev/null` (fall back to `main` if the repo is not initialized). The YAML front-matter header is auto-populated at creation time (branch from git, date from today, `active_contract` empty because no contract exists yet):
-
-```markdown
----
-status: Initialized
-branch: [Current branch from git]
-last_updated: [ISO date]
-active_contract: ""
-schema_version: 1
 ---
 
-# Progress
-
-## Current State
-- Status: Initialized
-- Branch: [Current branch from git]
-- Last updated: [ISO date]
-- Active contract: none
-
-## Completed
-- Project harness initialized via Prometh Context Framework
-
-## In Progress
-- *empty*
-
-## Next
-- *empty*
-
-## Blockers
-- *empty*
-
-## Codebase State
-- Tests: unknown
-- Build: unknown
-- Known issues: none
+*Generated with: Prometh Context Framework by Prometh*
 ```
-
-**`.gitignore` Enforcement:**
-
-Ensure `.gitignore` at project root contains the progress file pattern. If `.gitignore` does not exist, create it. If it exists but does not contain an entry that matches `PROMETH-PROGRESS.local.md`, append:
-
-```
-# Prometh harness - per-worktree ephemeral progress state
-PROMETH-PROGRESS.local.md
-```
-
-Note: users who already have a broad `*.local.*` or `*.local.md` rule will match automatically; the explicit line is harmless and self-documenting.
-
-**Verification:**
-- `PROMETH-PROGRESS.local.md` exists at project root (never inside `${DOCS_DIR}`)
-- `.gitignore` contains a rule that excludes `PROMETH-PROGRESS.local.md`
-- `${DOCS_DIR}/contracts/archive/` exists
-- `${AGENT_FILE}` contains exactly one `## Prometh Harness Protocol` heading
-- Tracking file contains the Harness Configuration section with Guides, Sensors, Contracts, Progress, and Red Flags subsections
 
 ### 6. Next Steps Guidance
 
@@ -630,12 +576,13 @@ echo "   For local-only: mv docs prometh-docs.local"
 
 ## Instructions
 
-1. **Always validate AGENTS.md first** - This is the foundation requirement
+1. **Validate project setup** - Recommend running in a project root with .git or similar
 2. **Create directory structure safely** - Check permissions and report issues
 3. **Initialize or update PROMETH.md** - Maintain existing data while ensuring correct structure
-4. **Provide contextual guidance** - Analyze project state and give specific next step recommendations
-5. **Handle errors gracefully** - Provide clear error messages and recovery instructions
-6. **Report completion status** - Confirm successful initialization with helpful summary
+4. **Do NOT create PROMETH-PROGRESS.local.md** - This file is managed by `/prometh-progress` command
+5. **Provide contextual guidance** - Analyze project state and give specific next step recommendations
+6. **Handle errors gracefully** - Provide clear error messages and recovery instructions
+7. **Report completion status** - Confirm successful initialization with helpful summary
 
 ## Example Usage
 

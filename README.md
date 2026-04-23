@@ -47,19 +47,19 @@ Harness Protocol    ──┘             │
                      when failures repeat)
 ```
 
-- **Guides** live in `prometh-docs/` (or `prometh-docs.local/`) and in the `## Prometh Harness Protocol` section that `/prometh-init` injects directly into `CLAUDE.md` / `AGENTS.md`.
-- **Sensors** are registered via `/prometh-sensor add` and dual-written into both the manifest (`PROMETH.md`) and the agent file's inline `### Sensors` block, so every session automatically runs them before committing.
+- **Guides** live in `prometh-docs/` (or `prometh-docs.local/`) and in the `## Prometh Harness Protocol` section of the manifest (`PROMETH.md` / `PROMETH.local.md`), which the agent reads at session start.
+- **Sensors** are registered via `/prometh-sensor add` into the manifest (`PROMETH.md`), which the agent reads at session start to run checks before committing.
 - **Contracts** codify what *done* means for a unit of work with testable acceptance criteria; `/prometh-eval` runs those criteria against the codebase and records results.
 - **Progress** (`PROMETH-PROGRESS.local.md` at the project root) is the cross-session memory that a fresh agent reads at session start and writes at session end. It is **per-worktree and always gitignored** — each branch/worktree maintains its own state, never shared, never committed. An optional YAML front-matter header (`status`, `branch`, `last_updated`, `active_contract`, `schema_version`) gives orchestrators and dashboards a stable parse surface without invoking an LLM.
 - **Humans** remain in the loop — when failures repeat, the human iterates on the guides and sensors, not on each individual agent run.
 
 ## Architecture Overview
 
-The framework follows the same structure on both platforms: **8 slash commands** for workflow and harness operations, **3 skills** for document generation.
+The framework follows the same structure on both platforms: **7 slash commands** for workflow and harness operations, **3 skills** for document generation.
 
 | Type | Claude Code | OpenCode | What it does |
 |------|-------------|----------|--------------|
-| **Slash commands** | `.claude/commands/` | `.opencode/commands/` | `init`, `build`, `status`, `help`, `progress`, `contract`, `eval`, `sensor` |
+| **Slash commands** | `.claude/commands/` | `.opencode/commands/` | `init`, `status`, `help`, `progress`, `contract`, `eval`, `sensor` |
 | **Skills** | `.claude/skills/*/SKILL.md` | `.opencode/skills/*/SKILL.md` | `prd`, `spec`, `doc` |
 | **Output styles** | `.claude/output-styles/` | *(embedded inline)* | Templates referenced by skills and contract generation |
 
@@ -70,9 +70,8 @@ The framework follows the same structure on both platforms: **8 slash commands**
 ### Feedforward — Guide Generation
 
 **Slash commands:**
-- **`/prometh-init`** — Initialize the framework in any project; injects the `## Prometh Harness Protocol` section into `CLAUDE.md` / `AGENTS.md`, creates `PROMETH-PROGRESS.local.md` at the project root, sets up contracts and archive directories, and adds the progress file to `.gitignore`
-- **`/prometh-build`** — Execute a SPEC with interactive 3-phase implementation tracking
-- **`/prometh-status`** — Display project dashboard, harness panel, and agent-file sync check
+- **`/prometh-init`** — Initialize the framework in any project; creates the manifest (`PROMETH.md` / `PROMETH.local.md`), creates `PROMETH-PROGRESS.local.md` at the project root, sets up contracts and archive directories, and adds the progress file to `.gitignore`
+- **`/prometh-status`** — Display project dashboard and harness readiness scorecard
 - **`/prometh-help`** — Display the full command and skill reference
 
 **Skills (invoked contextually — describe your intent in conversation):**
@@ -84,10 +83,10 @@ The framework follows the same structure on both platforms: **8 slash commands**
 
 - **`/prometh-contract <name>`** — Generate a sprint or feature contract with testable acceptance criteria (each marked `computational`, `inferential`, or `manual`), required sensors, and Red Flags / Risk Assessment
 - **`/prometh-eval [contract-name]`** — Evaluate the codebase against an active contract. Runs each criterion by type, records `Pass` / `Fail` / `Partial` / `Manual`, writes an Evaluation Summary, and pipes results into `PROMETH-PROGRESS.local.md`
-- **`/prometh-progress [update|reset]`** — View, refresh, or reset the cross-session progress file. `update` reads git log, diff, and active contract to bridge memory between sessions
-- **`/prometh-sensor add <name> <cmd> --type <t> --when <w>`** — Register a feedback sensor. Computational pre-commit sensors are dual-written to both the manifest and the inline `### Sensors` block in `CLAUDE.md` / `AGENTS.md`
+- **`/prometh-progress --contract <file> [update|reset]`** — View, refresh, or reset the cross-session progress file scoped to a contract. `--contract` is required. `update` reads git log, diff, and active contract to bridge memory between sessions. Auto-deletes progress file when all contract criteria reach `Pass` or `Manual`.
+- **`/prometh-sensor add <name> <cmd> --type <t> --when <w>`** — Register a feedback sensor into the manifest
 - **`/prometh-sensor list`** — Display all registered sensors grouped by timing (pre-commit, pipeline, pre-PR)
-- **`/prometh-sensor remove <name>`** — Remove a sensor from both the manifest and the agent file
+- **`/prometh-sensor remove <name>`** — Remove a sensor from the manifest
 
 ### Output Style Templates (Claude Code)
 
@@ -141,7 +140,7 @@ cd /path/to/your/project
 /init
 
 # Initialize Prometh Framework — creates docs dirs, PROMETH-PROGRESS.local.md,
-# contracts/, archive dirs, and injects the Harness Protocol into CLAUDE.md/AGENTS.md
+# contracts/, and archive dirs
 /prometh-init
 ```
 
@@ -154,7 +153,6 @@ It will then:
 2. Create `PROMETH-PROGRESS.local.md` at the project root (per-worktree ephemeral state — never inside `prometh-docs/`)
 3. Append `PROMETH-PROGRESS.local.md` to `.gitignore` so it is never committed
 4. Extend the manifest with the `## Harness Configuration` section (Guides, Sensors, Contracts, Progress, Red Flags)
-5. Inject the `## Prometh Harness Protocol` section into your agent file — idempotently (re-running replaces, never duplicates)
 
 ## Usage
 
@@ -185,14 +183,6 @@ It will then:
 # "Write concept documentation for new team members"
 ```
 
-### Executing a SPEC
-
-```bash
-/prometh-build prometh-docs/specs/feature-user-auth-spec.md
-```
-
-Guides you through all 3 phases interactively, updating the tracking file at each milestone.
-
 ### Creating a Contract
 
 ```bash
@@ -206,11 +196,11 @@ Every criterion must be testable and must declare a verification type: `computat
 ### Registering Sensors
 
 ```bash
-# Computational pre-commit sensor (dual-written to agent file's ### Sensors block)
+# Computational pre-commit sensor (registered in manifest)
 /prometh-sensor add terraform-validate "mise run terraform:validate" \
   --type computational --when pre-commit
 
-# Pipeline-only computational sensor (manifest only, not run by the agent)
+# Pipeline-only computational sensor (manifest only)
 /prometh-sensor add terratest "mise run terraform:test" \
   --type computational --when pipeline
 
@@ -235,12 +225,17 @@ Runs computational criteria, semantically checks inferential criteria, flags man
 ### Bridging Sessions with Progress
 
 ```bash
-/prometh-progress          # Display current state
-/prometh-progress update   # Refresh from git log, diff, and active contract
-/prometh-progress reset    # Wipe to initial template (with confirmation)
+# Display current progress for a contract
+/prometh-progress --contract prometh-docs.local/contracts/sprint-7.md
+
+# Refresh from git log, diff, and active contract
+/prometh-progress --contract prometh-docs.local/contracts/sprint-7.md update
+
+# Wipe to initial template (with confirmation)
+/prometh-progress --contract prometh-docs.local/contracts/sprint-7.md reset
 ```
 
-The `## Prometh Harness Protocol` in your agent file instructs every new session to read `PROMETH-PROGRESS.local.md` at start and call `/prometh-progress update` at end — no hooks, no external runner.
+The `## Prometh Harness Protocol` in your agent file instructs every new session to read `PROMETH-PROGRESS.local.md` at start and call `/prometh-progress update` at end — no hooks, no external runner. Progress file is scoped to a single active contract; switching contracts requires completing or resetting the previous session first.
 
 ### Monitoring project status
 
@@ -258,12 +253,12 @@ The harness panel reports active contract state, progress summary, sensor counts
 
 ```
 Strategic Vision  →  Plan  →  Contract  →  Guided Execution  →  Evaluation  →  Delivery
-  prometh-prd      prometh-spec  /prometh-contract  /prometh-build    /prometh-eval    Completed
-     (skill)         (skill)    (slash command)    (slash command)  (slash command)
-                                       │
-                                       ▼
-                                 feedback loops back into
-                                 PROMETH-PROGRESS.local.md and sensors
+   prometh-prd      prometh-spec  /prometh-contract  (agent acts)    /prometh-eval    Completed
+      (skill)         (skill)    (slash command)    with guide     (slash command)
+                                        │
+                                        ▼
+                                  feedback loops back into
+                                  PROMETH-PROGRESS.local.md and sensors
 ```
 
 ### Example: Feature delivery end-to-end
@@ -285,14 +280,14 @@ Strategic Vision  →  Plan  →  Contract  →  Guided Execution  →  Evaluati
 /prometh-sensor add lint         "mise run lint"         --type computational --when pre-commit
 /prometh-sensor add integration  "mise run test:int"     --type computational --when pipeline
 
-# 5. Execute with guided tracking
-/prometh-build prometh-docs/specs/feature-mobile-platform-spec.md
+# 5. Execute the SPEC (agent follows the SPEC with the contract as acceptance criteria)
+# The agent reads the Harness Protocol from PROMETH.md at session start; contract criteria steer progress
 
 # 6. Evaluate against the contract
 /prometh-eval mobile-platform-v1
 
 # 7. Bridge to the next session
-/prometh-progress update
+/prometh-progress --contract prometh-docs/contracts/mobile-platform-v1.md update
 
 # 8. Monitor end-to-end health
 /prometh-status
@@ -303,9 +298,8 @@ Strategic Vision  →  Plan  →  Contract  →  Guided Execution  →  Evaluati
 ```
 prometh-context-framework/
 ├── .claude/
-│   ├── commands/              # 8 slash commands
+│   ├── commands/              # 7 slash commands
 │   │   ├── prometh-init.md
-│   │   ├── prometh-build.md
 │   │   ├── prometh-status.md
 │   │   ├── prometh-help.md
 │   │   ├── prometh-progress.md
@@ -326,7 +320,7 @@ prometh-context-framework/
 │       ├── prometh-doc-runbook.md
 │       └── prometh-doc-concept.md
 ├── .opencode/
-│   ├── commands/              # 8 slash commands (self-contained)
+│   ├── commands/              # 7 slash commands (self-contained)
 │   └── skills/                # 3 agent skills (templates embedded inline)
 │       ├── prometh-prd/SKILL.md
 │       ├── prometh-spec/SKILL.md
@@ -341,7 +335,7 @@ After `/prometh-init` runs in a target project:
 
 ```
 your-project/
-├── CLAUDE.md  (or AGENTS.md)  # contains injected ## Prometh Harness Protocol
+├── CLAUDE.md  (or AGENTS.md)  # agent configuration file (not modified by Prometh)
 ├── PROMETH.md                 # harness manifest (committed mode)
 ├── PROMETH-PROGRESS.local.md  # per-worktree cross-session memory (always gitignored)
 └── prometh-docs/
@@ -368,7 +362,7 @@ In local mode, everything collapses under `prometh-docs.local/` and the manifest
 - **Claude Code skills and `/prometh-contract`** reference output-style templates from `~/.claude/output-styles/` — templates live separately from skill logic
 - **OpenCode skills and `/prometh-contract`** are fully self-contained — templates are embedded inline
 - On both platforms, skills (`prometh-prd`, `prometh-spec`, `prometh-doc`) are invoked contextually by the agent or by describing your intent in conversation — not via `/` slash syntax
-- The Harness Protocol is injected into whichever agent file is present: `CLAUDE.md` for Claude Code, `AGENTS.md` for OpenCode
+- The Harness Protocol lives in the manifest (`PROMETH.md` / `PROMETH.local.md`), which the agent reads at session start
 - **README generation** produces 3 commit-ready files: `README.md` (lean landing page), `docs/getting-started.md` (full tutorial), and `CONTRIBUTING.md` (contributor guide)
 
 ## Document Lifecycle

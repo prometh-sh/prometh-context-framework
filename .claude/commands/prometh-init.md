@@ -1,5 +1,5 @@
 ---
-description: Initialize Prometh Context Framework in a project with validation, directory setup, and harness protocol injection
+description: Initialize Prometh Context Framework in a project with validation, directory setup, and manifest initialization
 allowed-tools: ["Read", "Write", "Edit", "LS", "Glob", "MultiEdit", "Bash"]
 ---
 
@@ -51,33 +51,21 @@ fi
 - If either exists, skip prompts and use existing structure
 - If legacy `docs/` exists, offer migration (see Migration section below)
 
-### 1. CLAUDE.md Validation
+### 1. Project Validation
 
-**MANDATORY FIRST STEP**: Check for CLAUDE.md or CLAUDE.local.md in the project root:
+**LIGHTWEIGHT VALIDATION**: Check that the project root is valid (a git repository or has necessary files):
 
 ```bash
-# Check for required configuration files
-ls CLAUDE.md CLAUDE.local.md 2>/dev/null
+# Check for basic project indicators
+if [ ! -d ".git" ] && [ ! -f "package.json" ] && [ ! -f "pyproject.toml" ]; then
+  # Optional check only - warn but don't block
+  echo "ℹ️  No git repo or package.json detected. Initializing Prometh anyway..."
+fi
 ```
 
-**If NEITHER file exists:**
-```
-❌ Prometh Context Framework Error
+**Note**: CLAUDE.md or CLAUDE.local.md presence is no longer required. The Prometh Harness Protocol is now stored entirely in the tracking manifest (PROMETH.md / PROMETH.local.md) and read by the agent at session start.
 
-CLAUDE.md or CLAUDE.local.md not found in project root.
-
-Please initialize your project with Claude Code first:
-• Run '/init' in Claude Code to create CLAUDE.md with project configuration
-• Or create CLAUDE.local.md for local development overrides
-
-These files are required for Prometh commands to ensure proper context and configuration.
-
-Learn more: https://docs.anthropic.com/en/docs/claude-code
-
-After creating CLAUDE.md, run '/prometh-init' again to continue setup.
-```
-
-**If files exist, proceed to next step.**
+**Proceed to next step.**
 
 ### 2. Directory Structure Selection
 
@@ -111,6 +99,7 @@ Based on user selection, create the required directory structure:
 # Option 1: Committed documentation (user chose 1)
 mkdir -p prometh-docs/prds/archive
 mkdir -p prometh-docs/specs/archive
+mkdir -p prometh-docs/plans
 mkdir -p prometh-docs/concepts
 mkdir -p prometh-docs/runbooks
 mkdir -p prometh-docs/adrs
@@ -120,6 +109,7 @@ DOCS_DIR="prometh-docs"
 # Option 2: Local-only documentation (user chose 2)
 mkdir -p prometh-docs.local/prds/archive
 mkdir -p prometh-docs.local/specs/archive
+mkdir -p prometh-docs.local/plans
 mkdir -p prometh-docs.local/concepts
 mkdir -p prometh-docs.local/runbooks
 mkdir -p prometh-docs.local/adrs
@@ -130,8 +120,10 @@ DOCS_DIR="prometh-docs.local"
 **Verification:**
 - Check that `${DOCS_DIR}/prds/` and `${DOCS_DIR}/prds/archive/` were created successfully
 - Check that `${DOCS_DIR}/specs/` and `${DOCS_DIR}/specs/archive/` were created successfully
+- Check that `${DOCS_DIR}/plans/` was created successfully
 - Check that `${DOCS_DIR}/contracts/archive/` was created successfully
 - Archive directories hold `Completed` or `Deprecated` PRDs/SPECs moved out of the active workspace (see lifecycle docs)
+- Plans directory holds `PLN-YYYYMMDD-<slug>.md` Pixel Planner project plan files
 - Report any creation failures
 
 **Store the selected directory for use in subsequent steps.**
@@ -254,6 +246,13 @@ concept_pattern: "{DATETIME}-{NAME}.md"
 |------|---------|------|------------|--------|-------------|--------------|
 | *No SPECs created yet* |
 
+### Project Plans (Pixel Planner)
+*High-level project plans with Gantt timelines, phases, and milestone tracking*
+
+| Plan | Project | Status | Created | Last Updated |
+|------|---------|--------|---------|--------------|
+| *No plans created yet* |
+
 ### Technical Documentation
 *Project documentation, runbooks, and operational guides*
 
@@ -283,6 +282,7 @@ concept_pattern: "{DATETIME}-{NAME}.md"
 - ADRs: ${DOCS_DIR}/adrs/
 - PRDs: ${DOCS_DIR}/prds/
 - Specs: ${DOCS_DIR}/specs/
+- Plans: ${DOCS_DIR}/plans/
 
 ### Sensors (Feedback)
 
@@ -308,6 +308,7 @@ concept_pattern: "{DATETIME}-{NAME}.md"
 
 ### Progress
 - File: PROMETH-PROGRESS.local.md (project root, always gitignored)
+- Created and managed by: `/prometh-progress` command
 - Update: end of each agent session via `/prometh-progress update`
 - Note: per-worktree ephemeral state — never committed, never symlinked across worktrees
 
@@ -316,6 +317,30 @@ concept_pattern: "{DATETIME}-{NAME}.md"
 - High: *none registered*
 - Medium: *none registered*
 - Low: *none registered*
+
+## Harness Protocol
+
+### Session Start
+1. Read `${TRACKING_FILE}` at project root for harness configuration
+2. Read `PROMETH-PROGRESS.local.md` at project root for current state (per-worktree ephemeral file)
+3. If the progress file's `Branch:` field differs from the current git branch, run `/prometh-progress update` before proceeding
+4. If an active contract exists in `${DOCS_DIR}/contracts/`, read it
+5. Do not begin implementation until progress state is understood
+
+### Session End
+1. Update `PROMETH-PROGRESS.local.md` at project root with:
+   - What was completed (include commit hashes if applicable)
+   - What remains
+   - Blockers or decisions pending
+   - Codebase state (clean / tests passing / known issues)
+2. If a contract is active, note which criteria are now met
+
+### Sensors
+Before committing or creating a PR, run these checks:
+- *No sensors registered yet - use `/prometh-sensor add` to register*
+
+For the full sensor registry and inferential review instructions,
+see the Sensors (Feedback) section in the harness manifest.
 
 ## Recent Activity
 
@@ -341,118 +366,6 @@ Run one of these commands to get started:
 
 *Generated with: Prometh Context Framework by Prometh*
 ```
-
-### 5.5. Harness Protocol Injection
-
-**Purpose**: Inject the Prometh Harness Protocol into the agent instruction file so every future session reads progress, contracts, and sensor state at start and updates them at end. This makes the agent file the single harness entry point — no hooks, no external runner.
-
-**Agent File Detection:**
-```bash
-# Claude Code variant prefers CLAUDE.md
-if [ -f "CLAUDE.md" ]; then
-  AGENT_FILE="CLAUDE.md"
-elif [ -f "CLAUDE.local.md" ]; then
-  AGENT_FILE="CLAUDE.local.md"
-else
-  # Should never reach here - Step 1 already validated
-  AGENT_FILE="CLAUDE.md"
-fi
-```
-
-**Harness Protocol Section Template:**
-
-Compose this text, substituting `${DOCS_DIR}` with the resolved path (`prometh-docs` or `prometh-docs.local`) and `${TRACKING_FILE}` with the resolved manifest filename (`PROMETH.md` or `PROMETH.local.md`):
-
-```markdown
-## Prometh Harness Protocol
-
-### Session Start
-1. Read `${TRACKING_FILE}` at project root for harness configuration
-2. Read `PROMETH-PROGRESS.local.md` at project root for current state (per-worktree ephemeral file)
-3. If the progress file's `Branch:` field differs from the current git branch, run `/prometh-progress update` before proceeding
-4. If an active contract exists in `${DOCS_DIR}/contracts/`, read it
-5. Do not begin implementation until progress state is understood
-
-### Session End
-1. Update `PROMETH-PROGRESS.local.md` at project root with:
-   - What was completed (include commit hashes if applicable)
-   - What remains
-   - Blockers or decisions pending
-   - Codebase state (clean / tests passing / known issues)
-2. If a contract is active, note which criteria are now met
-
-### Sensors
-Before committing or creating a PR, run these checks:
-- *No sensors registered yet - use `/prometh-sensor add` to register*
-
-For the full sensor registry and inferential review instructions,
-see the Sensors (Feedback) section in the harness manifest.
-```
-
-**Injection Logic (Idempotent):**
-1. Read the current contents of `${AGENT_FILE}`
-2. Search for an existing `## Prometh Harness Protocol` heading
-3. **If found**: replace everything from that heading up to the next top-level `##` heading (or end of file) with the new section
-4. **If not found**: append the new section to the end of the file, preceded by a blank line separator
-5. Write the updated file back
-6. Verify the section is present exactly once after the operation
-
-**Progress File Creation (`PROMETH-PROGRESS.local.md`):**
-
-Create `PROMETH-PROGRESS.local.md` at the **project root** — not inside `${DOCS_DIR}`. Only create it if it does not already exist (never clobber an existing progress file). Use the current branch from `git rev-parse --abbrev-ref HEAD 2>/dev/null` (fall back to `main` if the repo is not initialized). The YAML front-matter header is auto-populated at creation time (branch from git, date from today, `active_contract` empty because no contract exists yet):
-
-```markdown
----
-status: Initialized
-branch: [Current branch from git]
-last_updated: [ISO date]
-active_contract: ""
-schema_version: 1
----
-
-# Progress
-
-## Current State
-- Status: Initialized
-- Branch: [Current branch from git]
-- Last updated: [ISO date]
-- Active contract: none
-
-## Completed
-- Project harness initialized via Prometh Context Framework
-
-## In Progress
-- *empty*
-
-## Next
-- *empty*
-
-## Blockers
-- *empty*
-
-## Codebase State
-- Tests: unknown
-- Build: unknown
-- Known issues: none
-```
-
-**`.gitignore` Enforcement:**
-
-Ensure `.gitignore` at project root contains the progress file pattern. If `.gitignore` does not exist, create it. If it exists but does not contain an entry that matches `PROMETH-PROGRESS.local.md`, append:
-
-```
-# Prometh harness - per-worktree ephemeral progress state
-PROMETH-PROGRESS.local.md
-```
-
-Note: users who already have a broad `*.local.*` or `*.local.md` rule will match automatically; the explicit line is harmless and self-documenting.
-
-**Verification:**
-- `PROMETH-PROGRESS.local.md` exists at project root (never inside `${DOCS_DIR}`)
-- `.gitignore` contains a rule that excludes `PROMETH-PROGRESS.local.md`
-- `${DOCS_DIR}/contracts/archive/` exists
-- `${AGENT_FILE}` contains exactly one `## Prometh Harness Protocol` heading
-- Tracking file contains the Harness Configuration section with Guides, Sensors, Contracts, Progress, and Red Flags subsections
 
 ### 6. Next Steps Guidance
 
@@ -628,12 +541,13 @@ echo "   For local-only: mv docs prometh-docs.local"
 
 ## Instructions
 
-1. **Always validate CLAUDE.md first** - This is the foundation requirement
+1. **Perform lightweight project validation** - Warn if no git repo or package.json, but don't block
 2. **Create directory structure safely** - Check permissions and report issues
 3. **Initialize or update PROMETH.md** - Maintain existing data while ensuring correct structure
-4. **Provide contextual guidance** - Analyze project state and give specific next step recommendations
-5. **Handle errors gracefully** - Provide clear error messages and recovery instructions
-6. **Report completion status** - Confirm successful initialization with helpful summary
+4. **Do NOT create PROMETH-PROGRESS.local.md** - This file is managed by `/prometh-progress` command
+5. **Provide contextual guidance** - Analyze project state and give specific next step recommendations
+6. **Handle errors gracefully** - Provide clear error messages and recovery instructions
+7. **Report completion status** - Confirm successful initialization with helpful summary
 
 ## Example Usage
 
