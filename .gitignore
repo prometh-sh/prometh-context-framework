@@ -42,8 +42,5 @@ prometh-docs.local/
 PROMETH.local.md
 
 !AGENTS.md
-!.claude
 
 .opencode/
-!.opencode/commands
-!.opencode/skills
