@@ -136,8 +136,8 @@ safe_copy() {
 install_claude_skills() {
     echo
     echo -e "${YELLOW}Installing skills...${NC}"
-    if [ -d "$REPO_DIR/.claude/skills" ]; then
-        for skill_dir in "$REPO_DIR/.claude/skills"/*/; do
+    if [ -d "$REPO_DIR/claude/skills" ]; then
+        for skill_dir in "$REPO_DIR/claude/skills"/*/; do
             if [ -d "$skill_dir" ]; then
                 skill_name=$(basename "$skill_dir")
                 mkdir -p "$CLAUDE_DIR/skills/$skill_name"
@@ -162,7 +162,7 @@ install_claude_skills() {
             fi
         done
     else
-        echo -e "  ${YELLOW}⚠️  No .claude/skills directory found in repository${NC}"
+        echo -e "  ${YELLOW}⚠️  No claude/skills directory found in repository${NC}"
     fi
 }
 
@@ -178,8 +178,8 @@ install_claude() {
     mkdir -p "$CLAUDE_DIR/skills"
 
     echo -e "${YELLOW}Installing commands...${NC}"
-    if [ -d "$REPO_DIR/.claude/commands" ]; then
-        for cmd_file in "$REPO_DIR/.claude/commands"/*.md; do
+    if [ -d "$REPO_DIR/claude/commands" ]; then
+        for cmd_file in "$REPO_DIR/claude/commands"/*.md; do
             if [ -f "$cmd_file" ]; then
                 cmd_name=$(basename "$cmd_file")
                 safe_copy "$cmd_file" "$CLAUDE_DIR/commands/$cmd_name" "Command"
@@ -191,8 +191,8 @@ install_claude() {
 
     echo
     echo -e "${YELLOW}Installing output styles...${NC}"
-    if [ -d "$REPO_DIR/.claude/output-styles" ]; then
-        for style_file in "$REPO_DIR/.claude/output-styles"/*.md; do
+    if [ -d "$REPO_DIR/claude/output-styles" ]; then
+        for style_file in "$REPO_DIR/claude/output-styles"/*.md; do
             if [ -f "$style_file" ]; then
                 style_name=$(basename "$style_file")
                 safe_copy "$style_file" "$CLAUDE_DIR/output-styles/$style_name" "Output style"
@@ -209,8 +209,8 @@ install_claude() {
 install_opencode_skills() {
     echo
     echo -e "${YELLOW}Installing skills...${NC}"
-    if [ -d "$REPO_DIR/.opencode/skills" ]; then
-        for skill_dir in "$REPO_DIR/.opencode/skills"/*/; do
+    if [ -d "$REPO_DIR/opencode/skills" ]; then
+        for skill_dir in "$REPO_DIR/opencode/skills"/*/; do
             if [ -d "$skill_dir" ]; then
                 skill_name=$(basename "$skill_dir")
                 mkdir -p "$OPENCODE_DIR/skills/$skill_name"
@@ -235,7 +235,7 @@ install_opencode_skills() {
             fi
         done
     else
-        echo -e "  ${YELLOW}⚠️  No .opencode/skills directory found in repository${NC}"
+        echo -e "  ${YELLOW}⚠️  No opencode/skills directory found in repository${NC}"
     fi
 }
 
@@ -250,15 +250,15 @@ install_opencode() {
     mkdir -p "$OPENCODE_DIR/skills"
 
     echo -e "${YELLOW}Installing commands...${NC}"
-    if [ -d "$REPO_DIR/.opencode/commands" ]; then
-        for cmd_file in "$REPO_DIR/.opencode/commands"/*.md; do
+    if [ -d "$REPO_DIR/opencode/commands" ]; then
+        for cmd_file in "$REPO_DIR/opencode/commands"/*.md; do
             if [ -f "$cmd_file" ]; then
                 cmd_name=$(basename "$cmd_file")
                 safe_copy "$cmd_file" "$OPENCODE_DIR/commands/$cmd_name" "Command"
             fi
         done
     else
-        echo -e "  ${YELLOW}⚠️  No .opencode/commands directory found in repository${NC}"
+        echo -e "  ${YELLOW}⚠️  No opencode/commands directory found in repository${NC}"
     fi
 
     install_opencode_skills

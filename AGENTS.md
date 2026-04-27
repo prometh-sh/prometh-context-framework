@@ -6,11 +6,12 @@ This file provides guidance to agentic coding assistants (OpenCode, Claude Code,
 
 A documentation-first AI tooling framework providing slash commands and output-style templates for creating PRDs, implementation SPECs, and technical documentation. There is **no compiled application** — the repository consists entirely of Markdown files and a Bash setup script.
 
-Primary artifacts:
-- `.claude/commands/` — Claude Code slash command definitions (Markdown)
-- `.claude/output-styles/` — Claude Code output style templates (Markdown)
-- `.opencode/commands/` — OpenCode slash command definitions (4 workflow commands)
-- `.opencode/skills/` — OpenCode Agent Skills (3 document-creation skills, self-contained)
+Primary artifacts (post-refactor; dot-prefixes removed as of v2.6+):
+- `claude/commands/` — Claude Code slash command definitions (Markdown)
+- `claude/output-styles/` — Claude Code output style templates (Markdown)
+- `claude/skills/` — Claude Code agent skills (self-contained)
+- `opencode/commands/` — OpenCode slash command definitions (7 workflow commands)
+- `opencode/skills/` — OpenCode Agent Skills (3 document-creation skills, plus prometh-planner)
 - `setup.sh` — Multi-platform Bash installation script
 
 ---
@@ -26,8 +27,8 @@ This project has no build pipeline, test runner, or package manager at the root 
 
 ### Install for a specific platform (non-interactive)
 ```bash
-./setup.sh --claude      # Claude Code only  (~/.claude/commands/ and ~/.claude/output-styles/)
-./setup.sh --opencode    # OpenCode only     (~/.config/opencode/commands/)
+./setup.sh --claude      # Claude Code: ~/.claude/commands/, ~/.claude/output-styles/, ~/.claude/skills/
+./setup.sh --opencode    # OpenCode: ~/.config/opencode/commands/, ~/.config/opencode/skills/
 ./setup.sh --all         # Both platforms
 ```
 
@@ -57,15 +58,21 @@ shellcheck setup.sh     # Full static analysis (requires shellcheck)
 
 ```
 prometh-context-framework/
-├── .claude/
+├── claude/
 │   ├── commands/           # Claude Code slash commands (7 files)
-│   └── output-styles/      # Claude Code output templates (5 files)
-├── .opencode/
-│   ├── commands/           # OpenCode slash commands (4 workflow commands)
-│   └── skills/             # OpenCode Agent Skills (3 document-creation skills)
+│   ├── output-styles/      # Claude Code output templates (8 files)
+│   └── skills/             # Claude Code agent skills (4 skills)
+│       ├── prometh-doc/SKILL.md
+│       ├── prometh-planner/SKILL.md
 │       ├── prometh-prd/SKILL.md
-│       ├── prometh-spec/SKILL.md
-│       └── prometh-doc/SKILL.md
+│       └── prometh-spec/SKILL.md
+├── opencode/
+│   ├── commands/           # OpenCode slash commands (7 files)
+│   └── skills/             # OpenCode Agent Skills (4 skills)
+│       ├── prometh-doc/SKILL.md
+│       ├── prometh-planner/SKILL.md
+│       ├── prometh-prd/SKILL.md
+│       └── prometh-spec/SKILL.md
 ├── setup.sh                # Installation script
 ├── CLAUDE.md               # Claude Code project instructions
 ├── AGENTS.md               # This file (OpenCode / general agent instructions)
@@ -91,7 +98,7 @@ prometh-context-framework/
 ### Frontmatter (YAML)
 Every command file begins with a YAML frontmatter block:
 
-**Claude Code commands** (`.claude/commands/`):
+**Claude Code commands** (`claude/commands/`):
 ```yaml
 ---
 description: One-line summary for the command picker
@@ -100,14 +107,14 @@ allowed-tools: ["Read", "Write", "Edit", "Glob", "Bash"]
 ---
 ```
 
-**OpenCode commands** (`.opencode/commands/`):
+**OpenCode commands** (`opencode/commands/`):
 ```yaml
 ---
 description: One-line summary for the command picker
 ---
 ```
 
-**OpenCode skills** (`.opencode/skills/<name>/SKILL.md`):
+**OpenCode skills** (`opencode/skills/<name>/SKILL.md`):
 ```yaml
 ---
 name: prometh-<name>
@@ -218,14 +225,14 @@ Error messages use emoji prefixes for scannability: `❌` fatal, `⚠️` warnin
 | Output styles | `~/.claude/output-styles/` | Embedded directly in skill files |
 | Frontmatter | `allowed-tools`, `argument-hint` supported | `description` only (commands); `name` + `description` (skills) |
 
-When adding a new workflow command, create it in **both** `.claude/commands/` and `.opencode/commands/`. When adding a document-creation feature (PRD, SPEC, doc), create a Claude Code command in `.claude/commands/` **and** an OpenCode skill in `.opencode/skills/<name>/SKILL.md`. Skills must embed output templates inline.
+When adding a new workflow command, create it in **both** `claude/commands/` and `opencode/commands/`. When adding a document-creation feature (PRD, SPEC, doc), create a Claude Code command in `claude/commands/` **and** an OpenCode skill in `opencode/skills/<name>/SKILL.md`. Skills must embed output templates inline.
 
 ---
 
 ## Contributing Workflow
 
 1. Branch from `main`: `git checkout -b feature/<name>` or `fix/<name>`.
-2. Make changes in both `.claude/` and `.opencode/` when applicable.
+2. Make changes in both `claude/` and `opencode/` when applicable.
 3. Run `./setup.sh --all` on a clean machine to verify installation.
 4. Manually exercise changed commands in Claude Code and/or OpenCode.
 5. Update `CHANGELOG.md` under `[Unreleased]` using Keep a Changelog categories: `Added`, `Changed`, `Fixed`, `Removed`.
